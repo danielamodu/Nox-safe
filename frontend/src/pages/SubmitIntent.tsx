@@ -71,6 +71,18 @@ export function SubmitIntent() {
     if (log?.topics[1]) setLiveIntentId(log.topics[1] as `0x${string}`);
   }, [receipt]);
 
+  // Poll oracle for live status after submission
+  const { data: liveStatus } = useReadContract({
+    address: ADDRESSES.NoxGuardModule,
+    abi: MODULE_ABI,
+    functionName: "getIntentStatus",
+    args: liveIntentId ? [liveIntentId as `0x${string}`] : undefined,
+    query: {
+      enabled: !!liveIntentId && step === "done",
+      refetchInterval: 3000,
+    },
+  });
+
   // Request notification permission when user submits
   useEffect(() => {
     if (step === "done" && "Notification" in window && Notification.permission === "default") {
@@ -93,18 +105,6 @@ export function SubmitIntent() {
     }
     prevStatusRef.current = status;
   }, [liveStatus]);
-
-  // Poll oracle for live status after submission
-  const { data: liveStatus } = useReadContract({
-    address: ADDRESSES.NoxGuardModule,
-    abi: MODULE_ABI,
-    functionName: "getIntentStatus",
-    args: liveIntentId ? [liveIntentId as `0x${string}`] : undefined,
-    query: {
-      enabled: !!liveIntentId && step === "done",
-      refetchInterval: 3000,
-    },
-  });
 
   const handleSubmit = async () => {
     setError("");
