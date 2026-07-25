@@ -12,7 +12,7 @@ import { createHandleClient } from "@iexec-nox/handle";
 
 const ALCHEMY = process.env.SEPOLIA_RPC_URL!;
 const ORACLE_KEY = process.env.ORACLE_PRIVATE_KEY!;
-const NOX_GUARD_MODULE = "0xB004821f6578Ad4124f3B1Ff2B326e705a414e2f";
+const NOX_GUARD_MODULE = "0xbb616000b55d256cEC4fb9E211f4138e43cbA2e5";
 const NOX_COMPUTE = "0x24ef36ec5b626d7dcd09a98f3083c2758f0f77bf";
 
 // Use a dummy safe address (won't execute since the module isn't enabled on it).
