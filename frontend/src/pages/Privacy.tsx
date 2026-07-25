@@ -1,44 +1,31 @@
 import { Link } from "react-router-dom";
+import { GlassNav } from "../components/GlassNav";
 
 export function Privacy() {
   return (
     <div className="min-h-screen bg-[#f5f0e8]">
-      {/* Nav */}
-      <nav className="border-b-2 border-black bg-[#f5f0e8] px-6 py-4 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link to="/" className="font-heading font-extrabold text-xl text-black tracking-tight">
-            Nox-Safe
-          </Link>
-          <Link
-            to="/app"
-            className="font-body font-bold text-sm bg-primary text-black px-4 py-2 border-2 border-black"
-            style={{ boxShadow: "2px 2px 0px #000" }}
-          >
-            Launch App →
-          </Link>
-        </div>
-      </nav>
+      <GlassNav />
 
-      <main className="max-w-4xl mx-auto px-6 py-16">
-        {/* Header */}
-        <div className="mb-14">
+      {/* Dark hero strip */}
+      <div className="bg-charcoal pt-32 pb-16 px-6 border-b-2 border-black">
+        <div className="max-w-4xl mx-auto">
           <div className="inline-block bg-primary border-2 border-black px-3 py-1 font-mono text-xs font-bold mb-6">
             LEGAL
           </div>
-          <h1 className="font-heading font-extrabold text-5xl md:text-6xl text-black tracking-tight mb-4">
+          <h1 className="font-heading font-extrabold text-5xl md:text-6xl text-white tracking-tight mb-4">
             Privacy Policy
           </h1>
-          <p className="font-body text-sm text-black/50 font-mono">Last updated: July 2025</p>
+          <p className="font-body text-sm text-white/40 font-mono">Last updated: July 2025</p>
         </div>
+      </div>
 
+      <main className="max-w-4xl mx-auto px-6 py-16">
         <div className="space-y-10 font-body text-black/80 leading-relaxed">
           <PolicySection title="1. What we collect">
             <p>
               Nox-Safe is a client-side application. We do not operate a backend, user database, or authentication service. No account is created when you use the app.
             </p>
-            <p className="mt-3">
-              The only data transmitted to external services is:
-            </p>
+            <p className="mt-3">The only data transmitted to external services is:</p>
             <ul className="mt-3 space-y-2 list-none">
               {[
                 ["Encrypted intent data", "Your recipient address and ETH value are sent to the iExec Nox gateway (gateway-testnets.noxprotocol.dev) to produce encrypted handles. The Nox TEE processes this inside a confidential enclave — the plaintext is not stored by the gateway."],
@@ -56,9 +43,6 @@ export function Privacy() {
           <PolicySection title="2. Cookies and tracking">
             <p>
               We do not use cookies, analytics scripts, tracking pixels, or any third-party advertising technology. There is no telemetry collected by the Nox-Safe application.
-            </p>
-            <p className="mt-3">
-              The app may load fonts or assets from CDN providers included in the build. These follow standard browser caching behaviour and are not used to track users.
             </p>
           </PolicySection>
 
@@ -83,15 +67,11 @@ export function Privacy() {
             <p>
               Transactions broadcast to the Sepolia testnet are permanently public and immutable. Encrypted handles stored on-chain are opaque 32-byte values — the plaintext is not recoverable without access to the iExec Nox TEE decryption infrastructure.
             </p>
-            <p className="mt-3">
-              We have no ability to delete or alter on-chain data on your behalf.
-            </p>
+            <p className="mt-3">We have no ability to delete or alter on-chain data on your behalf.</p>
           </PolicySection>
 
           <PolicySection title="5. Children">
-            <p>
-              Nox-Safe is not directed at children under 18. We do not knowingly collect information from children.
-            </p>
+            <p>Nox-Safe is not directed at children under 18. We do not knowingly collect information from children.</p>
           </PolicySection>
 
           <PolicySection title="6. Changes to this policy">
@@ -103,21 +83,11 @@ export function Privacy() {
           <PolicySection title="7. Contact">
             <p>
               For privacy questions, open an issue on{" "}
-              <a
-                href="https://github.com/danielamodu"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-primary"
-              >
+              <a href="https://github.com/danielamodu" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
                 GitHub (@danielamodu)
               </a>{" "}
               or reach out on{" "}
-              <a
-                href="https://x.com/szrxbt"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-primary"
-              >
+              <a href="https://x.com/szrxbt" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
                 Twitter (@szrxbt)
               </a>.
             </p>

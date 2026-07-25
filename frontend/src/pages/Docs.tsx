@@ -1,38 +1,27 @@
 import { Link } from "react-router-dom";
+import { GlassNav } from "../components/GlassNav";
 
 export function Docs() {
   return (
     <div className="min-h-screen bg-[#f5f0e8]">
-      {/* Nav */}
-      <nav className="border-b-2 border-black bg-[#f5f0e8] px-6 py-4 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link to="/" className="font-heading font-extrabold text-xl text-black tracking-tight">
-            Nox-Safe
-          </Link>
-          <Link
-            to="/app"
-            className="font-body font-bold text-sm bg-primary text-black px-4 py-2 border-2 border-black"
-            style={{ boxShadow: "2px 2px 0px #000" }}
-          >
-            Launch App →
-          </Link>
-        </div>
-      </nav>
+      <GlassNav />
 
-      <main className="max-w-4xl mx-auto px-6 py-16">
-        {/* Header */}
-        <div className="mb-14">
+      {/* Dark hero strip */}
+      <div className="bg-charcoal pt-32 pb-16 px-6 border-b-2 border-black">
+        <div className="max-w-4xl mx-auto">
           <div className="inline-block bg-primary border-2 border-black px-3 py-1 font-mono text-xs font-bold mb-6">
             DOCUMENTATION
           </div>
-          <h1 className="font-heading font-extrabold text-5xl md:text-6xl text-black tracking-tight mb-4">
+          <h1 className="font-heading font-extrabold text-5xl md:text-6xl text-white tracking-tight mb-4">
             How Nox-Safe works
           </h1>
-          <p className="font-body text-lg text-black/60 max-w-2xl">
+          <p className="font-body text-lg text-white/50 max-w-2xl">
             Technical reference for the contracts, oracle daemon, and Chrome extension. Built for the iExec WTF!! hackathon on Sepolia.
           </p>
         </div>
+      </div>
 
+      <main className="max-w-4xl mx-auto px-6 py-16">
         <div className="space-y-12">
           {/* Architecture */}
           <Section title="Architecture overview">
@@ -156,20 +145,20 @@ NOX_GUARD_MODULE=0xbb616000b55d256cEC4fb9E211f4138e43cbA2e5
 POLICY_REGISTRY=0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1
 NOX_RECIPIENT_PROXY=0x1D9f855d88e526745fDb8b04Fe3180a274604172`}</CodeBlock>
             <p className="mt-4">
-              The oracle wallet must match the <code>noxOracle</code> address stored in <code>NoxGuardModule</code>. To change it, call <code>NoxGuardModule.setNoxOracle(newAddress)</code> from the deployer/owner wallet. For production, run the daemon with PM2 on EC2 for automatic restarts and reboot persistence.
+              The oracle wallet must match the <code>noxOracle</code> address stored in <code>NoxGuardModule</code>. To change it, call <code>NoxGuardModule.setNoxOracle(newAddress)</code> from the deployer/owner wallet.
             </p>
           </Section>
 
           {/* Chrome extension */}
           <Section title="Chrome Extension">
             <p>
-              Manifest V3 content script injected into <code>app.safe.global</code>. The floating "Shield with Nox" button only appears when a real Safe is selected (URL contains <code>?safe=&lt;network&gt;:0x…</code>). SPA navigation is intercepted via <code>history.pushState</code> — the button mounts and unmounts correctly as you navigate between pages.
+              Manifest V3 content script injected into <code>app.safe.global</code>. The floating "Shield with Nox" button only appears when a real Safe is selected (URL contains <code>?safe=&lt;network&gt;:0x…</code>). SPA navigation is intercepted via <code>history.pushState</code> — the button mounts and unmounts correctly as you navigate.
             </p>
             <p className="mt-3">
               The modal reads the target address and value from Safe's own form fields, calls the Nox gateway to produce encrypted handles, and submits to <code>NoxGuardModule.submitIntent</code> through MetaMask.
             </p>
             <p className="mt-3 font-mono text-sm bg-black/5 border border-black/20 px-4 py-3">
-              Load unpacked from <code>extension/</code> in Chrome's developer mode — no build step required.
+              Load unpacked from <code>extension/</code> in Chrome developer mode — no build step required.
             </p>
           </Section>
 
@@ -187,7 +176,7 @@ NOX_RECIPIENT_PROXY=0x1D9f855d88e526745fDb8b04Fe3180a274604172`}</CodeBlock>
               ))}
             </ul>
             <p className="mt-4 text-sm text-black/60">
-              For native ETH transfers (<code>data = 0x</code>) the recipient and amount are fully private until fulfillment. Full calldata privacy (encrypting arbitrary-length bytes) requires a v2 Nox handle type.
+              For native ETH transfers (<code>data = 0x</code>) the recipient and amount are fully private until fulfillment.
             </p>
           </Section>
         </div>

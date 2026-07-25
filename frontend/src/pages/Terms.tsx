@@ -1,36 +1,25 @@
 import { Link } from "react-router-dom";
+import { GlassNav } from "../components/GlassNav";
 
 export function Terms() {
   return (
     <div className="min-h-screen bg-[#f5f0e8]">
-      {/* Nav */}
-      <nav className="border-b-2 border-black bg-[#f5f0e8] px-6 py-4 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link to="/" className="font-heading font-extrabold text-xl text-black tracking-tight">
-            Nox-Safe
-          </Link>
-          <Link
-            to="/app"
-            className="font-body font-bold text-sm bg-primary text-black px-4 py-2 border-2 border-black"
-            style={{ boxShadow: "2px 2px 0px #000" }}
-          >
-            Launch App →
-          </Link>
-        </div>
-      </nav>
+      <GlassNav />
 
-      <main className="max-w-4xl mx-auto px-6 py-16">
-        {/* Header */}
-        <div className="mb-14">
+      {/* Dark hero strip */}
+      <div className="bg-charcoal pt-32 pb-16 px-6 border-b-2 border-black">
+        <div className="max-w-4xl mx-auto">
           <div className="inline-block bg-primary border-2 border-black px-3 py-1 font-mono text-xs font-bold mb-6">
             LEGAL
           </div>
-          <h1 className="font-heading font-extrabold text-5xl md:text-6xl text-black tracking-tight mb-4">
+          <h1 className="font-heading font-extrabold text-5xl md:text-6xl text-white tracking-tight mb-4">
             Terms of Service
           </h1>
-          <p className="font-body text-sm text-black/50 font-mono">Last updated: July 2025</p>
+          <p className="font-body text-sm text-white/40 font-mono">Last updated: July 2025</p>
         </div>
+      </div>
 
+      <main className="max-w-4xl mx-auto px-6 py-16">
         {/* Testnet notice */}
         <div className="bg-primary border-2 border-black p-5 mb-12">
           <p className="font-body font-bold text-sm text-black">
@@ -64,9 +53,7 @@ export function Terms() {
           </TermsSection>
 
           <TermsSection title="4. No warranties">
-            <p>
-              The App is provided "as is" and "as available" without warranty of any kind — express, implied, or statutory. We do not warrant that:
-            </p>
+            <p>The App is provided "as is" and "as available" without warranty of any kind. We do not warrant that:</p>
             <ul className="mt-3 space-y-2 list-disc list-inside text-sm text-black/70">
               <li>The App will be available at any particular time or uninterrupted</li>
               <li>The smart contracts are free from bugs or vulnerabilities</li>
@@ -77,7 +64,7 @@ export function Terms() {
 
           <TermsSection title="5. Limitation of liability">
             <p>
-              To the maximum extent permitted by applicable law, the creators of Nox-Safe shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of funds, data, or profits, arising out of or related to your use of the App — even if advised of the possibility of such damages.
+              To the maximum extent permitted by applicable law, the creators of Nox-Safe shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of funds, data, or profits, arising out of or related to your use of the App.
             </p>
           </TermsSection>
 
@@ -96,9 +83,6 @@ export function Terms() {
             <p>
               Nox-Safe is released under the MIT License. You are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to the terms of that license.
             </p>
-            <p className="mt-3">
-              The iExec Nox SDK, Safe contracts, and Sablier protocol are subject to their respective licenses.
-            </p>
           </TermsSection>
 
           <TermsSection title="8. Third-party services">
@@ -115,28 +99,18 @@ export function Terms() {
 
           <TermsSection title="10. Changes to these terms">
             <p>
-              We may revise these Terms at any time by updating this page. The "Last updated" date will reflect the most recent revision. Continued use of the App after changes constitutes acceptance.
+              We may revise these Terms at any time by updating this page. Continued use of the App after changes constitutes acceptance.
             </p>
           </TermsSection>
 
           <TermsSection title="11. Contact">
             <p>
               Questions about these Terms can be directed via{" "}
-              <a
-                href="https://github.com/danielamodu"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-primary"
-              >
+              <a href="https://github.com/danielamodu" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
                 GitHub (@danielamodu)
               </a>{" "}
               or{" "}
-              <a
-                href="https://x.com/szrxbt"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-primary"
-              >
+              <a href="https://x.com/szrxbt" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
                 Twitter (@szrxbt)
               </a>.
             </p>
