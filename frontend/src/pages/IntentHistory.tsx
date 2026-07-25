@@ -8,16 +8,16 @@ import { ADDRESSES, MODULE_ABI } from "../config/contracts";
 import { StatusBadge } from "../components/StatusBadge";
 import { useSafe } from "../hooks/useSafe";
 
-// DRPC for per-intent reads (status, block timestamp) — no range issues for single calls
 const drpcClient = createPublicClient({
   chain: sepolia,
   transport: http("https://sepolia.drpc.org"),
 });
 
-// Etherscan Sepolia log API — no block-range restriction; used instead of eth_getLogs
-const ETHERSCAN_API = "https://api-sepolia.etherscan.io/api";
-// keccak256("IntentSubmitted(bytes32,address,bytes32,bytes32,bytes)")
-const INTENT_SUBMITTED_TOPIC = "0x0eb390c85815a99dadc7627c96589c10ccb4086491e2ab89a545c980a6a0a30f";
+// DRPC free plan caps eth_getLogs at 9 000 blocks per request.
+// Chunk into parallel 9 000-block windows covering the last 54 000 blocks
+// (~7.5 days at 14 s/block) — more than enough since the contract is new.
+const CHUNK = 9_000n;
+const LOOK_BACK = 54_000n; // 6 chunks
 
 const STATUS_LABEL: Record<number, string> = { 0: "Pending", 1: "Executed", 2: "Rejected" };
 
@@ -99,38 +99,45 @@ export function IntentHistory() {
     setLoadingList(true);
     setListError("");
     try {
-      // topic2 = safe address padded to 32 bytes (address is indexed param #2)
-      const paddedSafe = "0x000000000000000000000000" + safeAddress.slice(2).toLowerCase();
+      const latest = await drpcClient.getBlockNumber();
+      const oldest = latest > LOOK_BACK ? latest - LOOK_BACK : 0n;
 
-      const params = new URLSearchParams({
-        module: "logs",
-        action: "getLogs",
-        address: ADDRESSES.NoxGuardModule,
-        topic0: INTENT_SUBMITTED_TOPIC,
-        topic2: paddedSafe,
-        topic0_2_opr: "and",
-        fromBlock: "0",
-        toBlock: "latest",
-      });
-
-      const res = await fetch(`${ETHERSCAN_API}?${params}`);
-      const json = await res.json() as {
-        status: string;
-        message: string;
-        result: Array<{ topics: string[]; blockNumber: string; transactionHash: string }> | string;
-      };
-
-      // "No records found" is a normal empty-list response, not an error
-      if (json.status !== "1" && json.message !== "No records found") {
-        throw new Error(typeof json.result === "string" ? json.result : json.message);
+      // Build chunk windows: [oldest, oldest+CHUNK), [oldest+CHUNK, oldest+2*CHUNK), …
+      const windows: Array<{ from: bigint; to: bigint }> = [];
+      for (let from = oldest; from < latest; from += CHUNK) {
+        windows.push({ from, to: from + CHUNK - 1n < latest ? from + CHUNK - 1n : latest });
       }
 
-      const logs = Array.isArray(json.result) ? json.result : [];
+      const eventAbi = {
+        type: "event",
+        name: "IntentSubmitted",
+        inputs: [
+          { name: "intentId",     type: "bytes32", indexed: true  },
+          { name: "safe",         type: "address",  indexed: true  },
+          { name: "targetHandle", type: "bytes32", indexed: false },
+          { name: "valueHandle",  type: "bytes32", indexed: false },
+          { name: "data",         type: "bytes",   indexed: false },
+        ],
+      } as const;
+
+      // Fetch all chunks in parallel
+      const chunkLogs = await Promise.all(
+        windows.map((w) =>
+          drpcClient.getLogs({
+            address: ADDRESSES.NoxGuardModule,
+            event: eventAbi,
+            args: { safe: safeAddress as `0x${string}` },
+            fromBlock: w.from,
+            toBlock: w.to,
+          }).catch(() => [])
+        )
+      );
+
+      const logs = chunkLogs.flat();
 
       const rows = await Promise.all(
         logs.map(async (log) => {
-          const intentId = log.topics[1] as `0x${string}`;
-          const blockNum = BigInt(log.blockNumber);
+          const intentId = log.args.intentId as `0x${string}`;
           const [status, block] = await Promise.all([
             drpcClient.readContract({
               address: ADDRESSES.NoxGuardModule,
@@ -138,19 +145,19 @@ export function IntentHistory() {
               functionName: "getIntentStatus",
               args: [intentId],
             }).catch(() => 0),
-            drpcClient.getBlock({ blockNumber: blockNum }).catch(() => null),
+            drpcClient.getBlock({ blockNumber: log.blockNumber! }).catch(() => null),
           ]);
           return {
             intentId,
             status: Number(status),
             timestamp: block ? Number(block.timestamp) : 0,
-            blockNumber: blockNum,
-            txHash: log.transactionHash as `0x${string}`,
+            blockNumber: log.blockNumber!,
+            txHash: log.transactionHash!,
           } satisfies IntentRow;
         })
       );
 
-      setIntents(rows.reverse()); // newest first
+      setIntents(rows.reverse());
       setLastRefreshed(new Date());
     } catch (e: unknown) {
       setListError(e instanceof Error ? e.message : "Failed to load transactions");
