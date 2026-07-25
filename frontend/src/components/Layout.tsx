@@ -36,13 +36,22 @@ export function Layout() {
         <Outlet />
       </main>
       <footer className="border-t-2 border-black bg-charcoal px-6 py-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <span className="font-body text-sm text-sage">
             Nox-Safe — Confidential Transaction Guard
           </span>
-          <span className="font-mono text-xs text-sage/60">
-            Sepolia Testnet
-          </span>
+          <div className="flex items-center gap-4">
+            <a href="https://github.com/danielamodu" target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-sage/70 hover:text-primary transition-colors">
+              GitHub (@danielamodu)
+            </a>
+            <a href="https://x.com/szrxbt" target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-sage/70 hover:text-primary transition-colors">
+              Twitter (@szrxbt)
+            </a>
+            <span className="font-mono text-xs text-sage/30">|</span>
+            <span className="font-mono text-xs text-sage/60">
+              Sepolia Testnet
+            </span>
+          </div>
         </div>
       </footer>
     </div>

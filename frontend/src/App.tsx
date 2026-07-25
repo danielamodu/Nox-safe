@@ -8,12 +8,18 @@ import { SubmitIntent } from "./pages/SubmitIntent";
 import { SablierShield } from "./pages/SablierShield";
 import { IntentHistory } from "./pages/IntentHistory";
 import { PolicyView } from "./pages/PolicyView";
+import { Docs } from "./pages/Docs";
+import { Privacy } from "./pages/Privacy";
+import { Terms } from "./pages/Terms";
 
 export function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/docs" element={<Docs />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
         <Route path="/connect" element={<ConnectPage />} />
         <Route path="/app" element={<Layout />}>
           <Route index element={<Dashboard />} />
