@@ -1,0 +1,22 @@
+node_modules/
+.env
+.env.local
+dist/
+build/
+artifacts/
+cache/
+typechain-types/
+coverage/
+coverage.json
+*.tsbuildinfo
+
+# Hardhat
+deployments/
+.openzeppelin/
+
+# Frontend
+.vite/
+
+# OS
+.DS_Store
+Thumbs.db

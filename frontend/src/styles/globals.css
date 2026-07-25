@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Neo-Brutalist design tokens */
+:root {
+  --primary: #ffe17c;
+  --charcoal: #171e19;
+  --sage: #b7c6c2;
+  --white: #ffffff;
+  --black: #000000;
+  --dark: #272727;
+  --border-w: 2px;
+  --shadow-sm: 4px 4px 0px 0px #000000;
+  --shadow-md: 6px 6px 0px 0px #000000;
+  --shadow-lg: 8px 8px 0px 0px #000000;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--charcoal);
+  color: var(--black);
+  font-family: "DM Sans", sans-serif;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Dot pattern background utility */
+.dot-pattern {
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Brutal button base */
+@layer components {
+  .btn-brutal {
+    @apply font-heading font-bold px-6 py-3 border-2 border-black rounded-xl
+           transition-all duration-200 cursor-pointer select-none;
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-brutal:hover {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 0 #000;
+  }
+  .btn-brutal:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 0 #000;
+  }
+
+  .btn-brutal-lg {
+    box-shadow: var(--shadow-lg);
+  }
+  .btn-brutal-lg:hover {
+    transform: translate(4px, 4px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-primary {
+    @apply btn-brutal bg-black text-white;
+  }
+  .btn-secondary {
+    @apply btn-brutal bg-white text-black;
+  }
+  .btn-accent {
+    @apply btn-brutal bg-primary text-black;
+  }
+  .btn-danger {
+    @apply btn-brutal bg-red-500 text-white;
+  }
+
+  .card-brutal {
+    @apply bg-white border-2 border-black rounded-xl p-6;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .card-brutal-lg {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .input-brutal {
+    @apply w-full px-4 py-3 bg-white border-2 border-black rounded-xl
+           font-body text-black placeholder:text-gray-400
+           focus:outline-none focus:ring-0;
+    box-shadow: 2px 2px 0px 0px #000;
+  }
+  .input-brutal:focus {
+    box-shadow: var(--shadow-sm);
+  }
+
+  .badge-brutal {
+    @apply inline-flex items-center px-3 py-1 text-sm font-bold
+           border-2 border-black rounded-full;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--charcoal);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--sage);
+  border-radius: 4px;
+}

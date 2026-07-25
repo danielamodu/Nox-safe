@@ -1,0 +1,22 @@
+{
+  "name": "nox-safe-task",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node --loader ts-node/esm src/index.ts",
+    "encrypt": "node --loader ts-node/esm src/encrypt.ts"
+  },
+  "dependencies": {
+    "@iexec-nox/handle": "^0.1.0-beta.13",
+    "dotenv": "^17.4.2",
+    "ethers": "^6.17.0",
+    "viem": "^2.55.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
