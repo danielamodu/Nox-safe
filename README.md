@@ -298,7 +298,11 @@ The daemon picks up the event, decrypts the recipient inside the TEE, verifies t
 
 **Policy updates require a full Safe multisig tx.** There is no delegated admin role. Updating the whitelist or caps requires assembling, signing, and executing a new Safe transaction with owner quorum. This is intentional for security but creates friction for teams that adjust policy frequently.
 
-**Event-log based history (no subgraph).** The transaction history page fetches `IntentSubmitted` events via `getLogs` filtered by the Safe address, scanning the last ~200k blocks. This covers the typical use window but does not provide a full audit trail back to genesis. A subgraph or off-chain indexer would be needed for exhaustive historical lookups across arbitrary time ranges.
+**Event-log based history (no subgraph).** The transaction history page fetches `IntentSubmitted` events via `getLogs` filtered by the Safe address, using 6 parallel 9,000-block chunks via DRPC (~54,000 blocks, roughly 7.5 days). This covers the typical use window but does not provide a full audit trail back to genesis. A subgraph or off-chain indexer would be needed for exhaustive historical lookups across arbitrary time ranges.
+
+**Oracle is a trusted party for decrypted content.** The oracle must decrypt the target address and value to validate and submit `fulfillIntent`. It observes all transaction details during processing. `Nox.publicDecrypt` verifies proofs on-chain, preventing the oracle from executing unauthorized transactions, but does not prevent the oracle operator from observing transaction contents. In production, the oracle should be run inside a TEE enclave with remote attestation, removing operator visibility.
+
+**Sablier shielded recipient flow is not surfaced in the web UI.** `NoxRecipientProxy.sol` and the oracle daemon fully implement the shielded Sablier withdrawal flow, but the web frontend does not expose it in this build — it requires a live Sablier lockup stream and is demonstrated via the E2E deployment scripts rather than the app UI.
 
 ---
 

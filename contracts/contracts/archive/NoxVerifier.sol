@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.27;
 
-import "./interfaces/INoxVerifier.sol";
+// ARCHIVED — earlier architecture where proof verification was a separate contract.
+// The deployed NoxGuardModule uses Nox.publicDecrypt() from the iExec Nox SDK directly,
+// which handles NoxCompute verification internally. This contract is NOT deployed.
+
+import "../interfaces/INoxVerifier.sol";
 
 /// @dev Minimal interface for NoxCompute's decryption proof verification.
 interface INoxComputeVerify {

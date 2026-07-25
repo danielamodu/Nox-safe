@@ -245,7 +245,6 @@ async function processIntent(
   const targetUint = extractPlaintext(targetProof);
   const value      = extractPlaintext(valueProof);
   const target     = ethers.getAddress(ethers.toBeHex(targetUint, 20));
-  console.log(`[nox-task] Decoded: target=${target} value=${value}`);
 
   const policy = await registry.getPolicy(safe);
 
