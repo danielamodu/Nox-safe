@@ -31,6 +31,7 @@ function OracleBadge() {
 const NAV_LINKS = [
   { to: "/app", label: "Dashboard" },
   { to: "/app/submit", label: "Submit Intent" },
+  { to: "/app/sablier", label: "Sablier Shield" },
   { to: "/app/history", label: "History" },
 ];
 
