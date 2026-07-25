@@ -13,6 +13,6 @@ export const config = createConfig({
     coinbaseWallet({ appName: "Nox-Safe" }),           // Coinbase Wallet
   ],
   transports: {
-    [sepolia.id]: http("https://eth-sepolia.g.alchemy.com/v2/p1UTJaXuOhoxgK9S6ZdkX"),
+    [sepolia.id]: http("https://sepolia.drpc.org"),
   },
 });
