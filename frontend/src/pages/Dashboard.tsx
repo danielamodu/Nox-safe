@@ -20,7 +20,7 @@ function StatusDot({ ok }: { ok: boolean }) {
 
 function StepBadge({ n, total }: { n: number; total: number }) {
   return (
-    <span className="font-mono text-xs text-sage bg-charcoal/40 px-2 py-0.5 rounded-full border border-sage/30">
+    <span className="font-mono text-xs text-sage bg-charcoal/40 px-2 py-0.5 rounded-full border border-sage/30 whitespace-nowrap shrink-0">
       Step {n} of {total}
     </span>
   );
