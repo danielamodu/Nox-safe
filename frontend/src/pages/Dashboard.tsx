@@ -155,10 +155,18 @@ export function Dashboard() {
   const [hookError, setHookError] = useState("");
 
   // Policy form
-  const [targets, setTargets] = useState("");
+  const [targetsList, setTargetsList] = useState<string[]>([]);
+  const [newTarget, setNewTarget] = useState("");
   const [maxPerTx, setMaxPerTx] = useState("0.1");
   const [maxPerDay, setMaxPerDay] = useState("1.0");
   const [policyFormError, setPolicyFormError] = useState("");
+
+  function addTarget() {
+    const t = newTarget.trim();
+    if (!isAddress(t) || targetsList.some((a) => a.toLowerCase() === t.toLowerCase())) return;
+    setTargetsList((l) => [...l, t]);
+    setNewTarget("");
+  }
 
   // On-chain reads
   const { data: isModuleEnabled, isLoading: moduleLoading, refetch: refetchModule } = useReadContract({
@@ -248,9 +256,7 @@ export function Dashboard() {
   async function handleSetPolicy() {
     setPolicyFormError("");
     setHookError("");
-    const lines = targets.split("\n").map((l) => l.trim()).filter(Boolean);
-    if (!lines.length) { setPolicyFormError("Add at least one target address."); return; }
-    if (lines.some((l) => !isAddress(l))) { setPolicyFormError("One or more addresses are invalid."); return; }
+    if (!targetsList.length) { setPolicyFormError("Add at least one target address."); return; }
     let perTx: bigint, perDay: bigint;
     try { perTx = parseEther(maxPerTx); perDay = parseEther(maxPerDay); }
     catch { setPolicyFormError("Invalid ETH amount."); return; }
@@ -259,7 +265,7 @@ export function Dashboard() {
 
     setPolicyState("signing");
     try {
-      const result = await setPolicy({ whitelistedTargets: lines, maxValuePerTx: perTx, maxValuePerDay: perDay });
+      const result = await setPolicy({ whitelistedTargets: targetsList, maxValuePerTx: perTx, maxValuePerDay: perDay });
       if (result.executed) {
         setPolicyState("done");
         await refetchPolicy();
@@ -464,18 +470,48 @@ export function Dashboard() {
           {policyState === "idle" && (
             <>
               <div>
-                <label className="font-body font-bold text-sm block mb-1">
+                <label className="font-body font-bold text-sm block mb-2">
                   Approved recipient wallets
-                  <span className="font-normal text-gray-400 ml-2">— one address per line</span>
                 </label>
-                <textarea
-                  rows={3}
-                  value={targets}
-                  onChange={(e) => { setTargets(e.target.value); setPolicyFormError(""); }}
-                  placeholder={"0xRecipient1\n0xRecipient2"}
-                  className="input-brutal font-mono text-xs w-full resize-y"
-                />
-                <p className="font-body text-xs text-gray-400 mt-1">Only these wallet addresses can receive payments through Nox-Safe.</p>
+                <div className="space-y-2 mb-3">
+                  {targetsList.map((addr, i) => (
+                    <div key={addr} className="flex items-center gap-2 bg-gray-50 border-2 border-black px-3 py-2">
+                      <div className="w-2 h-2 rounded-full bg-green-400 border border-black shrink-0" />
+                      <span className="font-mono text-xs flex-1 break-all">{addr}</span>
+                      <button
+                        type="button"
+                        onClick={() => { setTargetsList((l) => l.filter((_, j) => j !== i)); setPolicyFormError(""); }}
+                        className="shrink-0 font-bold text-sm text-red-500 hover:text-red-700 transition-colors"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                  {targetsList.length === 0 && (
+                    <p className="font-body text-xs text-gray-400 py-1">No addresses added yet.</p>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newTarget}
+                    onChange={(e) => { setNewTarget(e.target.value); setPolicyFormError(""); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTarget(); } }}
+                    placeholder="0x… recipient address"
+                    className="input-brutal font-mono text-sm flex-1"
+                  />
+                  <button
+                    type="button"
+                    onClick={addTarget}
+                    disabled={!isAddress(newTarget) || targetsList.some((a) => a.toLowerCase() === newTarget.toLowerCase())}
+                    className="btn-primary disabled:opacity-40 whitespace-nowrap"
+                  >
+                    + Add
+                  </button>
+                </div>
+                {newTarget && !isAddress(newTarget) && (
+                  <p className="font-body text-xs text-red-500 mt-1">Not a valid Ethereum address</p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -597,30 +633,59 @@ export function Dashboard() {
 
       {/* Stats */}
       <motion.div
-        className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+        className="space-y-4"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.16 }}
       >
-        <div className="card-brutal">
-          <p className="font-body text-xs text-gray-500 mb-1">Max Per Transaction</p>
-          <p className="font-heading font-bold text-xl">
-            {policy?.maxValuePerTx ? `${formatEther(policy.maxValuePerTx)} ETH` : "—"}
-          </p>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="card-brutal">
+            <p className="font-body text-xs text-gray-500 mb-1">Max Per Transaction</p>
+            <p className="font-heading font-bold text-xl">
+              {policy?.maxValuePerTx ? `${formatEther(policy.maxValuePerTx)} ETH` : "—"}
+            </p>
+          </div>
+          <div className="card-brutal">
+            <p className="font-body text-xs text-gray-500 mb-1">Whitelisted Targets</p>
+            <p className="font-heading font-bold text-xl">{policy?.whitelistedTargets?.length ?? "—"}</p>
+          </div>
         </div>
-        <div className="card-brutal">
-          <p className="font-body text-xs text-gray-500 mb-1">Today's Spend</p>
-          <p className="font-heading font-bold text-xl">
-            {dailySpend !== undefined ? `${formatEther(dailySpend)} ETH` : "—"}
-          </p>
-          {policy?.maxValuePerDay !== undefined && policy.maxValuePerDay > 0n && (
-            <p className="font-mono text-xs text-gray-400">/ {formatEther(policy.maxValuePerDay)} ETH daily cap</p>
-          )}
-        </div>
-        <div className="card-brutal">
-          <p className="font-body text-xs text-gray-500 mb-1">Whitelisted Targets</p>
-          <p className="font-heading font-bold text-xl">{policy?.whitelistedTargets?.length ?? "—"}</p>
-        </div>
+
+        {/* Daily spending progress bar */}
+        {(() => {
+          const cap = policy?.maxValuePerDay ?? 0n;
+          const spend = dailySpend ?? 0n;
+          const pct = cap > 0n ? Math.min(100, Number((spend * 10000n) / cap) / 100) : 0;
+          const barColor = pct < 60 ? "bg-primary" : pct < 80 ? "bg-orange-400" : "bg-red-500";
+          return (
+            <div className="card-brutal space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="font-body font-bold text-sm">Today's Spending</p>
+                <p className="font-mono text-xs text-gray-500">
+                  {formatEther(spend)} / {cap > 0n ? formatEther(cap) : "—"} ETH
+                </p>
+              </div>
+              <div className="border-2 border-black h-7 bg-white relative overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-700 ease-out ${barColor}`}
+                  style={{ width: `${pct}%` }}
+                />
+                {pct >= 5 && (
+                  <span
+                    className="absolute inset-y-0 flex items-center font-mono text-xs font-bold text-black/70 pointer-events-none"
+                    style={{ left: `${Math.min(pct - 2, 90)}%`, transform: "translateX(-50%)" }}
+                  >
+                    {Math.round(pct)}%
+                  </span>
+                )}
+              </div>
+              <div className="flex justify-between font-mono text-xs text-gray-400">
+                <span>0 ETH</span>
+                {cap > 0n && <span>{formatEther(cap)} ETH daily cap</span>}
+              </div>
+            </div>
+          );
+        })()}
       </motion.div>
 
       {/* Whitelisted targets */}

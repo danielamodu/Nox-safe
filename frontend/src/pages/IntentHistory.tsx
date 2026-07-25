@@ -11,6 +11,7 @@ interface IntentRow {
   status: number;
   timestamp: number;
   blockNumber: bigint;
+  txHash: `0x${string}`;
 }
 
 function timeAgo(ts: number): string {
@@ -93,6 +94,7 @@ export function IntentHistory() {
             status: Number(status),
             timestamp: block ? Number(block.timestamp) : 0,
             blockNumber: log.blockNumber!,
+            txHash: log.transactionHash!,
           } satisfies IntentRow;
         })
       );
@@ -213,7 +215,7 @@ export function IntentHistory() {
                     {row.timestamp ? timeAgo(row.timestamp) : `block ${row.blockNumber}`}
                   </p>
                 </div>
-                <div className="flex items-center gap-3 shrink-0 ml-4">
+                <div className="flex items-center gap-2 shrink-0 ml-4">
                   <StatusBadge status={row.status} />
                   <button
                     onClick={() => {
@@ -225,6 +227,15 @@ export function IntentHistory() {
                   >
                     Details
                   </button>
+                  <a
+                    href={`https://sepolia.etherscan.io/tx/${row.txHash}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    title="View on Etherscan"
+                    className="font-mono text-xs border-2 border-black px-2 py-1 hover:bg-primary transition-colors"
+                  >
+                    ↗
+                  </a>
                 </div>
               </motion.div>
             ))}

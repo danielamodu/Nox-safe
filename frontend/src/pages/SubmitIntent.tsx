@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useAccount,
   useWalletClient,
   useWriteContract,
   useWaitForTransactionReceipt,
+  useReadContract,
 } from "wagmi";
 import { motion } from "motion/react";
 import { createWalletClient, custom, isAddress, parseEther } from "viem";
@@ -12,6 +13,7 @@ import { createViemHandleClient } from "@iexec-nox/handle";
 import { ADDRESSES, MODULE_ABI } from "../config/contracts";
 import { useSafe } from "../hooks/useSafe";
 import { friendlyError } from "../utils/errors";
+import { StatusBadge } from "../components/StatusBadge";
 
 const DRPC_URL = "https://sepolia.drpc.org";
 const READ_METHODS = new Set([
@@ -53,10 +55,32 @@ export function SubmitIntent() {
   const [value, setValue] = useState("0");
   const [data, setData] = useState("0x");
   const [error, setError] = useState("");
+  const [liveIntentId, setLiveIntentId] = useState<`0x${string}` | "">("");
 
   const { writeContract, data: txHash, isPending } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+  const { isLoading: isConfirming, isSuccess, data: receipt } = useWaitForTransactionReceipt({
     hash: txHash,
+  });
+
+  // Extract intentId from receipt logs once tx is confirmed
+  useEffect(() => {
+    if (!receipt) return;
+    const log = receipt.logs.find(
+      (l) => l.address.toLowerCase() === ADDRESSES.NoxGuardModule.toLowerCase()
+    );
+    if (log?.topics[1]) setLiveIntentId(log.topics[1] as `0x${string}`);
+  }, [receipt]);
+
+  // Poll oracle for live status after submission
+  const { data: liveStatus } = useReadContract({
+    address: ADDRESSES.NoxGuardModule,
+    abi: MODULE_ABI,
+    functionName: "getIntentStatus",
+    args: liveIntentId ? [liveIntentId as `0x${string}`] : undefined,
+    query: {
+      enabled: !!liveIntentId && step === "done",
+      refetchInterval: 3000,
+    },
   });
 
   const handleSubmit = async () => {
@@ -291,17 +315,37 @@ export function SubmitIntent() {
           <h2 className="font-heading font-bold text-xl mb-2 text-black">
             Transaction Queued
           </h2>
-          <p className="font-body text-gray-700 mb-2">
+          <p className="font-body text-gray-700 mb-3">
             Your encrypted transaction was broadcast to the blockchain.
           </p>
-          <p className="font-body text-sm text-gray-500 mb-4">
-            The oracle is now validating it against your spending rules. Check{" "}
-            <strong>Transaction History</strong> in ~15 seconds to see the result.
-          </p>
+
+          {/* Live oracle status */}
+          <div className="flex items-center justify-center gap-3 mb-4 py-3 bg-white/60 border-2 border-black/10 rounded-lg">
+            <span className="font-body text-sm text-gray-600">Oracle status:</span>
+            {!liveIntentId ? (
+              <span className="font-mono text-xs text-gray-400 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-gray-300 animate-pulse inline-block" />
+                Waiting for receipt…
+              </span>
+            ) : (
+              <div className="flex items-center gap-2">
+                <StatusBadge status={liveStatus !== undefined ? Number(liveStatus) : 0} />
+                {(liveStatus === undefined || Number(liveStatus) === 0) && (
+                  <span className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin inline-block" />
+                )}
+              </div>
+            )}
+          </div>
+
           {txHash && (
-            <p className="font-mono text-xs text-gray-400 break-all px-4 mb-2">
-              tx: {txHash}
-            </p>
+            <a
+              href={`https://sepolia.etherscan.io/tx/${txHash}`}
+              target="_blank"
+              rel="noreferrer"
+              className="font-mono text-xs text-gray-400 hover:text-primary transition-colors break-all px-4 mb-2 block"
+            >
+              {txHash.slice(0, 18)}…{txHash.slice(-10)} ↗
+            </a>
           )}
           <button
             onClick={() => {
@@ -310,6 +354,7 @@ export function SubmitIntent() {
               setValue("0");
               setData("0x");
               setError("");
+              setLiveIntentId("");
             }}
             className="btn-accent mt-4"
           >
