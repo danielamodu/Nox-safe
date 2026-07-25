@@ -1,11 +1,19 @@
 import { useState, useEffect, useCallback } from "react";
-import { useAccount, useReadContract, usePublicClient } from "wagmi";
-import { isHex } from "viem";
+import { useAccount, useReadContract } from "wagmi";
+import { createPublicClient, http, isHex } from "viem";
+import { sepolia } from "viem/chains";
 import { motion, AnimatePresence } from "motion/react";
 import { useSearchParams } from "react-router-dom";
 import { ADDRESSES, MODULE_ABI } from "../config/contracts";
 import { StatusBadge } from "../components/StatusBadge";
 import { useSafe } from "../hooks/useSafe";
+
+// Always read logs from DRPC — bypasses wagmi transport so it works
+// regardless of which wallet or RPC the user has configured.
+const drpcClient = createPublicClient({
+  chain: sepolia,
+  transport: http("https://sepolia.drpc.org"),
+});
 
 const STATUS_LABEL: Record<number, string> = { 0: "Pending", 1: "Executed", 2: "Rejected" };
 
@@ -53,7 +61,6 @@ export function IntentHistory() {
   const { isConnected } = useAccount();
   const { safeAddress } = useSafe();
   const hasSafe = safeAddress.length === 42;
-  const publicClient = usePublicClient();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [intents, setIntents] = useState<IntentRow[]>([]);
@@ -84,14 +91,14 @@ export function IntentHistory() {
   });
 
   const fetchIntents = useCallback(async () => {
-    if (!publicClient || !hasSafe) return;
+    if (!hasSafe) return;
     setLoadingList(true);
     setListError("");
     try {
-      const latest = await publicClient.getBlockNumber();
+      const latest = await drpcClient.getBlockNumber();
       const fromBlock = latest > BigInt(200000) ? latest - BigInt(200000) : BigInt(0);
 
-      const logs = await publicClient.getLogs({
+      const logs = await drpcClient.getLogs({
         address: ADDRESSES.NoxGuardModule,
         event: {
           type: "event",
@@ -114,13 +121,13 @@ export function IntentHistory() {
         logs.map(async (log) => {
           const intentId = log.args.intentId as `0x${string}`;
           const [status, block] = await Promise.all([
-            publicClient.readContract({
+            drpcClient.readContract({
               address: ADDRESSES.NoxGuardModule,
               abi: MODULE_ABI,
               functionName: "getIntentStatus",
               args: [intentId],
             }).catch(() => 0),
-            publicClient.getBlock({ blockNumber: log.blockNumber! }).catch(() => null),
+            drpcClient.getBlock({ blockNumber: log.blockNumber! }).catch(() => null),
           ]);
           return {
             intentId,
@@ -140,7 +147,7 @@ export function IntentHistory() {
     } finally {
       setLoadingList(false);
     }
-  }, [publicClient, safeAddress, hasSafe]);
+  }, [safeAddress, hasSafe]);
 
   // Initial fetch + 15s auto-refresh (only when a Safe is configured)
   useEffect(() => {
