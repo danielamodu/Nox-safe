@@ -16,28 +16,43 @@ import { friendlyError } from "../utils/errors";
 import { StatusBadge } from "../components/StatusBadge";
 
 const DRPC_URL = "https://sepolia.drpc.org";
-const READ_METHODS = new Set([
-  "eth_call", "eth_getCode", "eth_chainId", "net_version",
-  "eth_blockNumber", "eth_getBalance", "eth_getLogs",
+
+// Methods that MUST go through the connected wallet (signing, account access).
+// Everything else — reads, gas estimates, chain queries — goes through DRPC so
+// the transport works identically regardless of which wallet is connected.
+const WALLET_METHODS = new Set([
+  "eth_accounts",
+  "eth_requestAccounts",
+  "eth_sign",
+  "eth_signTransaction",
+  "eth_signTypedData",
+  "eth_signTypedData_v3",
+  "eth_signTypedData_v4",
+  "personal_sign",
+  "eth_sendTransaction",
+  "eth_sendRawTransaction",
+  "wallet_switchEthereumChain",
+  "wallet_addEthereumChain",
+  "wallet_getPermissions",
+  "wallet_requestPermissions",
 ]);
 
-// Routes reads through drpc (avoids MetaMask RPC issues with eth_call),
-// routes signing through the injected wallet (MetaMask).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function makeHybridTransport(injected: { request: (args: any) => Promise<unknown> }) {
   return custom({
     async request({ method, params }: { method: string; params?: unknown[] }) {
-      if (READ_METHODS.has(method)) {
-        const res = await fetch(DRPC_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params: params ?? [] }),
-        });
-        const json = await res.json() as { result?: unknown; error?: { message: string } };
-        if (json.error) throw new Error(json.error.message);
-        return json.result;
+      if (WALLET_METHODS.has(method)) {
+        return injected.request({ method, params });
       }
-      return injected.request({ method, params });
+      // All reads and anything unknown go through DRPC — wallet-agnostic.
+      const res = await fetch(DRPC_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: Date.now(), method, params: params ?? [] }),
+      });
+      const json = await res.json() as { result?: unknown; error?: { message: string } };
+      if (json.error) throw new Error(json.error.message);
+      return json.result;
     },
   });
 }
