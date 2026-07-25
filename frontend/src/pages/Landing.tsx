@@ -36,7 +36,7 @@ const FEATURES = [
   },
   {
     title: "TEE Validation",
-    desc: "A Trusted Execution Environment decrypts and validates your intent against on-chain policy — no trust in the operator.",
+    desc: "A Trusted Execution Environment decrypts and validates your transaction against on-chain policy — without trusting the operator.",
     icon: (
       <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
         <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" stroke="black" strokeWidth="2.5" />
@@ -78,13 +78,13 @@ const STEPS = [
   },
   {
     num: "02",
-    title: "Encrypt your intent",
-    desc: "ABI-encode your transaction, then encrypt it with a Nox handle. Only the TEE can read it.",
+    title: "Encrypt your transaction",
+    desc: "Enter the recipient and amount. The app encrypts both using iExec Nox — only the TEE can read them.",
   },
   {
     num: "03",
     title: "Submit on-chain",
-    desc: "Submit the encrypted handle to the NoxGuardModule. The intent is recorded but unreadable.",
+    desc: "Submit the encrypted transaction on-chain. It's recorded on the blockchain but completely unreadable.",
   },
   {
     num: "04",
@@ -103,7 +103,7 @@ const COMPARE = {
   before: [
     { label: "Transaction params", value: "Publicly visible on-chain" },
     { label: "MEV exposure", value: "Frontrunnable by anyone" },
-    { label: "Privacy", value: "Zero — all data readable" },
+    { label: "Privacy", value: "None — all data is readable" },
     { label: "Policy enforcement", value: "Social trust / off-chain" },
   ],
   after: [
@@ -242,8 +242,8 @@ export function Landing() {
               </motion.h1>
 
               <motion.p variants={fadeUp} className="font-body text-lg md:text-xl text-sage mt-6 max-w-lg leading-relaxed">
-                Nox-Safe encrypts Safe multisig intents with iExec Nox TEE.
-                Policy-checked in a Trusted Execution Environment.
+                Nox-Safe encrypts your Safe multisig transactions before they hit the blockchain.
+                A Trusted Execution Environment validates them against your spending policy.
                 Nobody sees your moves until they're done.
               </motion.p>
 
@@ -373,7 +373,7 @@ export function Landing() {
             <div className="badge-brutal bg-primary text-black text-xs mx-auto mb-4">Core Features</div>
             <h2 className="font-heading font-extrabold text-4xl md:text-5xl text-black tracking-tight">Why Nox-Safe?</h2>
             <p className="font-body text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-              Traditional multisig transactions are transparent — everyone sees the target, amount, and calldata. Nox-Safe changes that.
+              Traditional Safe transactions are transparent — anyone can see the recipient, amount, and calldata before they execute. Nox-Safe keeps that private.
             </p>
           </div>
           <motion.div
@@ -531,7 +531,7 @@ export function Landing() {
               },
               {
                 icon: <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" stroke="black" strokeWidth="2.5" /><path d="M7 11V7a5 5 0 0110 0v4" stroke="black" strokeWidth="2.5" strokeLinecap="round" /></svg>,
-                title: "Encrypt", desc: "ABI-encode → Nox handle (32 bytes)", bg: "bg-primary",
+                title: "Encrypt", desc: "Recipient + value → Nox handle (32 bytes)", bg: "bg-primary",
               },
               {
                 icon: <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="3" stroke="black" strokeWidth="2.5" /><path d="M8 12h8M8 8h5" stroke="black" strokeWidth="2.5" strokeLinecap="round" /></svg>,
@@ -618,7 +618,7 @@ export function Landing() {
                   "Auto-detects transaction parameters from the Safe form",
                   "One-click encryption with the Nox handle flow",
                   "Submits directly to NoxGuardModule on Sepolia",
-                  "Same Neo-Brutalist design — feels native",
+                  "Matches the Safe UI — no tab switching, no copy-pasting",
                 ].map((feat) => (
                   <div key={feat} className="flex items-center gap-3">
                     <div className="w-5 h-5 rounded-full bg-primary border-2 border-black flex items-center justify-center shrink-0">
