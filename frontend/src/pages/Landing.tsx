@@ -788,7 +788,7 @@ export function Landing() {
                     </a>
                   ))}
                 </div>
-                <p className="font-body text-black/50 text-xs mt-2">© 2025 Nox-Safe. Built by <a href="https://github.com/danielamodu" target="_blank" rel="noopener noreferrer" className="underline hover:text-black">@danielamodu</a></p>
+                <p className="font-body text-black/50 text-xs mt-2">© 2026 Nox-Safe. Built by <a href="https://github.com/danielamodu" target="_blank" rel="noopener noreferrer" className="underline hover:text-black">@danielamodu</a></p>
               </div>
             </div>
 

@@ -15,7 +15,7 @@ export function Privacy() {
           <h1 className="font-heading font-extrabold text-5xl md:text-6xl text-white tracking-tight mb-4">
             Privacy Policy
           </h1>
-          <p className="font-body text-sm text-white/40 font-mono">Last updated: July 2025</p>
+          <p className="font-body text-sm text-white/40 font-mono">Last updated: July 2026</p>
         </div>
       </div>
 
