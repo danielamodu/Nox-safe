@@ -128,7 +128,16 @@ contract NoxGuardModule is INoxGuardModule, ReentrancyGuard {
             dataHash:     keccak256(data)
         });
 
-        emit IntentSubmitted(intentId, safe, rawTarget, rawValue, data);
+        // Emit the EXTERNAL handles (pre-fromExternal) so the oracle can query
+        // the Nox gateway at /v0/public/<externalHandle>. The internal handles
+        // (rawTarget/rawValue) are stored in the struct for on-chain publicDecrypt.
+        emit IntentSubmitted(
+            intentId,
+            safe,
+            externalEuint256.unwrap(targetHandle),
+            externalEuint256.unwrap(valueHandle),
+            data
+        );
     }
 
     /// @inheritdoc INoxGuardModule

@@ -129,7 +129,15 @@ export function SubmitIntent() {
         }
       );
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      const msg = err instanceof Error ? err.message : String(err);
+      if (/chain.*does not match|wrong.*chain|chain.*mismatch/i.test(msg))
+        setError("Wrong network — please switch your wallet to Sepolia testnet.");
+      else if (/user rejected|user denied|rejected the request/i.test(msg))
+        setError("Transaction cancelled.");
+      else if (/insufficient funds/i.test(msg))
+        setError("Insufficient funds in your wallet.");
+      else
+        setError("Something went wrong. Please try again.");
       setStep("form");
     }
   };
@@ -166,10 +174,10 @@ export function SubmitIntent() {
     >
       <div>
         <h1 className="font-heading font-extrabold text-4xl text-primary tracking-tight">
-          Submit Intent
+          Send Private Transaction
         </h1>
         <p className="font-body text-sage mt-2">
-          Submit a transaction intent for Nox TEE oracle validation
+          Your recipient and amount are encrypted before leaving your browser — only the oracle can read them.
         </p>
       </div>
 
@@ -182,12 +190,12 @@ export function SubmitIntent() {
           transition={{ duration: 0.25, delay: 0.1 }}
         >
           <h2 className="font-heading font-bold text-xl">
-            Transaction Parameters
+            Transaction Details
           </h2>
 
           <div>
             <label className="font-body font-bold text-sm block mb-1">
-              Target Address
+              Recipient Address
             </label>
             <input
               type="text"
@@ -200,7 +208,7 @@ export function SubmitIntent() {
 
           <div>
             <label className="font-body font-bold text-sm block mb-1">
-              Value (ETH)
+              Amount (ETH)
             </label>
             <input
               type="text"
@@ -213,7 +221,7 @@ export function SubmitIntent() {
 
           <div>
             <label className="font-body font-bold text-sm block mb-1">
-              Calldata (hex)
+              Calldata (optional, hex)
             </label>
             <input
               type="text"
@@ -230,7 +238,7 @@ export function SubmitIntent() {
             onClick={handleSubmit}
             className="btn-primary btn-brutal-lg"
           >
-            Submit Intent
+            Send Transaction
           </button>
         </motion.div>
       )}
@@ -276,30 +284,29 @@ export function SubmitIntent() {
       {/* Done */}
       {(step === "done" || isSuccess) && (
         <motion.div
-          className="card-brutal card-brutal-lg bg-green-50 border-green-500 text-center py-12"
+          className="card-brutal card-brutal-lg bg-yellow-50 border-yellow-400 text-center py-12"
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="w-12 h-12 bg-green-400 border-2 border-black rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-12 h-12 bg-primary border-2 border-black rounded-full flex items-center justify-center mx-auto mb-4">
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-              <path
-                d="M5 13l4 4L19 7"
-                stroke="black"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              <circle cx="12" cy="12" r="3" fill="black" />
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="black" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
           </div>
           <h2 className="font-heading font-bold text-xl mb-2 text-black">
-            Intent Submitted!
+            Transaction Queued
           </h2>
-          <p className="font-body text-gray-600 mb-4">
-            The Nox TEE oracle will process your encrypted intent shortly.
+          <p className="font-body text-gray-700 mb-2">
+            Your encrypted transaction was broadcast to the blockchain.
+          </p>
+          <p className="font-body text-sm text-gray-500 mb-4">
+            The oracle is now validating it against your spending rules. Check{" "}
+            <strong>Transaction History</strong> in ~15 seconds to see the result.
           </p>
           {txHash && (
-            <p className="font-mono text-xs text-gray-400 break-all px-4">
+            <p className="font-mono text-xs text-gray-400 break-all px-4 mb-2">
               tx: {txHash}
             </p>
           )}
@@ -311,9 +318,9 @@ export function SubmitIntent() {
               setData("0x");
               setError("");
             }}
-            className="btn-accent mt-6"
+            className="btn-accent mt-4"
           >
-            Submit Another
+            Send Another
           </button>
         </motion.div>
       )}

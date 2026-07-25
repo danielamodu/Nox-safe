@@ -27,8 +27,28 @@ function StepBadge({ n, total }: { n: number; total: number }) {
 
 // ─── Pending signature card ───────────────────────────────────────────────────
 
+function CopyButton({ text, label }: { text: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+  function copy() {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+  return (
+    <button
+      onClick={copy}
+      className="flex items-center gap-2 w-full bg-charcoal/20 border border-black/20 rounded px-3 py-2 text-left hover:bg-charcoal/30 transition-colors"
+    >
+      <span className="font-mono text-xs text-gray-600 truncate flex-1">{label}</span>
+      <span className="font-mono text-xs font-bold text-primary shrink-0">{copied ? "Copied!" : "Copy"}</span>
+    </button>
+  );
+}
+
 function PendingCard({
   safeTxHash,
+  safeAddress,
   confirmations,
   confirmationsRequired,
   alreadySigned,
@@ -37,6 +57,7 @@ function PendingCard({
   isLoading,
 }: {
   safeTxHash: string;
+  safeAddress: string;
   confirmations: number;
   confirmationsRequired: number;
   alreadySigned: boolean;
@@ -46,6 +67,7 @@ function PendingCard({
 }) {
   const remaining = confirmationsRequired - confirmations;
   const thresholdMet = confirmations >= confirmationsRequired;
+  const appUrl = window.location.origin + "/app";
 
   return (
     <div className="card-brutal bg-sage/10 space-y-4 mt-4">
@@ -69,16 +91,36 @@ function PendingCard({
           <button onClick={onExecute} disabled={isLoading} className="btn-primary btn-brutal-lg disabled:opacity-50">
             {isLoading ? "Executing…" : "Execute Transaction"}
           </button>
+          {isLoading && (
+            <div className="flex items-start gap-2 bg-primary/20 border border-primary/40 rounded px-3 py-2">
+              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin shrink-0 mt-0.5" />
+              <p className="font-body text-xs text-black/80">
+                <strong>Check MetaMask</strong> — approve the transaction to complete execution on-chain.
+              </p>
+            </div>
+          )}
         </div>
       ) : alreadySigned ? (
-        <div className="space-y-2">
-          <p className="font-body text-sm font-bold text-sage">
-            Waiting for {remaining} more owner{remaining !== 1 ? "s" : ""} to sign
-          </p>
-          <p className="font-body text-sm text-gray-500">
-            Switch to another owner wallet — the Sign button will appear for them automatically.
-          </p>
-          <p className="font-mono text-xs text-gray-400 break-all">{safeTxHash}</p>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
+            <p className="font-body text-sm font-bold text-sage">
+              You've signed. Waiting for {remaining} more owner{remaining !== 1 ? "s" : ""}.
+            </p>
+          </div>
+
+          <div className="bg-white/60 border-2 border-black/10 rounded-lg p-4 space-y-3">
+            <p className="font-heading font-bold text-sm text-black">Tell your co-signer to:</p>
+            <ol className="space-y-2 font-body text-sm text-black/70 list-none">
+              <li className="flex gap-2"><span className="font-bold text-primary shrink-0">1.</span> Open the app link below and connect their wallet</li>
+              <li className="flex gap-2"><span className="font-bold text-primary shrink-0">2.</span> Enter the Safe address below if prompted</li>
+              <li className="flex gap-2"><span className="font-bold text-primary shrink-0">3.</span> Click <strong>Sign Transaction</strong> — it will appear automatically</li>
+            </ol>
+            <div className="space-y-2 pt-1">
+              <CopyButton text={appUrl} label={appUrl} />
+              <CopyButton text={safeAddress} label={`Safe: ${safeAddress}`} />
+            </div>
+          </div>
         </div>
       ) : (
         <div className="space-y-3">
@@ -93,6 +135,19 @@ function PendingCard({
 }
 
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
+
+function friendlyError(e: unknown): string {
+  const msg = e instanceof Error ? e.message : String(e);
+  if (/chain.*does not match|wrong.*chain|chain.*mismatch/i.test(msg))
+    return "Wrong network — please switch your wallet to Sepolia testnet.";
+  if (/user rejected|user denied|rejected the request/i.test(msg))
+    return "Transaction cancelled.";
+  if (/insufficient funds/i.test(msg))
+    return "Insufficient funds in your wallet.";
+  if (/nonce/i.test(msg))
+    return "Transaction nonce error — try again.";
+  return "Something went wrong. Please try again.";
+}
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -197,7 +252,7 @@ export function Dashboard() {
         await refreshPendingTxs();
       }
     } catch (e: unknown) {
-      setHookError(e instanceof Error ? e.message : String(e));
+      setHookError(friendlyError(e));
       setModuleState("idle");
     }
   }
@@ -225,7 +280,7 @@ export function Dashboard() {
         await refreshPendingTxs();
       }
     } catch (e: unknown) {
-      setHookError(e instanceof Error ? e.message : String(e));
+      setHookError(friendlyError(e));
       setPolicyState("idle");
     }
   }
@@ -243,7 +298,7 @@ export function Dashboard() {
         else setPolicyState("done");
       }
     } catch (e: unknown) {
-      setHookError(e instanceof Error ? e.message : String(e));
+      setHookError(friendlyError(e));
     }
   }
 
@@ -256,7 +311,7 @@ export function Dashboard() {
       if (!isModuleEnabled) setModuleState("done");
       else setPolicyState("done");
     } catch (e: unknown) {
-      setHookError(e instanceof Error ? e.message : String(e));
+      setHookError(friendlyError(e));
     }
   }
 
@@ -271,18 +326,21 @@ export function Dashboard() {
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       >
         <div>
-          <h1 className="font-heading font-extrabold text-3xl text-primary">Get started</h1>
-          <p className="font-body text-sage mt-1 text-sm">Enter your Gnosis Safe address to continue.</p>
+          <h1 className="font-heading font-extrabold text-3xl text-primary">Connect your Safe</h1>
+          <p className="font-body text-sage mt-1 text-sm">
+            A Safe is a shared crypto wallet that requires multiple approvals before sending funds.
+            Paste your Safe's address below to get started.
+          </p>
         </div>
 
         <div className="card-brutal card-brutal-lg space-y-4">
           <div>
-            <label className="font-body font-bold text-sm block mb-1">Safe Address</label>
+            <label className="font-body font-bold text-sm block mb-1">Safe Wallet Address</label>
             <input
               type="text"
               value={safeInput}
               onChange={(e) => { setSafeInput(e.target.value); setSafeInputError(""); }}
-              placeholder="0x..."
+              placeholder="0x…"
               className="input-brutal font-mono text-sm"
             />
             {safeInputError && <p className="font-body text-sm text-red-500 mt-1">{safeInputError}</p>}
@@ -291,9 +349,9 @@ export function Dashboard() {
             Continue →
           </button>
           <p className="font-body text-xs text-gray-500 text-center">
-            Don't have a Safe?{" "}
+            Don't have a Safe yet?{" "}
             <a href="https://app.safe.global" target="_blank" rel="noreferrer" className="underline text-sage">
-              Create one at app.safe.global
+              Create one free at app.safe.global
             </a>
           </p>
         </div>
@@ -305,8 +363,9 @@ export function Dashboard() {
 
   if (hasSafe && (moduleLoading || policyLoading)) {
     return (
-      <div className="flex items-center justify-center py-24">
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        <p className="font-body text-sm text-sage">Loading your Safe…</p>
       </div>
     );
   }
@@ -323,42 +382,39 @@ export function Dashboard() {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-heading font-extrabold text-3xl text-primary">Enable Guard</h1>
-            <p className="font-body text-sage mt-1 text-sm">Allow Nox-Safe to execute validated transactions from your Safe.</p>
+            <h1 className="font-heading font-extrabold text-3xl text-primary">Activate Nox Guard</h1>
+            <p className="font-body text-sage mt-1 text-sm">Give Nox-Safe permission to execute transactions from your Safe — after validating them in the TEE.</p>
           </div>
           <StepBadge n={1} total={2} />
         </div>
 
         <div className="card-brutal card-brutal-lg space-y-4">
           <div className="bg-charcoal/30 rounded-lg px-3 py-2 space-y-1">
-            <p className="font-body text-xs text-sage">Safe</p>
+            <p className="font-body text-xs text-sage">Your Safe</p>
             <p className="font-mono text-xs text-white break-all">{safeAddress}</p>
-          </div>
-          <div className="bg-charcoal/30 rounded-lg px-3 py-2 space-y-1">
-            <p className="font-body text-xs text-sage">Module to enable</p>
-            <p className="font-mono text-xs text-white break-all">{ADDRESSES.NoxGuardModule}</p>
           </div>
 
           <p className="font-body text-sm text-gray-400">
-            This submits a Safe transaction. Your multisig will need the required number of signatures before it executes on-chain.
+            This will create a transaction that all required Safe owners must sign. Once enough signatures are collected, anyone can execute it on-chain.
           </p>
 
           {moduleState === "idle" && (
             <button onClick={handleEnableModule} className="btn-primary btn-brutal-lg w-full">
-              Enable Module
+              Activate Nox Guard
             </button>
           )}
 
           {moduleState === "signing" && (
             <div className="flex items-center gap-3 py-2">
               <div className="w-5 h-5 border-4 border-primary border-t-transparent rounded-full animate-spin shrink-0" />
-              <p className="font-body text-sm">Check MetaMask — sign the Safe tx hash…</p>
+              <p className="font-body text-sm">Check MetaMask — approve the transaction proposal…</p>
             </div>
           )}
 
           {moduleState === "pending" && activePendingTx && (
             <PendingCard
               safeTxHash={activePendingTx.safeTxHash}
+              safeAddress={safeAddress!}
               confirmations={activePendingTx.confirmations}
               confirmationsRequired={activePendingTx.confirmationsRequired}
               alreadySigned={activePendingTx.alreadySigned}
@@ -369,14 +425,17 @@ export function Dashboard() {
           )}
 
           {moduleState === "pending" && !activePendingTx && (
-            <div className="flex items-center gap-3 py-3">
-              <div className="w-5 h-5 border-4 border-primary border-t-transparent rounded-full animate-spin shrink-0" />
-              <div>
-                <p className="font-body text-sm">Waiting for co-signer…</p>
-                <button onClick={refreshPendingTxs} className="font-body text-xs text-sage underline mt-1">
-                  Refresh
-                </button>
+            <div className="space-y-3 py-2">
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 border-4 border-primary border-t-transparent rounded-full animate-spin shrink-0" />
+                <p className="font-body text-sm">Loading pending approvals…</p>
               </div>
+              <button
+                onClick={refreshPendingTxs}
+                className="w-full btn-brutal py-2 font-body text-sm font-bold border-2 border-black bg-white hover:bg-sage/10 transition-colors"
+              >
+                Refresh status
+              </button>
             </div>
           )}
 
@@ -405,8 +464,8 @@ export function Dashboard() {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-heading font-extrabold text-3xl text-primary">Set Policy</h1>
-            <p className="font-body text-sage mt-1 text-sm">Define who can receive funds and how much.</p>
+            <h1 className="font-heading font-extrabold text-3xl text-primary">Set Spending Rules</h1>
+            <p className="font-body text-sage mt-1 text-sm">Control who can receive funds from your Safe and set daily limits. Only approved recipients can be paid.</p>
           </div>
           <StepBadge n={2} total={2} />
         </div>
@@ -416,8 +475,8 @@ export function Dashboard() {
             <>
               <div>
                 <label className="font-body font-bold text-sm block mb-1">
-                  Whitelisted Target Addresses
-                  <span className="font-normal text-gray-400 ml-2">one per line</span>
+                  Approved recipient wallets
+                  <span className="font-normal text-gray-400 ml-2">— one address per line</span>
                 </label>
                 <textarea
                   rows={3}
@@ -426,15 +485,16 @@ export function Dashboard() {
                   placeholder={"0xRecipient1\n0xRecipient2"}
                   className="input-brutal font-mono text-xs w-full resize-y"
                 />
+                <p className="font-body text-xs text-gray-400 mt-1">Only these wallet addresses can receive payments through Nox-Safe.</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="font-body font-bold text-sm block mb-1">Max per Tx (ETH)</label>
+                  <label className="font-body font-bold text-sm block mb-1">Max per transaction (ETH)</label>
                   <input type="text" value={maxPerTx} onChange={(e) => setMaxPerTx(e.target.value)} className="input-brutal font-mono text-sm" />
                 </div>
                 <div>
-                  <label className="font-body font-bold text-sm block mb-1">Max per Day (ETH)</label>
+                  <label className="font-body font-bold text-sm block mb-1">Max per day (ETH)</label>
                   <input type="text" value={maxPerDay} onChange={(e) => setMaxPerDay(e.target.value)} className="input-brutal font-mono text-sm" />
                 </div>
               </div>
@@ -442,10 +502,10 @@ export function Dashboard() {
               {policyFormError && <p className="font-body text-sm text-red-500">{policyFormError}</p>}
 
               <button onClick={handleSetPolicy} className="btn-primary btn-brutal-lg w-full">
-                Set Policy
+                Save Spending Rules
               </button>
               <p className="font-body text-xs text-gray-500">
-                This also requires your Safe's multisig signatures.
+                Like Step 1, this requires all Safe owners to sign before it takes effect.
               </p>
             </>
           )}
@@ -453,13 +513,14 @@ export function Dashboard() {
           {policyState === "signing" && (
             <div className="flex items-center gap-3 py-2">
               <div className="w-5 h-5 border-4 border-primary border-t-transparent rounded-full animate-spin shrink-0" />
-              <p className="font-body text-sm">Check MetaMask — sign the Safe tx hash…</p>
+              <p className="font-body text-sm">Check MetaMask — approve the transaction proposal…</p>
             </div>
           )}
 
           {policyState === "pending" && activePendingTx && (
             <PendingCard
               safeTxHash={activePendingTx.safeTxHash}
+              safeAddress={safeAddress!}
               confirmations={activePendingTx.confirmations}
               confirmationsRequired={activePendingTx.confirmationsRequired}
               alreadySigned={activePendingTx.alreadySigned}
@@ -470,12 +531,17 @@ export function Dashboard() {
           )}
 
           {policyState === "pending" && !activePendingTx && (
-            <div className="flex items-center gap-3 py-3">
-              <div className="w-5 h-5 border-4 border-primary border-t-transparent rounded-full animate-spin shrink-0" />
-              <div>
-                <p className="font-body text-sm">Waiting for co-signer…</p>
-                <button onClick={refreshPendingTxs} className="font-body text-xs text-sage underline mt-1">Refresh</button>
+            <div className="space-y-3 py-2">
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 border-4 border-primary border-t-transparent rounded-full animate-spin shrink-0" />
+                <p className="font-body text-sm">Loading pending approvals…</p>
               </div>
+              <button
+                onClick={refreshPendingTxs}
+                className="w-full btn-brutal py-2 font-body text-sm font-bold border-2 border-black bg-white hover:bg-sage/10 transition-colors"
+              >
+                Refresh status
+              </button>
             </div>
           )}
 
@@ -526,9 +592,9 @@ export function Dashboard() {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="font-heading font-extrabold text-2xl text-black">Submit Intent</h2>
+            <h2 className="font-heading font-extrabold text-2xl text-black">Send Private Transaction</h2>
             <p className="font-body text-sm text-black/70 mt-1">
-              Encrypt and send a confidential transaction to your Safe.
+              Encrypt the recipient and amount — nobody sees them until the TEE validates and executes.
             </p>
           </div>
           <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center shrink-0">
@@ -575,7 +641,7 @@ export function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.22 }}
         >
-          <h3 className="font-heading font-bold text-base">Whitelisted Targets</h3>
+          <h3 className="font-heading font-bold text-base">Approved Recipients</h3>
           {policy.whitelistedTargets.map((addr: string) => (
             <div key={addr} className="flex items-center gap-2 px-3 py-2 bg-gray-50 border-2 border-black rounded-lg">
               <div className="w-2 h-2 rounded-full bg-green-400 border border-black shrink-0" />
@@ -593,12 +659,12 @@ export function Dashboard() {
         transition={{ duration: 0.4, delay: 0.28 }}
       >
         <button onClick={() => navigate("/app/history")} className="card-brutal py-4 text-left hover:bg-sage/10 transition-colors">
-          <p className="font-heading font-bold text-sm">Intent History</p>
-          <p className="font-body text-xs text-gray-500 mt-0.5">View past encrypted intents</p>
+          <p className="font-heading font-bold text-sm">Transaction History</p>
+          <p className="font-body text-xs text-gray-500 mt-0.5">View your past encrypted transactions</p>
         </button>
         <button onClick={() => navigate("/app/setup")} className="card-brutal py-4 text-left hover:bg-sage/10 transition-colors">
-          <p className="font-heading font-bold text-sm">Update Policy</p>
-          <p className="font-body text-xs text-gray-500 mt-0.5">Change spending limits or targets</p>
+          <p className="font-heading font-bold text-sm">Update Spending Rules</p>
+          <p className="font-body text-xs text-gray-500 mt-0.5">Change limits or approved recipients</p>
         </button>
       </motion.div>
     </div>
