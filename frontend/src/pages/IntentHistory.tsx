@@ -2,9 +2,31 @@ import { useState, useEffect, useCallback } from "react";
 import { useAccount, useReadContract, usePublicClient } from "wagmi";
 import { isHex } from "viem";
 import { motion, AnimatePresence } from "motion/react";
+import { useSearchParams } from "react-router-dom";
 import { ADDRESSES, MODULE_ABI } from "../config/contracts";
 import { StatusBadge } from "../components/StatusBadge";
 import { useSafe } from "../hooks/useSafe";
+
+const STATUS_LABEL: Record<number, string> = { 0: "Pending", 1: "Executed", 2: "Rejected" };
+
+function exportCsv(rows: IntentRow[]) {
+  const header = "Intent ID,Status,Timestamp,Block,Tx Hash,Etherscan\n";
+  const body = rows
+    .map((r) => {
+      const ts = r.timestamp ? new Date(r.timestamp * 1000).toISOString() : "";
+      const label = STATUS_LABEL[r.status] ?? "Unknown";
+      const link = `https://sepolia.etherscan.io/tx/${r.txHash}`;
+      return `${r.intentId},${label},${ts},${r.blockNumber},${r.txHash},${link}`;
+    })
+    .join("\n");
+  const blob = new Blob([header + body], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `nox-safe-history-${Date.now()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 interface IntentRow {
   intentId: `0x${string}`;
@@ -32,6 +54,7 @@ export function IntentHistory() {
   const { safeAddress } = useSafe();
   const hasSafe = safeAddress.length === 42;
   const publicClient = usePublicClient();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [intents, setIntents] = useState<IntentRow[]>([]);
   const [loadingList, setLoadingList] = useState(false);
@@ -41,6 +64,16 @@ export function IntentHistory() {
   // Manual lookup state
   const [intentId, setIntentId] = useState("");
   const [lookupId, setLookupId] = useState<`0x${string}` | "">("");
+
+  // Deep-link: auto-open intent from ?intent=0x... on mount
+  useEffect(() => {
+    const param = searchParams.get("intent");
+    if (param && isHex(param) && param.length === 66) {
+      setIntentId(param);
+      setLookupId(param as `0x${string}`);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const { data: intent, isLoading: lookupLoading, error: lookupError } = useReadContract({
     address: ADDRESSES.NoxGuardModule,
@@ -161,11 +194,19 @@ export function IntentHistory() {
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-heading font-bold text-xl">Recent Transactions</h2>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {lastRefreshed && (
                 <span className="font-mono text-xs text-gray-400">
                   updated {timeAgo(Math.floor(lastRefreshed.getTime() / 1000))}
                 </span>
+              )}
+              {intents.length > 0 && (
+                <button
+                  onClick={() => exportCsv(intents)}
+                  className="font-mono text-xs border-2 border-black px-3 py-1 hover:bg-primary transition-colors"
+                >
+                  Export CSV
+                </button>
               )}
               <button
                 onClick={fetchIntents}
@@ -221,6 +262,7 @@ export function IntentHistory() {
                     onClick={() => {
                       setIntentId(row.intentId);
                       setLookupId(row.intentId);
+                      setSearchParams({ intent: row.intentId });
                       window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
                     }}
                     className="font-mono text-xs border-2 border-black px-2 py-1 hover:bg-primary transition-colors"

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   useAccount,
   useWalletClient,
@@ -70,6 +70,29 @@ export function SubmitIntent() {
     );
     if (log?.topics[1]) setLiveIntentId(log.topics[1] as `0x${string}`);
   }, [receipt]);
+
+  // Request notification permission when user submits
+  useEffect(() => {
+    if (step === "done" && "Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, [step]);
+
+  // Fire notification when oracle responds
+  const prevStatusRef = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (liveStatus === undefined) return;
+    const status = Number(liveStatus);
+    if (prevStatusRef.current === 0 && status !== 0) {
+      if (Notification.permission === "granted") {
+        new Notification("Nox-Safe", {
+          body: status === 1 ? "Your transaction was executed ✓" : "Transaction rejected by oracle",
+          icon: "/favicon.ico",
+        });
+      }
+    }
+    prevStatusRef.current = status;
+  }, [liveStatus]);
 
   // Poll oracle for live status after submission
   const { data: liveStatus } = useReadContract({
