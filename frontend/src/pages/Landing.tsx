@@ -815,13 +815,13 @@ export function Landing() {
                   ],
                 },
                 {
-                  title: "Stack",
+                  title: "Resources",
                   links: [
-                    { name: "Safe{Wallet}", href: "#" },
-                    { name: "iExec Nox", href: "#" },
-                    { name: "Sepolia Testnet", href: "#" },
-                    { name: "Solidity", href: "#" },
-                    { name: "React + Vite", href: "#" },
+                    { name: "iExec Nox Docs", href: "https://docs.noxprotocol.dev" },
+                    { name: "Safe Documentation", href: "https://docs.safe.global" },
+                    { name: "NoxGuardModule on Etherscan", href: "https://sepolia.etherscan.io/address/0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51" },
+                    { name: "Sepolia Faucet", href: "https://sepoliafaucet.com" },
+                    { name: "GitHub", href: "https://github.com/danielamodu/nox-safe" },
                   ],
                 },
               ].map((section) => (
