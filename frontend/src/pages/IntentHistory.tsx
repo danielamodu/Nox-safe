@@ -107,12 +107,13 @@ export function IntentHistory() {
     }
   }, [publicClient, safeAddress, hasSafe]);
 
-  // Initial fetch + 15s auto-refresh
+  // Initial fetch + 15s auto-refresh (only when a Safe is configured)
   useEffect(() => {
+    if (!hasSafe) return;
     fetchIntents();
     const id = setInterval(fetchIntents, 15000);
     return () => clearInterval(id);
-  }, [fetchIntents]);
+  }, [fetchIntents, hasSafe]);
 
   const handleLookup = () => {
     if (!isHex(intentId) || intentId.length !== 66) return;

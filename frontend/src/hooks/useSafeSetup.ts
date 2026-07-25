@@ -89,28 +89,30 @@ export function useSafeSetup(safeAddress: string, address: `0x${string}` | undef
     return Safe.init({ provider: provider as any, signer: address, safeAddress });
   }
 
-  const refreshPendingTxs = useCallback(async () => {
-    if (!safeAddress || !address) return;
+  const refreshPendingTxs = useCallback(async (): Promise<PendingTx[]> => {
+    if (!safeAddress || !address) return [];
     try {
       const apiKit = makeApiKit();
       const result = await apiKit.getPendingTransactions(safeAddress);
-      setPendingTxs(
-        (result.results ?? []).map((tx) => ({
-          safeTxHash: tx.safeTxHash,
-          to: tx.to,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          data: (tx as any).data ?? "0x",
-          nonce: tx.nonce,
-          confirmations: tx.confirmations?.length ?? 0,
-          confirmationsRequired: tx.confirmationsRequired,
-          alreadySigned: (tx.confirmations ?? []).some(
-            (c) => c.owner.toLowerCase() === address.toLowerCase()
-          ),
-          description: describeData(tx.to, (tx as any).data ?? "0x", safeAddress),
-        }))
-      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const txs = (result.results ?? []).map((tx) => ({
+        safeTxHash: tx.safeTxHash,
+        to: tx.to,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        data: (tx as any).data ?? "0x",
+        nonce: tx.nonce,
+        confirmations: tx.confirmations?.length ?? 0,
+        confirmationsRequired: tx.confirmationsRequired,
+        alreadySigned: (tx.confirmations ?? []).some(
+          (c) => c.owner.toLowerCase() === address.toLowerCase()
+        ),
+        description: describeData(tx.to, (tx as any).data ?? "0x", safeAddress),
+      }));
+      setPendingTxs(txs);
+      return txs;
     } catch (e) {
       console.warn("useSafeSetup: failed to fetch pending txs", e);
+      return [];
     }
   }, [safeAddress, address]);
 

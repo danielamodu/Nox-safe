@@ -11,6 +11,7 @@ import { sepolia } from "viem/chains";
 import { createViemHandleClient } from "@iexec-nox/handle";
 import { ADDRESSES, MODULE_ABI } from "../config/contracts";
 import { useSafe } from "../hooks/useSafe";
+import { friendlyError } from "../utils/errors";
 
 const DRPC_URL = "https://sepolia.drpc.org";
 const READ_METHODS = new Set([
@@ -123,21 +124,13 @@ export function SubmitIntent() {
         {
           onSuccess: () => setStep("done"),
           onError: (err) => {
-            setError(err.message);
+            setError(friendlyError(err));
             setStep("form");
           },
         }
       );
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (/chain.*does not match|wrong.*chain|chain.*mismatch/i.test(msg))
-        setError("Wrong network — please switch your wallet to Sepolia testnet.");
-      else if (/user rejected|user denied|rejected the request/i.test(msg))
-        setError("Transaction cancelled.");
-      else if (/insufficient funds/i.test(msg))
-        setError("Insufficient funds in your wallet.");
-      else
-        setError("Something went wrong. Please try again.");
+      setError(friendlyError(err));
       setStep("form");
     }
   };
@@ -282,7 +275,7 @@ export function SubmitIntent() {
       )}
 
       {/* Done */}
-      {(step === "done" || isSuccess) && (
+      {step === "done" && (
         <motion.div
           className="card-brutal card-brutal-lg bg-yellow-50 border-yellow-400 text-center py-12"
           initial={{ opacity: 0, scale: 0.96 }}

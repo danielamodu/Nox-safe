@@ -6,6 +6,7 @@ import { formatEther, isAddress, parseEther } from "viem";
 import { ADDRESSES, MODULE_ABI, REGISTRY_ABI, SAFE_ABI } from "../config/contracts";
 import { useSafe } from "../hooks/useSafe";
 import { useSafeSetup } from "../hooks/useSafeSetup";
+import { friendlyError } from "../utils/errors";
 
 // ─── Tiny helpers ─────────────────────────────────────────────────────────────
 
@@ -136,19 +137,6 @@ function PendingCard({
 
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 
-function friendlyError(e: unknown): string {
-  const msg = e instanceof Error ? e.message : String(e);
-  if (/chain.*does not match|wrong.*chain|chain.*mismatch/i.test(msg))
-    return "Wrong network — please switch your wallet to Sepolia testnet.";
-  if (/user rejected|user denied|rejected the request/i.test(msg))
-    return "Transaction cancelled.";
-  if (/insufficient funds/i.test(msg))
-    return "Insufficient funds in your wallet.";
-  if (/nonce/i.test(msg))
-    return "Transaction nonce error — try again.";
-  return "Something went wrong. Please try again.";
-}
-
 export function Dashboard() {
   const navigate = useNavigate();
   const { address } = useAccount();
@@ -266,6 +254,7 @@ export function Dashboard() {
     let perTx: bigint, perDay: bigint;
     try { perTx = parseEther(maxPerTx); perDay = parseEther(maxPerDay); }
     catch { setPolicyFormError("Invalid ETH amount."); return; }
+    if (perTx === 0n) { setPolicyFormError("Max per transaction must be greater than 0 ETH."); return; }
     if (perDay < perTx) { setPolicyFormError("Max per day must be ≥ max per tx."); return; }
 
     setPolicyState("signing");
@@ -289,10 +278,12 @@ export function Dashboard() {
     setHookError("");
     try {
       await signAndExecutePending(pendingTxHash);
-      await refreshPendingTxs();
-      await refetchModule();
-      await refetchPolicy();
-      const stillPending = pendingTxs.some((t) => t.safeTxHash === pendingTxHash);
+      const [freshTxs] = await Promise.all([
+        refreshPendingTxs(),
+        refetchModule(),
+        refetchPolicy(),
+      ]);
+      const stillPending = freshTxs.some((t) => t.safeTxHash === pendingTxHash);
       if (!stillPending) {
         if (!isModuleEnabled) setModuleState("done");
         else setPolicyState("done");
@@ -306,8 +297,7 @@ export function Dashboard() {
     setHookError("");
     try {
       await executePending(pendingTxHash);
-      await refetchModule();
-      await refetchPolicy();
+      await Promise.all([refetchModule(), refetchPolicy()]);
       if (!isModuleEnabled) setModuleState("done");
       else setPolicyState("done");
     } catch (e: unknown) {
