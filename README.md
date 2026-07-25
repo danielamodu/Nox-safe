@@ -73,7 +73,7 @@ A Manifest V3 content script that injects into `app.safe.global`. On pages where
 | Contract | Address | Etherscan |
 |---|---|---|
 | `PolicyRegistry` | `0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1` | [view](https://sepolia.etherscan.io/address/0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1) |
-| `NoxGuardModule` | `0xbb616000b55d256cEC4fb9E211f4138e43cbA2e5` | [view](https://sepolia.etherscan.io/address/0xbb616000b55d256cEC4fb9E211f4138e43cbA2e5) |
+| `NoxGuardModule` | `0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51` | [view](https://sepolia.etherscan.io/address/0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51) |
 | `NoxRecipientProxy` | `0x1D9f855d88e526745fDb8b04Fe3180a274604172` | [view](https://sepolia.etherscan.io/address/0x1D9f855d88e526745fDb8b04Fe3180a274604172) |
 | `SablierV2LockupLinear` (Sepolia, Sablier-deployed) | `0xAFb979d9afAd1aD27C5eFf4E27226E3AB9e5dCC9` | [view](https://sepolia.etherscan.io/address/0xAFb979d9afAd1aD27C5eFf4E27226E3AB9e5dCC9) |
 | `NoxCompute` (iExec, used by Nox SDK) | `0x24Ef36Ec5b626D7DCD09a98F3083c2758F0F77bF` | [view](https://sepolia.etherscan.io/address/0x24Ef36Ec5b626D7DCD09a98F3083c2758F0F77bF) |
@@ -194,7 +194,7 @@ Fill in `.env`:
 ```
 SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
 ORACLE_PRIVATE_KEY=<oracle wallet private key, no 0x prefix>
-NOX_GUARD_MODULE=0xbb616000b55d256cEC4fb9E211f4138e43cbA2e5
+NOX_GUARD_MODULE=0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51
 POLICY_REGISTRY=0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1
 NOX_RECIPIENT_PROXY=0x1D9f855d88e526745fDb8b04Fe3180a274604172
 ```
@@ -235,7 +235,7 @@ The floating "Shield with Nox" button appears only on transactional pages where 
 1. Connect your wallet and enter your Safe address in the web app
 2. Click **Enable Module** — this proposes a Safe transaction with calldata:
    ```
-   0x610b5925000000000000000000000000bb616000b55d256cec4fb9e211f4138e43cba2e5
+   0x610b59250000000000000000000000001ba951e0883e5f4afedcdf88b76b8eef34165a51
    ```
 3. Each required owner signs (the app auto-detects pending txs when owners switch wallets, so Owner 2 sees the PendingCard without any manual sharing)
 4. Once the threshold is met, execute — the module is active on your Safe
@@ -298,7 +298,7 @@ The daemon picks up the event, decrypts the recipient inside the TEE, verifies t
 
 **Policy updates require a full Safe multisig tx.** There is no delegated admin role. Updating the whitelist or caps requires assembling, signing, and executing a new Safe transaction with owner quorum. This is intentional for security but creates friction for teams that adjust policy frequently.
 
-**No on-chain intent index.** The intent history page looks up intents by ID. There is no on-chain index of all intents for a given Safe address. A subgraph or off-chain event indexer would be needed for a full audit trail.
+**Event-log based history (no subgraph).** The transaction history page fetches `IntentSubmitted` events via `getLogs` filtered by the Safe address, scanning the last ~200k blocks. This covers the typical use window but does not provide a full audit trail back to genesis. A subgraph or off-chain indexer would be needed for exhaustive historical lookups across arbitrary time ranges.
 
 ---
 

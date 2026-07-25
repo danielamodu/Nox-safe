@@ -56,7 +56,7 @@ NoxGuardModule (on-chain)
               <tbody>
                 {[
                   ["PolicyRegistry", "0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1"],
-                  ["NoxGuardModule", "0xbb616000b55d256cEC4fb9E211f4138e43cbA2e5"],
+                  ["NoxGuardModule", "0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51"],
                   ["NoxRecipientProxy", "0x1D9f855d88e526745fDb8b04Fe3180a274604172"],
                   ["SablierV2LockupLinear", "0xAFb979d9afAd1aD27C5eFf4E27226E3AB9e5dCC9"],
                   ["NoxCompute (iExec)", "0x24Ef36Ec5b626D7DCD09a98F3083c2758F0F77bF"],
@@ -141,7 +141,7 @@ NoxGuardModule (on-chain)
             <CodeBlock>{`# .env required vars
 SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
 ORACLE_PRIVATE_KEY=<oracle wallet private key, no 0x prefix>
-NOX_GUARD_MODULE=0xbb616000b55d256cEC4fb9E211f4138e43cbA2e5
+NOX_GUARD_MODULE=0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51
 POLICY_REGISTRY=0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1
 NOX_RECIPIENT_PROXY=0x1D9f855d88e526745fDb8b04Fe3180a274604172`}</CodeBlock>
             <p className="mt-4">
