@@ -19,13 +19,74 @@
     .header {
       background: #ffe17c;
       border-bottom: 2px solid #000;
-      padding: 16px 20px;
+      padding: 14px 18px;
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
     .header-logo {
+      width: 30px;
+      height: 30px;
+      background: #000;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .header h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 800;
+      font-size: 17px;
+      color: #000;
+    }
+
+    .oracle-badge {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: #000;
+      background: rgba(0,0,0,0.12);
+      border-radius: 100px;
+      padding: 3px 9px;
+      border: 1.5px solid rgba(0,0,0,0.2);
+    }
+
+    .oracle-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(0,0,0,0.3);
+    }
+
+    .oracle-dot.active   { background: #4ade80; }
+    .oracle-dot.offline  { background: #f59e0b; animation: pulse 1.5s infinite; }
+    .oracle-dot.loading  { background: #d1d5db; animation: pulse 1.5s infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Safe card */
+    .safe-card {
+      background: #ffe17c;
+      border: 2px solid #000;
+      border-radius: 12px;
+      padding: 12px 14px;
+      box-shadow: 4px 4px 0px 0px #000;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .safe-card .safe-icon {
       width: 32px;
       height: 32px;
       background: #000;
@@ -33,127 +94,272 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
 
-    .header h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 800;
-      font-size: 18px;
-      color: #000;
-    }
+    .safe-card .safe-info { flex: 1; min-width: 0; }
 
-    .header .version {
-      margin-left: auto;
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      color: #000;
-      opacity: 0.5;
-    }
-
-    .content {
-      padding: 20px;
-    }
-
-    .status-card {
-      background: #ffe17c;
-      border: 2px solid #000;
-      border-radius: 12px;
-      padding: 14px 16px;
-      box-shadow: 4px 4px 0px 0px #000;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      border: 2px solid #000;
-    }
-
-    .status-dot.active { background: #4ade80; }
-    .status-dot.inactive { background: #f87171; }
-
-    .status-text {
+    .safe-card .safe-label {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 11px;
+      color: #000;
+      opacity: 0.55;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+
+    .safe-card .safe-addr {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
       color: #000;
     }
 
-    .status-sub {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      color: #000;
-      opacity: 0.6;
+    .module-badge {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 10px;
+      border: 1.5px solid #000;
+      border-radius: 100px;
+      padding: 2px 8px;
+      flex-shrink: 0;
     }
 
-    .info-section {
-      margin-bottom: 16px;
+    .module-badge.enabled  { background: #4ade80; color: #000; }
+    .module-badge.disabled { background: #f87171; color: #fff; }
+
+    /* Content */
+    .content { padding: 16px; }
+
+    /* Spending bar */
+    .spend-card {
+      background: #222;
+      border: 2px solid #333;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
     }
 
-    .info-label {
+    .spend-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .spend-title {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
       font-size: 12px;
       color: #b7c6c2;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
-    .info-value {
-      background: #222;
-      border: 2px solid #333;
-      border-radius: 10px;
-      padding: 10px 14px;
+    .spend-amount {
       font-family: 'DM Mono', monospace;
       font-size: 11px;
       color: #ffe17c;
-      word-break: break-all;
-      line-height: 1.4;
     }
 
-    .divider {
-      height: 2px;
+    .spend-bar-track {
+      height: 10px;
       background: #333;
-      margin: 20px 0;
+      border-radius: 100px;
+      overflow: hidden;
+      border: 1.5px solid #444;
     }
 
-    .action-btn {
+    .spend-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width 0.6s ease;
+    }
+
+    .spend-bar-fill.green  { background: #4ade80; }
+    .spend-bar-fill.orange { background: #f59e0b; }
+    .spend-bar-fill.red    { background: #f87171; }
+
+    .spend-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: #555;
+    }
+
+    /* Policy stats */
+    .stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stat-box {
+      background: #222;
+      border: 2px solid #333;
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .stat-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      color: #777;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: #ffe17c;
+      font-weight: 500;
+    }
+
+    /* Setup state */
+    .setup-card {
+      background: #222;
+      border: 2px solid #333;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .setup-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: #ffe17c;
+      margin-bottom: 6px;
+    }
+
+    .setup-desc {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      color: #b7c6c2;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .nox-input-dark {
+      width: 100%;
+      padding: 10px 12px;
+      background: #111;
+      border: 2px solid #444;
+      border-radius: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: #ffe17c;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    .nox-input-dark::placeholder { color: #555; }
+    .nox-input-dark:focus { border-color: #ffe17c; }
+
+    /* Buttons */
+    .btn-primary {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       background: #ffe17c;
       color: #000;
       border: 2px solid #000;
-      border-radius: 12px;
+      border-radius: 10px;
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
       box-shadow: 4px 4px 0px 0px #000;
       transition: all 0.2s ease;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
-    .action-btn:hover {
+    .btn-primary:hover {
       transform: translate(4px, 4px);
       box-shadow: 0 0 0 0 #000;
     }
 
-    .action-btn.secondary {
+    .btn-secondary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px;
       background: #fff;
+      color: #000;
+      border: 2px solid #444;
+      border-radius: 10px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0px 0px #444;
+      transition: all 0.2s ease;
+      margin-bottom: 8px;
     }
 
+    .btn-secondary:hover {
+      transform: translate(3px, 3px);
+      box-shadow: 0 0 0 0 #444;
+    }
+
+    .btn-ghost {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 8px;
+      background: transparent;
+      color: #555;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .btn-ghost:hover { color: #b7c6c2; }
+
+    /* Loading spinner */
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid #333;
+      border-top-color: #ffe17c;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: #555;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    /* Error */
+    .error-text {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      color: #f87171;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    /* Footer */
     .footer {
-      padding: 12px 20px;
-      border-top: 2px solid #333;
+      padding: 10px 16px;
+      border-top: 2px solid #222;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -161,119 +367,49 @@
 
     .footer-text {
       font-family: 'DM Sans', sans-serif;
-      font-size: 11px;
-      color: #b7c6c2;
-      opacity: 0.6;
+      font-size: 10px;
+      color: #444;
     }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 10px;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 11px;
-      border: 2px solid #000;
-      border-radius: 100px;
-      background: #b7c6c2;
-      color: #000;
-    }
-
-    .instructions {
-      background: #222;
-      border: 2px solid #333;
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 16px;
-    }
-
-    .instructions h3 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      color: #ffe17c;
-      margin-bottom: 8px;
-    }
-
-    .instructions ol {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      color: #b7c6c2;
-      padding-left: 20px;
-      line-height: 1.8;
-    }
-
-    .instructions code {
+    .change-safe {
       font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      color: #ffe17c;
-      background: rgba(0,0,0,0.3);
-      padding: 1px 5px;
-      border-radius: 3px;
+      font-size: 10px;
+      color: #555;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
     }
+
+    .change-safe:hover { color: #ffe17c; }
   </style>
 </head>
 <body>
+  <!-- Header -->
   <div class="header">
     <div class="header-logo">
-      <svg width="16" height="16" viewBox="0 0 32 32" fill="none">
+      <svg width="15" height="15" viewBox="0 0 32 32" fill="none">
         <path d="M16 2L4 8v8c0 7.4 5.12 14.32 12 16 6.88-1.68 12-8.6 12-16V8L16 2z" fill="#ffe17c" stroke="#ffe17c" stroke-width="1"/>
         <path d="M16 9l1.8 3.6H22l-3.4 2.5 1.3 4L16 16.6 12.1 19.1l1.3-4L10 12.6h4.2L16 9z" fill="#000"/>
       </svg>
     </div>
     <h1>Nox-Safe</h1>
-    <span class="version">v0.1.0</span>
+    <div class="oracle-badge" id="oracle-badge">
+      <div class="oracle-dot loading" id="oracle-dot"></div>
+      <span id="oracle-text">Oracle…</span>
+    </div>
   </div>
 
-  <div class="content">
-    <div class="status-card" id="status-card">
-      <div class="status-dot" id="status-dot"></div>
-      <div>
-        <div class="status-text" id="status-text">Checking...</div>
-        <div class="status-sub" id="status-sub">Detecting Safe app</div>
-      </div>
-    </div>
-
-    <div class="info-section">
-      <div class="info-label">Module Contract</div>
-      <div class="info-value">0xbb616000b55d256cEC4fb9E211f4138e43cbA2e5</div>
-    </div>
-
-    <div class="info-section">
-      <div class="info-label">Network</div>
-      <div class="info-value" style="display:flex;align-items:center;gap:8px;">
-        <span class="badge">Sepolia</span>
-        <span style="color:#b7c6c2;font-size:11px;">Chain ID: 11155111</span>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="instructions">
-      <h3>How to use</h3>
-      <ol>
-        <li>Go to <code>app.safe.global</code></li>
-        <li>Open a transaction — the <strong>Shield with Nox</strong> button appears</li>
-        <li>Click it to encrypt your intent</li>
-        <li>Paste the Nox handle from CLI</li>
-        <li>Submit — the TEE does the rest</li>
-      </ol>
-    </div>
-
-    <button class="action-btn" id="open-safe-btn">
-      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Open Safe App
-    </button>
-
-    <button class="action-btn secondary" id="open-dashboard-btn">
-      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" stroke-width="2.5"/><path d="M9 22V12h6v10" stroke="currentColor" stroke-width="2.5"/></svg>
-      Open Dashboard
-    </button>
+  <!-- Main content -->
+  <div class="content" id="main-content">
+    <div class="spinner"></div>
+    <p class="loading-text">Loading…</p>
   </div>
 
+  <!-- Footer -->
   <div class="footer">
-    <span class="footer-text">Nox-Safe Extension</span>
-    <span class="footer-text">iExec WTF!! Hackathon</span>
+    <span class="footer-text">Nox-Safe Extension · Sepolia</span>
+    <button class="change-safe" id="change-safe-btn" style="display:none;">Change Safe</button>
   </div>
 
   <script src="popup.js"></script>

@@ -3,10 +3,11 @@
   "name": "Nox-Safe — Shield Your Safe Transactions",
   "version": "0.1.0",
   "description": "Confidential transaction guard for Safe multisig. Encrypt intents with iExec Nox TEE.",
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["activeTab", "storage", "tabs"],
   "host_permissions": [
     "https://app.safe.global/*",
-    "https://gateway-testnets.noxprotocol.dev/*"
+    "https://gateway-testnets.noxprotocol.dev/*",
+    "https://sepolia.drpc.org/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",

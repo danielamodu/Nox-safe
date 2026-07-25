@@ -475,9 +475,21 @@
 
   // ── Observer — watches both DOM mutations and SPA URL changes ──
 
+  // ── Safe address sync ──
+  // Whenever we detect a Safe in the URL, save it to chrome.storage so the
+  // extension popup can read it without needing a content script on the app.
+
+  function syncSafeAddress() {
+    const match = window.location.href.match(/[?&]safe=\w+:(0x[a-fA-F0-9]{40})/i);
+    if (match) {
+      chrome.storage.local.set({ safeAddress: match[1] });
+    }
+  }
+
   function init() {
     syncFAB();
     injectShieldButton();
+    syncSafeAddress();
 
     // DOM mutations (Safe re-renders buttons dynamically)
     const observer = new MutationObserver(() => {
@@ -492,10 +504,12 @@
       _push(...args);
       syncFAB();
       injectShieldButton();
+      syncSafeAddress();
     };
     window.addEventListener("popstate", () => {
       syncFAB();
       injectShieldButton();
+      syncSafeAddress();
     });
   }
 
