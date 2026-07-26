@@ -11,7 +11,8 @@ coverage.json
 *.tsbuildinfo
 
 # Hardhat
-deployments/
+contracts/deployments/*
+!contracts/deployments/sepolia.json
 .openzeppelin/
 
 # Frontend
@@ -22,7 +23,6 @@ deployments/
 **/.demo-state.json
 
 # Windows / V8 temporary compile cache
-C*
 *.BLOB
 *.MAP
 
