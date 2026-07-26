@@ -36,7 +36,16 @@ export function Header() {
   const navigate = useNavigate();
   const { address, isConnected } = useAccount();
   const { connect } = useConnect();
-  const { disconnect } = useDisconnect();
+  const { disconnectAsync } = useDisconnect();
+
+  const handleDisconnect = async () => {
+    try {
+      await disconnectAsync();
+    } catch {
+      // Ignore wallet_revokePermissions unsupported RPC error from wallet extension
+    }
+    navigate("/connect", { replace: true });
+  };
 
   return (
     <header className="sticky top-0 z-50 h-20 bg-primary border-b-2 border-black flex items-center px-6 gap-6">
@@ -84,21 +93,15 @@ export function Header() {
               {address?.slice(0, 6)}...{address?.slice(-4)}
             </span>
             <button
-              onClick={() => {
-                disconnect();
-                navigate("/connect");
-              }}
-              className="btn-brutal bg-white text-black text-sm !py-2 !px-4"
+              onClick={handleDisconnect}
+              className="btn-brutal bg-white text-black text-sm !py-2 !px-4 hover:bg-red-100 transition-colors"
             >
               Disconnect
             </button>
           </div>
         ) : (
           <button
-            onClick={() => {
-              connect({ connector: injected() });
-              navigate("/connect");
-            }}
+            onClick={() => navigate("/connect")}
             className="btn-primary text-sm !py-2 !px-5"
           >
             Connect Wallet

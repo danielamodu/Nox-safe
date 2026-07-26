@@ -17,7 +17,7 @@ const fadeUp = {
 export function ConnectPage() {
   const { isConnected, address } = useAccount();
   const { connect, isPending } = useConnect();
-  const { disconnect } = useDisconnect();
+  const { disconnectAsync } = useDisconnect();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -120,8 +120,14 @@ export function ConnectPage() {
                 {address?.slice(0, 8)}...{address?.slice(-6)}
               </div>
               <button
-                onClick={() => disconnect()}
-                className="w-full py-2.5 rounded-xl font-body text-sm"
+                onClick={async () => {
+                  try {
+                    await disconnectAsync();
+                  } catch {
+                    // Ignore wallet_revokePermissions RPC error
+                  }
+                }}
+                className="w-full py-2.5 rounded-xl font-body text-sm hover:bg-white/5 transition-colors"
                 style={{ color: "rgba(255,255,255,0.35)", border: "1px solid rgba(255,255,255,0.1)" }}
               >
                 Disconnect
