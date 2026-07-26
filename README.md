@@ -290,34 +290,41 @@ The daemon picks up the event, decrypts the recipient inside the TEE, verifies t
 
 ## Try It Yourself — Sablier Shield
 
-A live demo stream is pre-deployed on Sepolia so judges can test the full shielded withdrawal flow without any setup.
+A live demo stream is deployed on Sepolia against the **real Sablier V2 LockupLinear** contract. The underlying token is `NoxDemoToken` (NDT) — a minimal ERC20 deployed solely for this demo. The entire oracle path is production: real `withdrawMax`, real Nox TEE proof, real ERC20 transfer to the decrypted recipient.
 
 | | |
 |---|---|
-| **Sablier contract** | `0x518B1b36bcfA237c909380D56B6254052b350bb1` (MockSablierLockup) |
-| **Stream ID** | `1` |
+| **Sablier contract** | `0xAFb979d9afAd1aD27C5eFf4E27226E3AB9e5dCC9` (Sablier V2 LockupLinear, Sepolia) |
+| **Stream ID** | see `ADDRESSES.DemoStreamId` in `frontend/src/config/contracts.ts` |
+| **Token** | NoxDemoToken (NDT) — 10 M tokens, 30-day linear vest, no cliff |
 | **Encrypted recipient** | Vitalik's address — `0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045` |
-| **Token** | None — mock stream, oracle flow is fully real |
 
 **Steps for judges:**
 
 1. Go to [noxsafe.vercel.app/app/sablier](https://noxsafe.vercel.app/app/sablier)
-2. Click **"Try Demo Stream →"** — pre-fills the contract address and stream ID
-3. Connect your wallet (any Sepolia wallet, you don't need to be the stream sender)
+2. Click **"Try Demo Stream →"** — pre-fills the real Sablier address and stream ID
+3. Connect any Sepolia wallet (no tokens needed; you are not the stream sender)
 4. Click **"Request Shielded Withdrawal"** — emits `ShieldedWithdrawRequested` on-chain
-5. The running oracle daemon picks it up within ~30 seconds, decrypts the recipient handle inside the Nox TEE, verifies the gateway proof on-chain via `Nox.publicDecrypt`, and calls `withdrawMax` directly
+5. The oracle picks it up within ~30 seconds, decrypts the recipient inside the Nox TEE, verifies `Nox.publicDecrypt` on-chain, calls `sablier.withdrawMax(streamId, recipient)` — real NDT tokens land at Vitalik's address
 
-To verify the Nox proof call fired: open [Sepolia Etherscan → NoxRecipientProxy](https://sepolia.etherscan.io/address/0x1D9f855d88e526745fDb8b04Fe3180a274604172#events) and look for a `ShieldedWithdrawFulfilled` event after your request.
+To verify the proof call fired: [Etherscan → NoxRecipientProxy events](https://sepolia.etherscan.io/address/0x1D9f855d88e526745fDb8b04Fe3180a274604172#events) → look for `ShieldedWithdrawExecuted` after your request.
 
-**Resetting the stream between judges** (run from `nox-task/` directory with a funded Sepolia wallet):
+**Multi-judge:** the stream is 30-day linear with no cliff, vesting ~0.38 NDT/second. After any drain, `withdrawableAmountOf` is non-zero again within ~3 seconds. No manual reset needed.
+
+**Stream setup (one-time, already done — documented for reproducibility):**
 
 ```bash
-cd nox-task
-cp .env.example .env   # fill in SEPOLIA_RPC_URL and ORACLE_PRIVATE_KEY
-npm run setup-demo
-```
+# 1. Compile DemoToken
+cd contracts && npm run compile
 
-The script is idempotent — it creates the stream and registers the encrypted recipient if they don't exist yet, then always resets the withdrawable amount so each judge gets a fresh test.
+# 2. Deploy token, create real Sablier stream, register on NoxRecipientProxy
+cd ../nox-task
+cp .env.example .env   # fill in SEPOLIA_RPC_URL + ORACLE_PRIVATE_KEY
+npm run setup-demo
+
+# 3. Copy the printed stream ID into frontend/src/config/contracts.ts → DemoStreamId
+# 4. git add + commit + push → Vercel auto-deploys
+```
 
 ---
 

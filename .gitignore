@@ -17,6 +17,9 @@ deployments/
 # Frontend
 .vite/
 
+# Demo stream state (local, contains on-chain addresses — commit DemoStreamId to contracts.ts instead)
+.demo-state.json
+
 # OS
 .DS_Store
 Thumbs.db
