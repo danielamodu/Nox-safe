@@ -2,8 +2,7 @@ import { createConfig, http } from "wagmi";
 import { sepolia } from "wagmi/chains";
 import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
 
-// Get a free project ID at https://cloud.walletconnect.com
-const WC_PROJECT_ID = import.meta.env.VITE_WC_PROJECT_ID ?? "b8a1daa2a6b8d0b56c2e3f4a7890abcd";
+const WC_PROJECT_ID = import.meta.env.VITE_WC_PROJECT_ID ?? "";
 
 export const config = createConfig({
   chains: [sepolia],
