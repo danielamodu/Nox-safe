@@ -29,10 +29,10 @@ function WrongNetworkBanner() {
 }
 
 const MOBILE_NAV_ITEMS = [
-  { to: "/app", label: "Dashboard", icon: "📊" },
-  { to: "/app/submit", label: "Submit", icon: "🔒" },
-  { to: "/app/sablier", label: "Sablier", icon: "🛡️" },
-  { to: "/app/history", label: "History", icon: "📜" },
+  { to: "/app", label: "Dashboard" },
+  { to: "/app/submit", label: "Submit Intent" },
+  { to: "/app/sablier", label: "Sablier Shield" },
+  { to: "/app/history", label: "History" },
 ];
 
 function MobileBottomNav() {
@@ -45,12 +45,13 @@ function MobileBottomNav() {
           <Link
             key={item.to}
             to={item.to}
-            className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all ${
-              active ? "bg-black text-primary font-bold" : "text-black hover:bg-black/10"
+            className={`px-2.5 py-1.5 rounded-lg font-heading font-bold text-[11px] uppercase tracking-wider transition-all ${
+              active
+                ? "bg-black text-primary"
+                : "text-black hover:bg-black/10"
             }`}
           >
-            <span className="text-base leading-none">{item.icon}</span>
-            <span className="font-heading text-[11px] uppercase tracking-wide">{item.label}</span>
+            {item.label}
           </Link>
         );
       })}
