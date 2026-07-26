@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAccount, useReadContract } from "wagmi";
-import { createPublicClient, http, isHex } from "viem";
+import { createPublicClient, http, fallback, isHex } from "viem";
 import { sepolia } from "viem/chains";
 import { motion, AnimatePresence } from "motion/react";
 import { useSearchParams } from "react-router-dom";
@@ -10,7 +10,11 @@ import { useSafe } from "../hooks/useSafe";
 
 const drpcClient = createPublicClient({
   chain: sepolia,
-  transport: http("https://sepolia.drpc.org"),
+  transport: fallback([
+    http("https://sepolia.drpc.org"),
+    http("https://ethereum-sepolia-rpc.publicnode.com"),
+    http("https://rpc.ankr.com/eth_sepolia"),
+  ]),
 });
 
 // DRPC free plan caps eth_getLogs at 9 000 blocks per request.

@@ -19,6 +19,12 @@ deployments/
 
 # Demo stream state (local, contains on-chain addresses — commit DemoStreamId to contracts.ts instead)
 .demo-state.json
+**/.demo-state.json
+
+# Windows / V8 temporary compile cache
+C*
+*.BLOB
+*.MAP
 
 # OS
 .DS_Store

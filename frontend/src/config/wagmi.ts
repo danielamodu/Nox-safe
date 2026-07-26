@@ -1,4 +1,4 @@
-import { createConfig, http } from "wagmi";
+import { createConfig, http, fallback } from "wagmi";
 import { sepolia } from "wagmi/chains";
 import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
 
@@ -12,6 +12,11 @@ export const config = createConfig({
     coinbaseWallet({ appName: "Nox-Safe" }),           // Coinbase Wallet
   ],
   transports: {
-    [sepolia.id]: http("https://sepolia.drpc.org"),
+    [sepolia.id]: fallback([
+      http("https://sepolia.drpc.org"),
+      http("https://ethereum-sepolia-rpc.publicnode.com"),
+      http("https://rpc.ankr.com/eth_sepolia"),
+    ]),
   },
 });
+

@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const NOX_MODULE = "0xbb616000b55d256cEC4fb9E211f4138e43cbA2e5";
+  const NOX_MODULE = "0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51";
   const SEPOLIA_CHAIN_ID = "0xaa36a7"; // 11155111
   const NOX_GATEWAY = "https://gateway-testnets.noxprotocol.dev";
 

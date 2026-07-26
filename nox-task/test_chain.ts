@@ -11,7 +11,7 @@ import { createHandleClient } from "@iexec-nox/handle";
 const ALCHEMY = process.env.SEPOLIA_RPC_URL!;
 const ORACLE_KEY = process.env.ORACLE_PRIVATE_KEY!;
 const NOX_COMPUTE = "0x24ef36ec5b626d7dcd09a98f3083c2758f0f77bf";
-const NOX_GUARD_MODULE = process.env.NOX_GUARD_MODULE ?? "0xbb616000b55d256cEC4fb9E211f4138e43cbA2e5";
+const NOX_GUARD_MODULE = process.env.NOX_GUARD_MODULE ?? "0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51";
 
 // Minimal ABI fragments
 const COMPUTE_ABI = [
