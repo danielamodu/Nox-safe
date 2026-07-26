@@ -148,18 +148,18 @@ export function SablierShield() {
       className="space-y-8"
     >
       {/* Header Banner */}
-      <div className="card-brutal bg-cream border-2 border-black p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="card-brutal bg-white border-2 border-black p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="badge-brutal bg-purple-200 text-purple-900 border-black font-mono text-xs">
+            <span className="badge-brutal bg-sage text-black border-black font-mono text-xs">
               Nox-Sablier V2
             </span>
-            <span className="font-mono text-xs text-charcoal/60">Shielded Recipient Wrapper</span>
+            <span className="font-mono text-xs text-black/50">Shielded Recipient Wrapper</span>
           </div>
           <h1 className="font-heading font-bold text-2xl text-black mt-1">
             Sablier V2 Privacy Shield
           </h1>
-          <p className="font-body text-sm text-charcoal/80 mt-1 max-w-2xl">
+          <p className="font-body text-sm text-black/70 mt-1 max-w-2xl">
             Shield the on-chain link between public Sablier streaming payrolls and recipient wallets.
             The actual recipient is encrypted via Nox TEE and validated by oracle gateway proofs upon withdrawal.
           </p>
@@ -173,7 +173,7 @@ export function SablierShield() {
           <button
             onClick={() => setTab("shield")}
             className={`px-4 py-2 rounded-lg font-body font-bold text-sm border-2 border-black transition-all ${
-              tab === "shield" ? "bg-primary text-black" : "bg-cream text-charcoal"
+              tab === "shield" ? "bg-primary text-black" : "bg-white text-black hover:bg-gray-50"
             }`}
             style={{ boxShadow: tab === "shield" ? "2px 2px 0px #000" : "none" }}
           >
@@ -182,7 +182,7 @@ export function SablierShield() {
           <button
             onClick={() => setTab("withdraw")}
             className={`px-4 py-2 rounded-lg font-body font-bold text-sm border-2 border-black transition-all ${
-              tab === "withdraw" ? "bg-primary text-black" : "bg-cream text-charcoal"
+              tab === "withdraw" ? "bg-primary text-black" : "bg-white text-black hover:bg-gray-50"
             }`}
             style={{ boxShadow: tab === "withdraw" ? "2px 2px 0px #000" : "none" }}
           >
@@ -208,7 +208,7 @@ export function SablierShield() {
                 value={sablierAddr}
                 onChange={(e) => setSablierAddr(e.target.value as `0x${string}`)}
                 placeholder="0x..."
-                className="w-full font-mono text-sm px-4 py-2.5 bg-cream border-2 border-black rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-primary"
+                className="input-brutal font-mono text-sm"
               />
             </div>
 
@@ -221,7 +221,7 @@ export function SablierShield() {
                 value={streamId}
                 onChange={(e) => setStreamId(e.target.value)}
                 placeholder="e.g. 101"
-                className="w-full font-mono text-sm px-4 py-2.5 bg-cream border-2 border-black rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-primary"
+                className="input-brutal font-mono text-sm"
               />
             </div>
 
@@ -234,10 +234,10 @@ export function SablierShield() {
                 value={recipient}
                 onChange={(e) => setRecipient(e.target.value)}
                 placeholder="0x..."
-                className="w-full font-mono text-sm px-4 py-2.5 bg-cream border-2 border-black rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-primary"
+                className="input-brutal font-mono text-sm"
               />
-              <p className="font-mono text-xs text-purple-700 mt-1">
-                🔒 Will be encrypted into a Nox handle before submission.
+              <p className="font-body text-xs text-sage mt-1">
+                Encrypted into a Nox handle before submission — the raw address never leaves your browser.
               </p>
             </div>
 
@@ -269,7 +269,7 @@ export function SablierShield() {
                 value={sablierAddr}
                 onChange={(e) => setSablierAddr(e.target.value as `0x${string}`)}
                 placeholder="0x..."
-                className="w-full font-mono text-sm px-4 py-2.5 bg-cream border-2 border-black rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-primary"
+                className="input-brutal font-mono text-sm"
               />
             </div>
 
@@ -282,7 +282,7 @@ export function SablierShield() {
                 value={streamId}
                 onChange={(e) => setStreamId(e.target.value)}
                 placeholder="e.g. 101"
-                className="w-full font-mono text-sm px-4 py-2.5 bg-cream border-2 border-black rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-primary"
+                className="input-brutal font-mono text-sm"
               />
             </div>
 
@@ -298,20 +298,32 @@ export function SablierShield() {
 
         {/* Status & Alerts */}
         {statusMsg && (
-          <div className="p-4 bg-blue-50 border-2 border-black rounded-lg text-blue-900 font-mono text-xs">
-            ℹ️ {statusMsg}
+          <div className="flex items-start gap-3 p-4 bg-sage/10 border-2 border-black rounded-xl">
+            <div className="w-5 h-5 border-4 border-black border-t-transparent rounded-full animate-spin shrink-0 mt-0.5" />
+            <p className="font-body text-sm text-black">{statusMsg}</p>
           </div>
         )}
 
         {error && (
-          <div className="p-4 bg-red-50 border-2 border-black rounded-lg text-red-900 font-mono text-xs">
-            ⚠️ {error}
+          <div className="p-4 bg-red-50 border-2 border-red-500 rounded-xl">
+            <p className="font-body text-sm text-red-700 break-words">{error}</p>
+            <button onClick={() => setError("")} className="font-body text-xs text-red-400 mt-1">Dismiss</button>
           </div>
         )}
 
         {isSuccess && (
-          <div className="p-4 bg-green-50 border-2 border-black rounded-lg text-green-900 font-mono text-xs">
-            ✅ Transaction confirmed on Sepolia! Tx: {txHash?.slice(0, 10)}...{txHash?.slice(-8)}
+          <div className="p-4 bg-primary/20 border-2 border-black rounded-xl space-y-1">
+            <p className="font-heading font-bold text-sm text-black">Transaction confirmed on Sepolia</p>
+            {txHash && (
+              <a
+                href={`https://sepolia.etherscan.io/tx/${txHash}`}
+                target="_blank"
+                rel="noreferrer"
+                className="font-mono text-xs text-black/60 hover:text-black transition-colors break-all"
+              >
+                {txHash.slice(0, 18)}…{txHash.slice(-10)} ↗
+              </a>
+            )}
           </div>
         )}
       </div>

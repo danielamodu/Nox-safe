@@ -96,7 +96,7 @@ const STEPS = [
 const STATS = [
   { value: "0", label: "Trust Assumptions", sub: "On-chain policy enforced" },
   { value: "100%", label: "Confidential", sub: "Encrypted until execution" },
-  { value: "<2s", label: "TEE Verification", sub: "Decrypt → validate → execute" },
+  { value: "~30s", label: "TEE Latency", sub: "Decrypt → validate → execute" },
 ];
 
 const COMPARE = {
@@ -592,7 +592,7 @@ export function Landing() {
               <div className="flex flex-wrap justify-center gap-3">
                 <div className="badge-brutal bg-primary text-black">NoxGuardModule</div>
                 <div className="badge-brutal bg-sage text-black">PolicyRegistry</div>
-                <div className="badge-brutal bg-white text-black">NoxVerifier</div>
+                <div className="badge-brutal bg-white text-black">Proof Verification</div>
                 <div className="badge-brutal bg-primary text-black">iExec Nox TEE</div>
               </div>
             </div>
@@ -698,7 +698,7 @@ export function Landing() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="bg-white border-y-2 border-black py-20 md:py-28">
+      <section id="faq" className="bg-white border-y-2 border-black py-20 md:py-28">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-16">
             <div className="badge-brutal bg-sage text-black text-xs mx-auto mb-4">FAQ</div>
@@ -801,7 +801,7 @@ export function Landing() {
                     { name: "Submit Intent", href: "/app/submit" },
                     { name: "Intent History", href: "/app/history" },
                     { name: "Policy View", href: "/app/policy" },
-                    { name: "Chrome Extension", href: "#" },
+                    { name: "Sablier Shield", href: "/app/sablier" },
                   ],
                 },
                 {
@@ -811,7 +811,7 @@ export function Landing() {
                     { name: "Privacy Policy", href: "/privacy" },
                     { name: "Terms of Service", href: "/terms" },
                     { name: "How it Works", href: "#how-it-works" },
-                    { name: "FAQ", href: "#" },
+                    { name: "FAQ", href: "#faq" },
                   ],
                 },
                 {

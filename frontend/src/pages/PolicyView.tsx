@@ -1,6 +1,7 @@
 import { useAccount, useReadContract } from "wagmi";
 import { formatEther } from "viem";
 import { motion } from "motion/react";
+import { Link } from "react-router-dom";
 import { ADDRESSES, REGISTRY_ABI } from "../config/contracts";
 import { useSafe } from "../hooks/useSafe";
 import { SafeInput } from "../components/SafeInput";
@@ -161,15 +162,20 @@ export function PolicyView() {
           </div>
 
           {/* How to update */}
-          <div className="card-brutal bg-charcoal text-sage">
-            <h3 className="font-heading font-bold text-lg text-primary mb-3">
-              How to Update Policy
+          <div className="card-brutal bg-charcoal text-sage space-y-4">
+            <h3 className="font-heading font-bold text-lg text-primary">
+              Update Policy
             </h3>
             <p className="font-body text-sm leading-relaxed">
-              Policies can only be set by the Safe itself (via a multisig transaction).
-              Call <code className="font-mono text-xs text-primary bg-black/30 px-1.5 py-0.5 rounded">
-              PolicyRegistry.setPolicy()</code> from your Safe to update the whitelist and spending caps.
+              Policies can only be changed by the Safe itself via a multisig transaction.
+              Use the Setup wizard to propose a new policy — all required owners will be prompted to sign.
             </p>
+            <Link
+              to="/app/setup"
+              className="btn-primary btn-brutal-lg block text-center"
+            >
+              Update Spending Rules →
+            </Link>
           </div>
         </motion.div>
       )}
