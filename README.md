@@ -213,7 +213,7 @@ The daemon scans the last 100 blocks on startup, then polls every 12 seconds. Al
 
 ### 4. Chrome Extension
 
-No build step required.
+No build step required. See [extension/INSTALL.md](extension/INSTALL.md) for a step-by-step guide with GIF walkthrough.
 
 1. Open Chrome → `chrome://extensions`
 2. Enable **Developer mode** (top-right toggle)

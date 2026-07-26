@@ -1,8 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Nox-Safe — Shield Your Safe Transactions",
+  "short_name": "Nox-Safe",
   "version": "0.1.0",
   "description": "Confidential transaction guard for Safe multisig. Encrypt intents with iExec Nox TEE.",
+  "homepage_url": "https://noxsafe.vercel.app",
   "permissions": ["activeTab", "storage", "tabs"],
   "host_permissions": [
     "https://app.safe.global/*",
