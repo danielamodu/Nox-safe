@@ -75,7 +75,7 @@ A Manifest V3 content script that injects into `app.safe.global`. On pages where
 | `PolicyRegistry` | `0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1` | [view](https://sepolia.etherscan.io/address/0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1) |
 | `NoxGuardModule` | `0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51` | [view](https://sepolia.etherscan.io/address/0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51) |
 | `NoxRecipientProxy` | `0x1D9f855d88e526745fDb8b04Fe3180a274604172` | [view](https://sepolia.etherscan.io/address/0x1D9f855d88e526745fDb8b04Fe3180a274604172) |
-| `SablierV2LockupLinear` (Sepolia, Sablier-deployed) | `0xAFb979d9afAd1aD27C5eFf4E27226E3AB9e5dCC9` | [view](https://sepolia.etherscan.io/address/0xAFb979d9afAd1aD27C5eFf4E27226E3AB9e5dCC9) |
+| `SablierV2LockupLinear` v1.1.2 (Sepolia, Sablier-deployed) | `0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301` | [view](https://sepolia.etherscan.io/address/0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301) |
 | `NoxCompute` (iExec, used by Nox SDK) | `0x24Ef36Ec5b626D7DCD09a98F3083c2758F0F77bF` | [view](https://sepolia.etherscan.io/address/0x24Ef36Ec5b626D7DCD09a98F3083c2758F0F77bF) |
 
 > `MockSafe` and `MockSablierLockup` are test helpers; their addresses are in `contracts/deployments/sepolia.json`. On-chain proof verification is handled by `Nox.publicDecrypt()` in the iExec Nox SDK, which calls `NoxCompute` — there is no separately deployed NoxVerifier contract.
@@ -294,7 +294,7 @@ A live demo stream is deployed on Sepolia against the **real Sablier V2 LockupLi
 
 | | |
 |---|---|
-| **Sablier contract** | `0xAFb979d9afAd1aD27C5eFf4E27226E3AB9e5dCC9` (Sablier V2 LockupLinear, Sepolia) |
+| **Sablier contract** | `0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301` (SablierV2LockupLinear v1.1.2, Sepolia) |
 | **Stream ID** | see `ADDRESSES.DemoStreamId` in `frontend/src/config/contracts.ts` |
 | **Token** | NoxDemoToken (NDT) — 10 M tokens, 30-day linear vest, no cliff |
 | **Encrypted recipient** | Vitalik's address — `0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045` |

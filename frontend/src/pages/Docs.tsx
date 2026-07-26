@@ -58,7 +58,7 @@ NoxGuardModule (on-chain)
                   ["PolicyRegistry", "0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1"],
                   ["NoxGuardModule", "0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51"],
                   ["NoxRecipientProxy", "0x1D9f855d88e526745fDb8b04Fe3180a274604172"],
-                  ["SablierV2LockupLinear", "0xAFb979d9afAd1aD27C5eFf4E27226E3AB9e5dCC9"],
+                  ["SablierV2LockupLinear v1.1.2", "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301"],
                   ["NoxCompute (iExec)", "0x24Ef36Ec5b626D7DCD09a98F3083c2758F0F77bF"],
                 ].map(([name, addr], i) => (
                   <tr key={name} className={i % 2 === 0 ? "bg-white" : "bg-[#f5f0e8]"}>

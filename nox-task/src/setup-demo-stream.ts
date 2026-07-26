@@ -42,7 +42,8 @@ const STATE_PATH     = join(__dir, "../.demo-state.json");
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const REAL_SABLIER  = "0xAFb979d9afAd1aD27C5eFf4E27226E3AB9e5dCC9";
+// SablierV2LockupLinear v1.1.2 on Sepolia — verified from sablier-labs/deployments repo
+const REAL_SABLIER  = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301";
 const NOX_PROXY     = "0x1D9f855d88e526745fDb8b04Fe3180a274604172";
 const DEMO_RECIPIENT = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Vitalik — memorable
 
