@@ -149,6 +149,16 @@ NOX_RECIPIENT_PROXY=0x1D9f855d88e526745fDb8b04Fe3180a274604172`}</CodeBlock>
             </p>
           </Section>
 
+          {/* Production architecture */}
+          <Section title="Production architecture">
+            <p>
+              In this hackathon build the oracle runs as a standard Node.js process. The oracle operator can observe decrypted transaction details — target address and ETH value — during processing. <code>Nox.publicDecrypt</code> enforces on-chain proof verification, so the oracle cannot execute transactions that weren't authorized by the submitter, but it can see what those transactions contain.
+            </p>
+            <p>
+              In production the oracle is packaged as a Docker image and deployed as an iExec worker app running inside an SGX enclave — the runtime Nox is specifically designed for. Decryption happens inside hardware-verified isolation: the operator cannot inspect memory, and remote attestation lets anyone verify the enclave code matches the published image. The path there is straightforward: containerize <code>nox-task</code>, register it as an iExec app, and configure a perpetual deal so the worker runs continuously. No contract changes are needed.
+            </p>
+          </Section>
+
           {/* Chrome extension */}
           <Section title="Chrome Extension">
             <p>

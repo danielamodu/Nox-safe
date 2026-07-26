@@ -328,6 +328,14 @@ npm run setup-demo
 
 ---
 
+## Production Architecture
+
+In this hackathon build the oracle runs as a standard Node.js process. The oracle operator can observe decrypted transaction details — target address and ETH value — during processing. `Nox.publicDecrypt` enforces on-chain proof verification, so the oracle cannot execute transactions that weren't authorized by the submitter, but it can see what those transactions contain.
+
+In production the oracle is packaged as a Docker image and deployed as an iExec worker app running inside an SGX enclave — the runtime Nox is specifically designed for. Decryption happens inside hardware-verified isolation: the operator cannot inspect memory, and remote attestation lets anyone verify the enclave code matches the published image. The path there is straightforward: containerize `nox-task`, register it as an iExec app, and configure a perpetual deal so the worker runs continuously. No contract changes are needed.
+
+---
+
 ## Known Limitations
 
 **Calldata privacy gap (v1).** Transaction calldata (`data`) is cleartext. Its `keccak256` hash is committed at intent submission so the oracle cannot swap it out, but the calldata itself is visible in the `IntentSubmitted` event. For native ETH transfers (`data = 0x`) there is nothing to leak. For ERC-20 transfers or DeFi calls where the recipient address is encoded in the calldata, that recipient is readable. Encrypting arbitrary-length calldata requires a `euint8[]` or `eBytes` Nox type — a v2 item.
