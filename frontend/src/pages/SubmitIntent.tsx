@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import {
   useAccount,
+  useChainId,
+  useSwitchChain,
   useWalletClient,
   useWriteContract,
   useWaitForTransactionReceipt,
@@ -61,6 +63,8 @@ type Step = "form" | "encrypting" | "submitting" | "done";
 
 export function SubmitIntent() {
   const { isConnected } = useAccount();
+  const chainId = useChainId();
+  const { switchChain } = useSwitchChain();
   const { data: walletClient } = useWalletClient();
   const { safeAddress } = useSafe();
   const hasSafe = safeAddress.length === 42;
@@ -133,7 +137,11 @@ export function SubmitIntent() {
       return;
     }
     if (!walletClient) {
-      setError("Wallet not ready");
+      if (!isConnected) {
+        setError("Please connect your wallet first.");
+      } else {
+        setError("Wallet not ready on Sepolia. Please enable Testnet Mode in your wallet extension and switch to Sepolia.");
+      }
       return;
     }
 
@@ -287,7 +295,25 @@ export function SubmitIntent() {
             />
           </div>
 
-          {error && <p className="text-red-500 font-body text-sm">{error}</p>}
+          {chainId !== sepolia.id && isConnected && (
+            <div className="p-4 bg-red-500/10 border-2 border-red-500/30 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 my-2">
+              <div className="flex flex-col text-left">
+                <span className="font-heading font-bold text-xs text-red-400">Wrong Network detected</span>
+                <span className="font-body text-xs text-sage/80 mt-0.5">
+                  Nox-Safe runs on Sepolia Testnet. Please switch your wallet or enable "Testnet Mode" in Zerion/Rabby.
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => switchChain({ chainId: sepolia.id })}
+                className="btn-brutal bg-white text-black text-xs font-bold shrink-0 !py-2 !px-4 hover:bg-sage/20 transition-colors"
+              >
+                Switch to Sepolia
+              </button>
+            </div>
+          )}
+
+          {error && <p className="text-red-400 font-body text-sm bg-red-500/10 p-3 rounded-lg border border-red-500/20">{error}</p>}
 
           <button
             onClick={handleSubmit}

@@ -48,16 +48,16 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 h-20 bg-primary border-b-2 border-black flex items-center px-6 gap-6">
+    <header className="sticky top-0 z-50 h-20 bg-primary border-b-2 border-black flex items-center px-4 sm:px-6 gap-3 sm:gap-6">
       {/* Logo */}
-      <Link to="/" className="flex items-center gap-3 shrink-0">
-        <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
+      <Link to="/" className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="w-9 h-9 sm:w-10 sm:h-10 bg-black rounded-lg flex items-center justify-center">
           <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
             <path d="M16 2L4 8v8c0 7.4 5.12 14.32 12 16 6.88-1.68 12-8.6 12-16V8L16 2z" fill="#ffe17c" stroke="#ffe17c" strokeWidth="1"/>
             <path d="M16 9l1.8 3.6H22l-3.4 2.5 1.3 4L16 16.6 12.1 19.1l1.3-4L10 12.6h4.2L16 9z" fill="#000"/>
           </svg>
         </div>
-        <span className="font-heading font-bold text-xl text-black tracking-tight">
+        <span className="font-heading font-bold text-lg sm:text-xl text-black tracking-tight">
           Nox-Safe
         </span>
       </Link>
@@ -88,9 +88,12 @@ export function Header() {
       {/* Wallet */}
       <div className="ml-auto">
         {isConnected ? (
-          <div className="flex items-center gap-3">
-            <span className="badge-brutal bg-white text-black text-xs font-mono">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="badge-brutal bg-white text-black text-xs font-mono hidden sm:inline-block">
               {address?.slice(0, 6)}...{address?.slice(-4)}
+            </span>
+            <span className="badge-brutal bg-white text-black text-[11px] font-mono sm:hidden">
+              {address?.slice(0, 4)}...{address?.slice(-2)}
             </span>
             <button
               onClick={handleDisconnect}

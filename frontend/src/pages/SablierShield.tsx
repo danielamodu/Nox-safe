@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAccount, useWalletClient, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useAccount, useChainId, useSwitchChain, useWalletClient, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { motion } from "motion/react";
 import { createWalletClient, custom, isAddress } from "viem";
 import { sepolia } from "viem/chains";
