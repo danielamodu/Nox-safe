@@ -1,4 +1,5 @@
-import { Outlet } from "react-router-dom";
+import { useEffect } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { sepolia } from "wagmi/chains";
 import { Header } from "./Header";
@@ -28,6 +29,15 @@ function WrongNetworkBanner() {
 }
 
 export function Layout() {
+  const navigate = useNavigate();
+  const { isConnected, isConnecting, isReconnecting } = useAccount();
+
+  useEffect(() => {
+    if (!isConnected && !isConnecting && !isReconnecting) {
+      navigate("/connect", { replace: true });
+    }
+  }, [isConnected, isConnecting, isReconnecting, navigate]);
+
   return (
     <div className="min-h-screen flex flex-col bg-charcoal">
       <Header />

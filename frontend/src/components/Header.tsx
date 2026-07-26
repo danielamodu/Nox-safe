@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAccount, useConnect, useDisconnect, useReadContract } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { ADDRESSES, MODULE_ABI } from "../config/contracts";
@@ -13,16 +13,12 @@ function OracleBadge() {
     query: { staleTime: 60_000 },
   });
   const online = !isError && !!oracleAddr && oracleAddr !== ZERO_ADDR;
-  const pending = oracleAddr === undefined && !isError;
+
   return (
-    <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-black/10 rounded-full border border-black/20">
-      <span
-        className={`w-2 h-2 rounded-full border border-black/30 ${
-          pending ? "bg-gray-300 animate-pulse" : online ? "bg-green-400" : "bg-yellow-400 animate-pulse"
-        }`}
-      />
-      <span className="font-mono text-xs text-black/70">
-        {pending ? "Oracle…" : online ? "Oracle Active" : "Oracle Offline"}
+    <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/20 border border-black/30">
+      <span className={`w-2 h-2 rounded-full ${online ? "bg-green-400 animate-pulse" : "bg-red-400"}`} />
+      <span className="font-mono text-xs text-black font-semibold">
+        {online ? "Oracle Active" : "Oracle Offline"}
       </span>
     </div>
   );
@@ -37,6 +33,7 @@ const NAV_LINKS = [
 
 export function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { address, isConnected } = useAccount();
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
@@ -87,7 +84,10 @@ export function Header() {
               {address?.slice(0, 6)}...{address?.slice(-4)}
             </span>
             <button
-              onClick={() => disconnect()}
+              onClick={() => {
+                disconnect();
+                navigate("/connect");
+              }}
               className="btn-brutal bg-white text-black text-sm !py-2 !px-4"
             >
               Disconnect
@@ -95,7 +95,10 @@ export function Header() {
           </div>
         ) : (
           <button
-            onClick={() => connect({ connector: injected() })}
+            onClick={() => {
+              connect({ connector: injected() });
+              navigate("/connect");
+            }}
             className="btn-primary text-sm !py-2 !px-5"
           >
             Connect Wallet
