@@ -230,9 +230,22 @@ export function Landing() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left — Text */}
             <motion.div variants={stagger(0.1)} initial="hidden" animate="show">
-              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 badge-brutal bg-charcoal text-primary text-xs border-primary/30 mb-8">
-                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                Live on Sepolia Testnet
+              {/* Top iExec Nox Integration Badge */}
+              <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-3 mb-8">
+                <a
+                  href="https://docs.noxprotocol.dev"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 badge-brutal bg-primary text-black text-xs font-heading font-bold border-2 border-black hover:bg-primary/90 transition-colors"
+                >
+                  <span className="w-2 h-2 rounded-full bg-black animate-pulse" />
+                  <span>Powered by iExec Nox</span>
+                  <span className="opacity-60 text-[10px] uppercase font-mono">TEE Layer</span>
+                </a>
+                <div className="inline-flex items-center gap-2 badge-brutal bg-charcoal text-primary text-xs border-primary/30">
+                  <span className="w-2 h-2 rounded-full bg-primary" />
+                  Sepolia Testnet
+                </div>
               </motion.div>
 
               <motion.h1 variants={fadeUp} className="font-heading font-extrabold text-5xl md:text-6xl lg:text-7xl text-white leading-[1.05] tracking-tight">
@@ -242,9 +255,8 @@ export function Landing() {
               </motion.h1>
 
               <motion.p variants={fadeUp} className="font-body text-lg md:text-xl text-sage mt-6 max-w-lg leading-relaxed">
-                Nox-Safe encrypts your Safe multisig transactions before they hit the blockchain.
-                A Trusted Execution Environment validates them against your spending policy.
-                Nobody sees your moves until they're done.
+                Nox-Safe encrypts your Safe multisig transactions before they hit the blockchain using iExec Nox TEE handles.
+                Nobody sees your moves until they're executed.
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-wrap gap-4 mt-10">
@@ -256,7 +268,7 @@ export function Landing() {
                 </a>
               </motion.div>
 
-              <motion.div variants={fadeUp} className="flex flex-wrap gap-8 mt-14 pt-8 border-t border-sage/20">
+              <motion.div variants={fadeUp} className="flex flex-wrap gap-8 mt-8 pt-6 border-t border-sage/10">
                 {STATS.map((s) => (
                   <div key={s.label}>
                     <p className="font-heading font-extrabold text-3xl text-primary">{s.value}</p>
