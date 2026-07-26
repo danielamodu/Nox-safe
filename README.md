@@ -288,6 +288,39 @@ The daemon picks up the event, decrypts the recipient inside the TEE, verifies t
 
 ---
 
+## Try It Yourself — Sablier Shield
+
+A live demo stream is pre-deployed on Sepolia so judges can test the full shielded withdrawal flow without any setup.
+
+| | |
+|---|---|
+| **Sablier contract** | `0x518B1b36bcfA237c909380D56B6254052b350bb1` (MockSablierLockup) |
+| **Stream ID** | `1` |
+| **Encrypted recipient** | Vitalik's address — `0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045` |
+| **Token** | None — mock stream, oracle flow is fully real |
+
+**Steps for judges:**
+
+1. Go to [noxsafe.vercel.app/app/sablier](https://noxsafe.vercel.app/app/sablier)
+2. Click **"Try Demo Stream →"** — pre-fills the contract address and stream ID
+3. Connect your wallet (any Sepolia wallet, you don't need to be the stream sender)
+4. Click **"Request Shielded Withdrawal"** — emits `ShieldedWithdrawRequested` on-chain
+5. The running oracle daemon picks it up within ~30 seconds, decrypts the recipient handle inside the Nox TEE, verifies the gateway proof on-chain via `Nox.publicDecrypt`, and calls `withdrawMax` directly
+
+To verify the Nox proof call fired: open [Sepolia Etherscan → NoxRecipientProxy](https://sepolia.etherscan.io/address/0x1D9f855d88e526745fDb8b04Fe3180a274604172#events) and look for a `ShieldedWithdrawFulfilled` event after your request.
+
+**Resetting the stream between judges** (run from `nox-task/` directory with a funded Sepolia wallet):
+
+```bash
+cd nox-task
+cp .env.example .env   # fill in SEPOLIA_RPC_URL and ORACLE_PRIVATE_KEY
+npm run setup-demo
+```
+
+The script is idempotent — it creates the stream and registers the encrypted recipient if they don't exist yet, then always resets the withdrawable amount so each judge gets a fresh test.
+
+---
+
 ## Known Limitations
 
 **Calldata privacy gap (v1).** Transaction calldata (`data`) is cleartext. Its `keccak256` hash is committed at intent submission so the oracle cannot swap it out, but the calldata itself is visible in the `IntentSubmitted` event. For native ETH transfers (`data = 0x`) there is nothing to leak. For ERC-20 transfers or DeFi calls where the recipient address is encoded in the calldata, that recipient is readable. Encrypting arbitrary-length calldata requires a `euint8[]` or `eBytes` Nox type — a v2 item.
@@ -301,8 +334,6 @@ The daemon picks up the event, decrypts the recipient inside the TEE, verifies t
 **Event-log based history (no subgraph).** The transaction history page fetches `IntentSubmitted` events via `getLogs` filtered by the Safe address, using 6 parallel 9,000-block chunks via DRPC (~54,000 blocks, roughly 7.5 days). This covers the typical use window but does not provide a full audit trail back to genesis. A subgraph or off-chain indexer would be needed for exhaustive historical lookups across arbitrary time ranges.
 
 **Oracle is a trusted party for decrypted content.** The oracle must decrypt the target address and value to validate and submit `fulfillIntent`. It observes all transaction details during processing. `Nox.publicDecrypt` verifies proofs on-chain, preventing the oracle from executing unauthorized transactions, but does not prevent the oracle operator from observing transaction contents. In production, the oracle should be run inside a TEE enclave with remote attestation, removing operator visibility.
-
-**Sablier shielded recipient flow is not surfaced in the web UI.** `NoxRecipientProxy.sol` and the oracle daemon fully implement the shielded Sablier withdrawal flow, but the web frontend does not expose it in this build — it requires a live Sablier lockup stream and is demonstrated via the E2E deployment scripts rather than the app UI.
 
 ---
 

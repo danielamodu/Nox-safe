@@ -166,6 +166,26 @@ export function SablierShield() {
         </div>
       </div>
 
+      {/* Demo Stream Callout */}
+      <div className="card-brutal bg-primary border-2 border-black p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <p className="font-heading font-bold text-sm text-black">Try the Live Demo Stream</p>
+          <p className="font-body text-xs text-black/70 mt-0.5">
+            Stream ID 1 on MockSablierLockup — pre-registered, withdrawable amount reset for each judge.
+          </p>
+        </div>
+        <button
+          onClick={() => {
+            setSablierAddr(ADDRESSES.MockSablierLockup as `0x${string}`);
+            setStreamId("1");
+            setTab("withdraw");
+          }}
+          className="btn-primary whitespace-nowrap shrink-0"
+        >
+          Try Demo Stream →
+        </button>
+      </div>
+
       {/* Main Form Card */}
       <div className="card-brutal bg-white border-2 border-black p-6 space-y-6">
         {/* Tab Selection */}
