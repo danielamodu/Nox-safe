@@ -233,7 +233,7 @@ export function Landing() {
               {/* Top iExec Nox Integration Badge */}
               <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-3 mb-8">
                 <a
-                  href="https://docs.noxprotocol.dev"
+                  href="https://docs.noxprotocol.io/getting-started/welcome"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 badge-brutal bg-primary text-black text-xs font-heading font-bold border-2 border-black hover:bg-primary/90 transition-colors"
@@ -829,7 +829,7 @@ export function Landing() {
                 {
                   title: "Resources",
                   links: [
-                    { name: "iExec Nox Docs", href: "https://docs.noxprotocol.dev" },
+                    { name: "iExec Nox Docs", href: "https://docs.noxprotocol.io/getting-started/welcome" },
                     { name: "Safe Documentation", href: "https://docs.safe.global" },
                     { name: "NoxGuardModule on Etherscan", href: "https://sepolia.etherscan.io/address/0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51" },
                     { name: "Sepolia Faucet", href: "https://sepoliafaucet.com" },
