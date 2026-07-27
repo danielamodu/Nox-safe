@@ -1,6 +1,12 @@
 # Nox-Safe
 
-Nox-Safe adds iExec Nox as a confidentiality layer into two existing, unmodified protocols — **Safe** (multisig treasury) and **Sablier** (token streaming) — without forking either one. It is not a standalone wallet or new chain primitive. The recipient address and ETH value of every Safe transaction are encrypted client-side via the Nox TEE gateway and travel on-chain only as opaque 32-byte handles. A Nox oracle daemon decrypts them inside the TEE, validates them against a per-Safe policy, and executes the transaction through Safe's standard module interface. The Sablier integration works the same way: a stream creator registers an encrypted end-recipient through `NoxRecipientProxy`, and no one on-chain can read the destination until the oracle fulfills a withdrawal.
+**Privacy infrastructure for on-chain finance, powered by iExec Nox TEE.**
+
+We integrated iExec Nox TEE into two existing, widely-used protocols — Safe ($100B+ TVL) and Sablier — as two distinct privacy primitives. Neither protocol is forked or modified. Both run on real Sepolia infrastructure with a 24/7 oracle and no mock data.
+
+**Nox-Safe (product)** — Confidential treasury execution for Safe multisig. Hide transaction target and value until the moment of execution. Built for DAOs, funds, and companies who can't afford to leak trading intent on-chain. Recipient address and ETH value are encrypted client-side via the Nox TEE gateway and travel on-chain only as opaque 32-byte handles. A Nox oracle daemon decrypts them inside the TEE, validates against a per-Safe policy, and executes through Safe's standard module interface.
+
+**NoxPay** — Confidential payroll streaming on Sablier. Shield employee wallet addresses from public view. Built for companies paying contributors on-chain without exposing who earns what. A stream creator registers an encrypted end-recipient through `NoxRecipientProxy`; no one on-chain can read the destination until the oracle fulfills a withdrawal.
 
 ---
 
@@ -64,7 +70,12 @@ A Node.js polling process (ethers v6) that listens for `IntentSubmitted` and `Sh
 
 ### Chrome Extension
 
-A Manifest V3 content script that injects into `app.safe.global`. On pages where a real Safe is selected (`?safe=<network>:0x...` in the URL), it adds a floating "Shield with Nox" button and an inline button next to Safe's execute/sign controls. The modal auto-detects the target address and value from Safe's form fields, encrypts them via the Nox gateway, and submits to `NoxGuardModule` through MetaMask.
+A Manifest V3 extension that injects context-aware buttons into two dapps:
+
+- **app.safe.global** — on pages where a real Safe is selected (`?safe=<network>:0x...` in the URL), adds a floating "Shield with Nox" button and an inline button next to Safe's execute/sign controls. Auto-detects target address and value from Safe's form fields, encrypts via the Nox gateway, and submits to `NoxGuardModule` through MetaMask.
+- **app.sablier.com** — on any stream page, adds a floating "Pay with NoxPay" button. On stream detail pages, auto-detects the stream ID from the URL and opens NoxPay's withdrawal page with the stream pre-filled.
+
+The popup displays both product cards (Nox-Safe and NoxPay) linking to [noxsafe.website](https://noxsafe.website), plus a live Nox-Safe dashboard (oracle status, daily spend, policy caps) for any detected Safe address.
 
 ---
 
@@ -111,7 +122,7 @@ Nox-safe/
 │   └── deployments/sepolia.json   ← canonical deployed addresses
 ├── frontend/               React + Vite + wagmi web app
 │   └── src/
-│       ├── pages/          Dashboard, SubmitIntent, SablierShield, …
+│       ├── pages/          Dashboard, SubmitIntent, NoxPayCreate, NoxPayStreams, NoxPayWithdraw, …
 │       ├── hooks/          useSafeSetup.ts (Safe Protocol Kit + API Kit)
 │       └── config/         contracts.ts (ABIs + addresses)
 ├── nox-task/               Oracle daemon (Node.js + ethers v6)
@@ -218,9 +229,9 @@ No build step required. See [extension/INSTALL.md](extension/INSTALL.md) for a s
 1. Open Chrome → `chrome://extensions`
 2. Enable **Developer mode** (top-right toggle)
 3. **Load unpacked** → select the `extension/` folder
-4. Go to `https://app.safe.global` and open an existing Safe
+4. Go to `https://app.safe.global` and open an existing Safe, or visit `https://app.sablier.com`
 
-The floating "Shield with Nox" button appears only on transactional pages where a Safe is selected. It does not appear on account creation, settings, or any page without a `?safe=...` query parameter.
+On Safe: the floating "Shield with Nox" button appears only on transactional pages where a Safe is selected (`?safe=...` in the URL). On Sablier: a "Pay with NoxPay" button appears on all pages; stream detail pages auto-detect the stream ID and pre-fill the NoxPay withdrawal form.
 
 ---
 
@@ -264,7 +275,7 @@ With `nox-task` running, the daemon picks up `IntentSubmitted` within ~12 second
 
 ---
 
-### Sablier Shielded Recipient Flow
+### NoxPay — Shielded Payroll Flow
 
 **Step 1 — Create a Sablier stream with the proxy as recipient**
 
@@ -272,7 +283,7 @@ Create a stream on the Sablier UI or directly on-chain, setting the recipient to
 
 **Step 2 — Register the encrypted real recipient**
 
-In the web app, go to **Sablier Shield**:
+In the web app, go to **NoxPay — Shield Stream** (`/app/noxpay`):
 
 1. Enter the Sablier lockup contract address and your stream ID
 2. Enter the real end-recipient address — it is encrypted via the Nox gateway before leaving the browser
@@ -288,7 +299,7 @@ The daemon picks up the event, decrypts the recipient inside the TEE, verifies t
 
 ---
 
-## Try It Yourself — Sablier Shield
+## Try It Yourself — NoxPay Demo
 
 A live demo stream is deployed on Sepolia against the **real Sablier V2 LockupLinear** contract. The underlying token is `NoxDemoToken` (NDT) — a minimal ERC20 deployed solely for this demo. The entire oracle path is production: real `withdrawMax`, real Nox TEE proof, real ERC20 transfer to the decrypted recipient.
 
@@ -301,7 +312,7 @@ A live demo stream is deployed on Sepolia against the **real Sablier V2 LockupLi
 
 **Steps for judges:**
 
-1. Go to [noxsafe.vercel.app/app/sablier](https://noxsafe.vercel.app/app/sablier)
+1. Go to [noxsafe.website/app/noxpay/withdraw](https://noxsafe.website/app/noxpay/withdraw)
 2. Click **"Try Demo Stream →"** — pre-fills the real Sablier address and stream ID
 3. Connect any Sepolia wallet (no tokens needed; you are not the stream sender)
 4. Click **"Request Shielded Withdrawal"** — emits `ShieldedWithdrawRequested` on-chain

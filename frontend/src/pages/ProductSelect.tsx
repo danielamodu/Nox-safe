@@ -77,8 +77,8 @@ export function ProductSelect() {
                 Confidential treasury execution for Safe multisig
               </p>
               <p className="font-body text-sm text-white/40 leading-relaxed mb-8">
-                Hide transaction target and value until execution. Built for DAOs, funds, and
-                companies managing on-chain treasury.
+                Hide transaction target and value until the moment of execution. Built for DAOs, funds,
+                and companies who can't afford to leak trading intent on-chain.
               </p>
             </div>
 
@@ -121,7 +121,7 @@ export function ProductSelect() {
               </p>
               <p className="font-body text-sm text-white/40 leading-relaxed mb-8">
                 Shield employee wallet addresses from public view. Built for companies paying
-                contributors on-chain.
+                contributors on-chain without exposing who earns what.
               </p>
             </div>
 

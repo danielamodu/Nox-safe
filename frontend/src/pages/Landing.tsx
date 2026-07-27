@@ -57,16 +57,15 @@ const FEATURES = [
     bg: "bg-white",
   },
   {
-    title: "Safe Multisig",
-    desc: "Built as a Safe module. Your multisig stays in control — Nox-Safe is an extension, not a replacement.",
+    title: "NoxPay — Shielded Payroll",
+    desc: "Shield employee wallet addresses on Sablier streams. Nobody on-chain sees who earns what until the Nox TEE fulfills the withdrawal.",
     icon: (
       <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="9" stroke="black" strokeWidth="2.5" />
-        <circle cx="12" cy="12" r="3" stroke="black" strokeWidth="2.5" />
-        <path d="M12 3v6M12 15v6M3 12h6M15 12h6" stroke="black" strokeWidth="2" />
+        <path d="M9 12h6M12 9v6" stroke="black" strokeWidth="2.5" strokeLinecap="round" />
       </svg>
     ),
-    bg: "bg-primary",
+    bg: "bg-sage",
   },
 ];
 
@@ -133,7 +132,7 @@ const FAQS = [
   },
   {
     q: "Do I need the Chrome extension?",
-    a: "No — the full dApp works standalone. The extension adds convenience: a 'Shield with Nox' button injected directly into the Safe app UI so you can encrypt intents without leaving the Safe interface.",
+    a: "No — both products work standalone in the dApp. The extension adds convenience: a 'Shield with Nox' button on app.safe.global and a 'Pay with NoxPay' button on app.sablier.com, with stream ID auto-detection.",
   },
   {
     q: "Which wallets are supported?",
@@ -255,8 +254,9 @@ export function Landing() {
               </motion.h1>
 
               <motion.p variants={fadeUp} className="font-body text-lg md:text-xl text-sage mt-6 max-w-lg leading-relaxed">
-                Nox-Safe encrypts your Safe multisig transactions before they hit the blockchain using iExec Nox TEE handles.
-                Nobody sees your moves until they're executed.
+                We integrated iExec Nox TEE into Safe ($100B+ TVL) and Sablier — two distinct privacy primitives.
+                Nox-Safe hides treasury transactions. NoxPay hides payroll recipients.
+                Real Sepolia infrastructure, 24/7 oracle, no mock data.
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-wrap gap-4 mt-10">
@@ -369,7 +369,7 @@ export function Landing() {
       <section className="border-y border-sage/10 py-8">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-40">
-            {["Safe{Wallet}", "iExec", "Nox TEE", "Sepolia", "Solidity"].map((name) => (
+            {["Safe{Wallet}", "Sablier", "iExec Nox TEE", "Sepolia", "Solidity"].map((name) => (
               <span key={name} className="font-heading font-bold text-lg md:text-xl text-white tracking-tight">
                 {name}
               </span>
@@ -383,9 +383,9 @@ export function Landing() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <div className="badge-brutal bg-primary text-black text-xs mx-auto mb-4">Core Features</div>
-            <h2 className="font-heading font-extrabold text-4xl md:text-5xl text-black tracking-tight">Why Nox-Safe?</h2>
+            <h2 className="font-heading font-extrabold text-4xl md:text-5xl text-black tracking-tight">Two privacy primitives</h2>
             <p className="font-body text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-              Traditional Safe transactions are transparent — anyone can see the recipient, amount, and calldata before they execute. Nox-Safe keeps that private.
+              Safe treasury targets get MEV'd. Sablier recipient addresses are public. We built two TEE-powered primitives — one for each — without forking either protocol.
             </p>
           </div>
           <motion.div
@@ -414,7 +414,7 @@ export function Landing() {
           <div className="text-center mb-16">
             <div className="badge-brutal bg-charcoal text-primary text-xs border-primary/30 mx-auto mb-4">The Problem</div>
             <h2 className="font-heading font-extrabold text-4xl md:text-5xl text-white tracking-tight">Before &amp; After</h2>
-            <p className="font-body text-lg text-sage mt-4 max-w-2xl mx-auto">Standard Safe multisig vs. Nox-Safe confidential intents</p>
+            <p className="font-body text-lg text-sage mt-4 max-w-2xl mx-auto">Standard on-chain payments vs. Nox-Safe privacy primitives</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <motion.div
@@ -500,7 +500,7 @@ export function Landing() {
           <div className="text-center mb-16">
             <div className="badge-brutal bg-charcoal text-primary text-xs border-primary/30 mx-auto mb-4">Step by Step</div>
             <h2 className="font-heading font-extrabold text-4xl md:text-5xl text-white tracking-tight">How it works</h2>
-            <p className="font-body text-lg text-sage mt-4 max-w-2xl mx-auto">Four steps from encrypted intent to executed transaction</p>
+            <p className="font-body text-lg text-sage mt-4 max-w-2xl mx-auto">Four steps from encrypted intent to executed transaction — shown for Nox-Safe (NoxPay follows the same TEE pattern)</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {STEPS.map((s, i) => (
@@ -619,18 +619,17 @@ export function Landing() {
             <div>
               <div className="badge-brutal bg-primary text-black text-xs mb-6">Chrome Extension</div>
               <h2 className="font-heading font-extrabold text-4xl md:text-5xl text-white tracking-tight mb-4">
-                Shield directly<br /><span className="text-primary">from Safe</span>
+                Two injections.<br /><span className="text-primary">One extension.</span>
               </h2>
               <p className="font-body text-lg text-sage leading-relaxed mb-8">
-                Our Chrome extension injects a "Shield with Nox" button right into the Safe app UI.
-                No context switching — encrypt and submit intents without leaving the Safe interface.
+                The Nox-Safe Chrome extension injects context-aware buttons into both Safe and Sablier — encrypt treasury intents on app.safe.global, request shielded withdrawals on app.sablier.com, all without leaving the dapp.
               </p>
               <div className="space-y-4 mb-8">
                 {[
-                  "Auto-detects transaction parameters from the Safe form",
-                  "One-click encryption with the Nox handle flow",
-                  "Submits directly to NoxGuardModule on Sepolia",
-                  "Matches the Safe UI — no tab switching, no copy-pasting",
+                  "Safe: injects a Shield with Nox button next to the execute button",
+                  "Sablier: injects a Pay with NoxPay button on stream detail pages",
+                  "Auto-detects Safe address and Sablier stream ID from the URL",
+                  "No build step — install unpacked, works instantly",
                 ].map((feat) => (
                   <div key={feat} className="flex items-center gap-3">
                     <div className="w-5 h-5 rounded-full bg-primary border-2 border-black flex items-center justify-center shrink-0">
@@ -749,11 +748,11 @@ export function Landing() {
         >
           <motion.h2 variants={fadeUp} className="font-heading font-extrabold text-4xl md:text-5xl text-white tracking-tight mb-4">Ready to go dark?</motion.h2>
           <motion.p variants={fadeUp} className="font-body text-lg text-sage mb-10 max-w-xl mx-auto">
-            Connect your wallet and start submitting confidential intents on Sepolia testnet.
+            Two products. One TEE layer. Choose Nox-Safe for treasury privacy or NoxPay for shielded payroll — both live on Sepolia.
           </motion.p>
           <motion.div variants={fadeUp}>
             <Link to="/products" className="btn-accent btn-brutal-lg text-xl !px-10 !py-5">
-              Launch Nox-Safe
+              Choose a Product
             </Link>
           </motion.div>
         </motion.div>
@@ -784,7 +783,7 @@ export function Landing() {
                   <span className="font-heading font-extrabold text-xl text-black">Nox-Safe</span>
                 </div>
                 <p className="font-body text-black/70 text-sm md:text-base leading-relaxed">
-                  Confidential transaction guard for Safe multisig. Encrypt intents, enforce policy on-chain, execute via TEE.
+                  Privacy infrastructure for on-chain finance, powered by iExec Nox TEE.
                 </p>
               </div>
               <div className="flex flex-col gap-3 mt-12 lg:mt-auto pt-8">
