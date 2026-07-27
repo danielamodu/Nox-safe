@@ -29,15 +29,15 @@ function WrongNetworkBanner() {
 }
 
 const NAV_LINKS = [
-  { to: "/app/pay", label: "Shield Stream" },
-  { to: "/app/pay/streams", label: "My Streams" },
-  { to: "/app/pay/withdraw", label: "Withdraw" },
+  { to: "/app/noxpay", label: "Shield Stream" },
+  { to: "/app/noxpay/streams", label: "My Streams" },
+  { to: "/app/noxpay/withdraw", label: "Withdraw" },
 ];
 
 const MOBILE_NAV_ITEMS = [
-  { to: "/app/pay", label: "Shield" },
-  { to: "/app/pay/streams", label: "My Streams" },
-  { to: "/app/pay/withdraw", label: "Withdraw" },
+  { to: "/app/noxpay", label: "Shield" },
+  { to: "/app/noxpay/streams", label: "My Streams" },
+  { to: "/app/noxpay/withdraw", label: "Withdraw" },
 ];
 
 function NoxPayHeader() {
@@ -53,7 +53,7 @@ function NoxPayHeader() {
     } catch {
       // ignore wallet_revokePermissions RPC error
     }
-    navigate("/connect?returnTo=/app/pay", { replace: true });
+    navigate("/connect?returnTo=/app/noxpay", { replace: true });
   };
 
   return (
@@ -66,7 +66,7 @@ function NoxPayHeader() {
 
       <div className="w-px h-5 bg-black/20" />
 
-      <Link to="/app/pay" className="flex items-center gap-2 sm:gap-3 shrink-0">
+      <Link to="/app/noxpay" className="flex items-center gap-2 sm:gap-3 shrink-0">
         <div className="w-9 h-9 sm:w-10 sm:h-10 bg-black rounded-lg flex items-center justify-center">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="9" stroke="#8fb88b" strokeWidth="2.5" />
@@ -113,7 +113,7 @@ function NoxPayHeader() {
           </div>
         ) : (
           <button
-            onClick={() => navigate("/connect?returnTo=/app/pay")}
+            onClick={() => navigate("/connect?returnTo=/app/noxpay")}
             className="btn-brutal bg-black text-sage text-sm !py-2 !px-5"
           >
             Connect Wallet
@@ -152,7 +152,7 @@ export function NoxPayLayout() {
 
   useEffect(() => {
     if (!isConnected && !isConnecting && !isReconnecting) {
-      navigate("/connect?returnTo=/app/pay", { replace: true });
+      navigate("/connect?returnTo=/app/noxpay", { replace: true });
     }
   }, [isConnected, isConnecting, isReconnecting, navigate]);
 

@@ -812,8 +812,8 @@ export function Landing() {
                     { name: "Choose Product", href: "/products" },
                     { name: "Nox-Safe Dashboard", href: "/app/safe" },
                     { name: "Submit Intent", href: "/app/safe/submit" },
-                    { name: "NoxPay — Shield Stream", href: "/app/pay" },
-                    { name: "NoxPay — Withdraw", href: "/app/pay/withdraw" },
+                    { name: "NoxPay — Shield Stream", href: "/app/noxpay" },
+                    { name: "NoxPay — Withdraw", href: "/app/noxpay/withdraw" },
                   ],
                 },
                 {

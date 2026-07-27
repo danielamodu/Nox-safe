@@ -100,7 +100,7 @@ function StreamCard({
       {stream?.active && (
         <div className="pt-1">
           <Link
-            to="/app/pay/withdraw"
+            to="/app/noxpay/withdraw"
             className="font-body text-xs font-bold text-black underline hover:text-primary transition-colors"
           >
             Request withdrawal →

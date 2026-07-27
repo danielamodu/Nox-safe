@@ -38,7 +38,7 @@ export function App() {
         </Route>
 
         {/* NoxPay (payroll streaming) */}
-        <Route path="/app/pay" element={<NoxPayLayout />}>
+        <Route path="/app/noxpay" element={<NoxPayLayout />}>
           <Route index element={<NoxPayCreate />} />
           <Route path="streams" element={<NoxPayStreams />} />
           <Route path="withdraw" element={<NoxPayWithdraw />} />

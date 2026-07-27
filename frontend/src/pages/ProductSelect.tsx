@@ -126,7 +126,7 @@ export function ProductSelect() {
             </div>
 
             <Link
-              to="/app/pay"
+              to="/app/noxpay"
               className="w-full py-3 rounded-xl font-heading font-bold text-sm text-center bg-sage text-black border-2 border-black transition-all hover:opacity-90"
               style={{ boxShadow: "3px 3px 0px 0px #000" }}
             >
