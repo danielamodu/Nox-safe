@@ -13,7 +13,7 @@ Four steps, under 60 seconds:
 
 **1. Download the zip**
 
-Download [`nox-safe-extension-v0.1.0.zip`](https://github.com/danielamodu/Nox-safe/releases) and unzip it to a permanent folder on your machine (e.g. `~/nox-safe-extension/`). Don't delete the folder after loading — Chrome reads the extension live from disk.
+Download [`nox-safe-extension-v0.1.0.zip`](https://github.com/danielamodu/Nox-safe) and unzip it to a permanent folder on your machine (e.g. `~/nox-safe-extension/`). Don't delete the folder after loading — Chrome reads the extension live from disk.
 
 **2. Open Chrome Extensions**
 

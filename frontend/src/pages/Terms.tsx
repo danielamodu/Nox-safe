@@ -106,8 +106,8 @@ export function Terms() {
           <TermsSection title="11. Contact">
             <p>
               Questions about these Terms can be directed via{" "}
-              <a href="https://github.com/danielamodu" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
-                GitHub (@danielamodu)
+              <a href="https://github.com/danielamodu/Nox-safe" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+                GitHub
               </a>{" "}
               or{" "}
               <a href="https://x.com/szrxbt" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">

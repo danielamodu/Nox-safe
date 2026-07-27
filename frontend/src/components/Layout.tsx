@@ -83,8 +83,8 @@ export function Layout() {
             Nox-Safe — Confidential Transaction Guard
           </span>
           <div className="flex items-center gap-4">
-            <a href="https://github.com/danielamodu" target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-sage/70 hover:text-primary transition-colors">
-              GitHub (@danielamodu)
+            <a href="https://github.com/danielamodu/Nox-safe" target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-sage/70 hover:text-primary transition-colors">
+              GitHub
             </a>
             <a href="https://x.com/szrxbt" target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-sage/70 hover:text-primary transition-colors">
               Twitter (@szrxbt)

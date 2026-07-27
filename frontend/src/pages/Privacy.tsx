@@ -83,8 +83,8 @@ export function Privacy() {
           <PolicySection title="7. Contact">
             <p>
               For privacy questions, open an issue on{" "}
-              <a href="https://github.com/danielamodu" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
-                GitHub (@danielamodu)
+              <a href="https://github.com/danielamodu/Nox-safe" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+                GitHub
               </a>{" "}
               or reach out on{" "}
               <a href="https://x.com/szrxbt" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
