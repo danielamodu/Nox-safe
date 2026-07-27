@@ -6,7 +6,7 @@
   const DRPC          = "https://sepolia.drpc.org";
   const NOX_MODULE    = "0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51";
   const POLICY_REG    = "0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1";
-  const DASHBOARD_URL = "https://noxsafe.vercel.app";
+  const DASHBOARD_URL = "https://noxsafe.website";
   const ZERO_ADDR     = "0x0000000000000000000000000000000000000000";
 
   // Pre-computed selectors (keccak256(sig).slice(0,10)):
@@ -214,11 +214,11 @@
     `;
 
     document.getElementById("open-dashboard-btn").addEventListener("click", () => {
-      chrome.tabs.create({ url: DASHBOARD_URL + "/app" });
+      chrome.tabs.create({ url: DASHBOARD_URL + "/app/safe" });
       window.close();
     });
     document.getElementById("submit-intent-btn").addEventListener("click", () => {
-      chrome.tabs.create({ url: DASHBOARD_URL + "/app/submit" });
+      chrome.tabs.create({ url: DASHBOARD_URL + "/app/safe/submit" });
       window.close();
     });
   }
@@ -262,6 +262,10 @@
 
   // "Change Safe" button clears storage and re-shows setup
   document.addEventListener("DOMContentLoaded", () => {
+    // Wire product card links
+    document.getElementById("safe-product-card").href = DASHBOARD_URL + "/app/safe";
+    document.getElementById("noxpay-product-card").href = DASHBOARD_URL + "/app/noxpay";
+
     document.getElementById("change-safe-btn").addEventListener("click", () => {
       chrome.storage.local.remove("safeAddress", () => {
         document.getElementById("change-safe-btn").style.display = "none";

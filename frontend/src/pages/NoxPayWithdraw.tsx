@@ -4,11 +4,21 @@ import { motion } from "motion/react";
 import { isAddress } from "viem";
 import { ADDRESSES, PROXY_ABI } from "../config/contracts";
 
+function useWithdrawParams() {
+  const params = new URLSearchParams(window.location.search);
+  const stream = params.get("stream") ?? "";
+  const sablier = params.get("sablier") ?? "";
+  return { stream, sablier };
+}
+
 export function NoxPayWithdraw() {
   const { isConnected } = useAccount();
+  const prefill = useWithdrawParams();
 
-  const [sablierAddr, setSablierAddr] = useState<`0x${string}`>(ADDRESSES.SablierV2SepoliaLinear);
-  const [streamId, setStreamId] = useState("");
+  const [sablierAddr, setSablierAddr] = useState<`0x${string}`>(
+    (prefill.sablier && isAddress(prefill.sablier) ? prefill.sablier : ADDRESSES.SablierV2SepoliaLinear) as `0x${string}`
+  );
+  const [streamId, setStreamId] = useState(prefill.stream);
   const [error, setError] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 

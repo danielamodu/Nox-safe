@@ -519,3 +519,130 @@
     init();
   }
 })();
+
+// ── NoxPay injection (app.sablier.com) ────────────────────────────────────────
+(function () {
+  "use strict";
+
+  const NOXPAY_BASE = "https://noxsafe.website";
+  const SABLIER_LINEAR_SEPOLIA = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301";
+
+  const PAY_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5"/><path d="M9 12h6M12 9v6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>`;
+
+  function isSablierSite() {
+    return /sablier\.com/.test(window.location.hostname);
+  }
+
+  // Sablier stream URLs: /stream/LL2-11155111-3487 or /stream/LT-11155111-42
+  function extractSablierStreamId() {
+    const m = window.location.pathname.match(/\/stream\/[A-Z0-9]+-\d+-(\d+)/i);
+    return m ? m[1] : null;
+  }
+
+  function buildNoxPayUrl(path) {
+    const streamId = extractSablierStreamId();
+    let url = `${NOXPAY_BASE}${path}`;
+    if (streamId) {
+      url += `?stream=${streamId}&sablier=${SABLIER_LINEAR_SEPOLIA}`;
+    }
+    return url;
+  }
+
+  // FAB shown on all Sablier pages; updates URL when stream is in the path
+  function syncSablierFAB() {
+    const existing = document.getElementById("noxpay-fab");
+
+    if (existing) {
+      // Keep FAB; update href in case user navigated to a different stream
+      const link = existing.querySelector("a");
+      if (link) link.href = buildNoxPayUrl("/app/noxpay/withdraw");
+      return;
+    }
+
+    const fab = document.createElement("div");
+    fab.id = "noxpay-fab";
+    fab.className = "noxpay-fab";
+    fab.innerHTML = `
+      <a href="${buildNoxPayUrl("/app/noxpay/withdraw")}" target="_blank" rel="noopener noreferrer"
+         style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;text-decoration:none;color:inherit;">
+        <div style="width:28px;height:28px;background:#000;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#8fb88b;">
+          ${PAY_SVG}
+        </div>
+      </a>
+      <span class="noxpay-fab-tooltip">Pay with NoxPay</span>
+    `;
+    document.body.appendChild(fab);
+  }
+
+  // Inject "Pay with NoxPay" button near Sablier stream action controls
+  function injectNoxPayButton() {
+    if (!extractSablierStreamId()) return; // only on stream detail pages
+    if (document.getElementById("noxpay-inject-btn")) return;
+
+    // Sablier renders action buttons inside a div/section near the withdraw area
+    // Try common selectors; fall back to inserting near the first main button
+    const candidates = [
+      '[data-testid="withdraw-button"]',
+      '[data-testid="stream-actions"]',
+      'button[data-testid*="withdraw"]',
+      'button[data-testid*="cancel"]',
+    ];
+
+    let anchor = null;
+    for (const sel of candidates) {
+      anchor = document.querySelector(sel);
+      if (anchor) break;
+    }
+
+    const btn = document.createElement("a");
+    btn.id = "noxpay-inject-btn";
+    btn.className = "noxpay-inject-btn";
+    btn.href = buildNoxPayUrl("/app/noxpay/withdraw");
+    btn.target = "_blank";
+    btn.rel = "noopener noreferrer";
+    btn.innerHTML = `${PAY_SVG} Pay with NoxPay`;
+
+    if (anchor) {
+      anchor.parentElement?.insertBefore(btn, anchor);
+    } else {
+      // Graceful fallback: append near the first <main> child
+      const main = document.querySelector("main");
+      if (main) main.insertBefore(btn, main.firstChild);
+    }
+  }
+
+  function sablierInit() {
+    if (!isSablierSite()) return;
+
+    syncSablierFAB();
+    injectNoxPayButton();
+
+    const observer = new MutationObserver(() => {
+      syncSablierFAB();
+      injectNoxPayButton();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    const _push = history.pushState.bind(history);
+    history.pushState = function (...args) {
+      _push(...args);
+      // Reset injected button so it re-appears with correct stream ID
+      const existing = document.getElementById("noxpay-inject-btn");
+      if (existing) existing.remove();
+      syncSablierFAB();
+      injectNoxPayButton();
+    };
+    window.addEventListener("popstate", () => {
+      const existing = document.getElementById("noxpay-inject-btn");
+      if (existing) existing.remove();
+      syncSablierFAB();
+      injectNoxPayButton();
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", sablierInit);
+  } else {
+    sablierInit();
+  }
+})();

@@ -1,13 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "Nox-Safe — Shield Your Safe Transactions",
+  "name": "Nox-Safe & NoxPay — Confidential Web3",
   "short_name": "Nox-Safe",
-  "version": "0.1.0",
-  "description": "Confidential transaction guard for Safe multisig. Encrypt intents with iExec Nox TEE.",
-  "homepage_url": "https://noxsafe.vercel.app",
+  "version": "0.2.0",
+  "description": "Confidential transaction guard for Safe multisig (app.safe.global) and shielded payroll streaming on Sablier (app.sablier.com). Powered by iExec Nox TEE.",
+  "homepage_url": "https://noxsafe.website",
   "permissions": ["activeTab", "storage", "tabs"],
   "host_permissions": [
     "https://app.safe.global/*",
+    "https://app.sablier.com/*",
     "https://gateway-testnets.noxprotocol.dev/*",
     "https://sepolia.drpc.org/*"
   ],
@@ -21,7 +22,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://app.safe.global/*"],
+      "matches": ["https://app.safe.global/*", "https://app.sablier.com/*"],
       "js": ["content/content.js"],
       "css": ["content/content.css"],
       "run_at": "document_idle"

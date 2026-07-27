@@ -432,3 +432,79 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ── NoxPay Injected UI (app.sablier.com) ── */
+
+.noxpay-inject-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #8fb88b;
+  color: #000;
+  border: 2px solid #000;
+  border-radius: 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0px 0px #000;
+  transition: all 0.2s ease;
+  user-select: none;
+  text-decoration: none;
+  z-index: 9999;
+  margin-bottom: 8px;
+}
+
+.noxpay-inject-btn:hover {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 0 #000;
+}
+
+.noxpay-inject-btn svg {
+  flex-shrink: 0;
+}
+
+.noxpay-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  background: #8fb88b;
+  border: 2px solid #000;
+  border-radius: 16px;
+  box-shadow: 4px 4px 0px 0px #000;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 99999;
+}
+
+.noxpay-fab:hover {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 0 #000;
+}
+
+.noxpay-fab .noxpay-fab-tooltip {
+  position: absolute;
+  right: 68px;
+  background: #171e19;
+  color: #8fb88b;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 2px solid #000;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.noxpay-fab:hover .noxpay-fab-tooltip {
+  opacity: 1;
+}

@@ -13,7 +13,7 @@ Four steps, under 60 seconds:
 
 **1. Download the zip**
 
-Download [`nox-safe-extension-v0.1.0.zip`](https://github.com/danielamodu/Nox-safe) and unzip it to a permanent folder on your machine (e.g. `~/nox-safe-extension/`). Don't delete the folder after loading — Chrome reads the extension live from disk.
+Download [`nox-safe-extension-v0.2.0.zip`](https://github.com/danielamodu/Nox-safe) and unzip it to a permanent folder on your machine (e.g. `~/nox-safe-extension/`). Don't delete the folder after loading — Chrome reads the extension live from disk.
 
 **2. Open Chrome Extensions**
 
@@ -31,11 +31,19 @@ The Nox-Safe shield icon appears in your Chrome toolbar. Pin it for easy access.
 
 ---
 
-## Using the Extension
+## What the Extension Does
 
-- Go to [app.safe.global](https://app.safe.global) and open an existing Sepolia Safe.
-- The extension auto-detects the Safe from the URL. Click the toolbar icon to see live oracle status, daily spend, and policy caps.
-- On any Safe transaction page, a floating **Shield with Nox** button lets you encrypt and submit a confidential intent without leaving Safe's UI.
+The popup shows two product cards linking to [noxsafe.website](https://noxsafe.website). The extension also injects context-aware buttons on supported dapps:
+
+### NOX-SAFE — app.safe.global
+
+- Open a Sepolia Safe at [app.safe.global](https://app.safe.global). The extension auto-detects the Safe from the URL — click the toolbar icon to see live oracle status, daily spend, and policy caps.
+- On any Safe transaction page, a floating **Shield with Nox** button lets you encrypt and submit a confidential intent without leaving Safe's UI. Target address and ETH value are encrypted inside the Nox TEE before the transaction hits the chain.
+
+### NOXPAY — app.sablier.com
+
+- Browse any Sablier stream at [app.sablier.com](https://app.sablier.com). A floating **Pay with NoxPay** button appears in the corner.
+- On a stream detail page (e.g. `/stream/LL2-11155111-3487`), the stream ID is auto-detected and the button opens NoxPay's withdrawal page with the stream pre-filled — no copy-pasting needed.
 
 ---
 
@@ -58,8 +66,10 @@ The Nox-Safe shield icon appears in your Chrome toolbar. Pin it for easy access.
 | 3 | Hover over "Developer mode" toggle (top-right), then click it ON. | "Load unpacked" button appears |
 | 4 | Click **Load unpacked** → navigate to / click the `extension/` folder → click **Select Folder**. | Nox-Safe card appears in the grid |
 | 5 | Click the puzzle-piece icon in the toolbar → click the pin next to Nox-Safe. | Shield icon is pinned to toolbar |
-| 6 | Click the Nox-Safe icon → popup opens showing "Connect your Safe" or live Safe data. | Popup UI is visible |
-| 7 | Stop recording. | — |
+| 6 | Click the Nox-Safe icon → popup opens showing product cards (NOX-SAFE and NOXPAY) plus Safe dashboard. | Popup UI is visible |
+| 7 | Navigate to app.safe.global with a Safe open → floating Shield button appears. | "Shield with Nox" button injected |
+| 8 | Navigate to app.sablier.com and open a stream → floating NoxPay button appears. | "Pay with NoxPay" button injected |
+| 9 | Stop recording. | — |
 
 Save as `install-demo.gif` and place it in this `extension/` folder. Then replace the placeholder comment at the top of this file with:
 

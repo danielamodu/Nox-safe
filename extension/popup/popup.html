@@ -16,6 +16,7 @@
       overflow-x: hidden;
     }
 
+    /* ── Header ── */
     .header {
       background: #ffe17c;
       border-bottom: 2px solid #000;
@@ -73,7 +74,83 @@
       50% { opacity: 0.4; }
     }
 
-    /* Safe card */
+    /* ── Product cards ── */
+    .products-section {
+      padding: 14px 16px;
+      border-bottom: 2px solid #222;
+    }
+
+    .products-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 10px;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 10px;
+    }
+
+    .product-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 13px;
+      border-radius: 10px;
+      border: 2px solid #2a2a2a;
+      background: #1e2620;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.15s ease, background 0.15s ease;
+      margin-bottom: 8px;
+    }
+
+    .product-card:last-child { margin-bottom: 0; }
+
+    .product-card:hover {
+      border-color: #444;
+      background: #242e26;
+    }
+
+    .product-card-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1.5px solid rgba(0,0,0,0.4);
+    }
+
+    .product-card-icon.safe { background: #ffe17c; }
+    .product-card-icon.pay  { background: #8fb88b; }
+
+    .product-card-body { flex: 1; min-width: 0; }
+
+    .product-card-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .product-card-desc {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      color: #666;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .product-card-arrow {
+      font-size: 14px;
+      color: #444;
+      flex-shrink: 0;
+    }
+
+    /* ── Safe dashboard (existing) ── */
     .safe-card {
       background: #ffe17c;
       border: 2px solid #000;
@@ -400,7 +477,40 @@
     </div>
   </div>
 
-  <!-- Main content -->
+  <!-- Product selection -->
+  <div class="products-section">
+    <div class="products-label">Products</div>
+
+    <a class="product-card" id="safe-product-card" href="#" target="_blank" rel="noopener noreferrer">
+      <div class="product-card-icon safe">
+        <svg width="16" height="16" viewBox="0 0 32 32" fill="none">
+          <path d="M16 2L4 8v8c0 7.4 5.12 14.32 12 16 6.88-1.68 12-8.6 12-16V8L16 2z" fill="#000"/>
+          <path d="M16 9l1.8 3.6H22l-3.4 2.5 1.3 4L16 16.6 12.1 19.1l1.3-4L10 12.6h4.2L16 9z" fill="#ffe17c"/>
+        </svg>
+      </div>
+      <div class="product-card-body">
+        <div class="product-card-name">NOX-SAFE</div>
+        <div class="product-card-desc">Confidential treasury execution for Safe multisig</div>
+      </div>
+      <div class="product-card-arrow">→</div>
+    </a>
+
+    <a class="product-card" id="noxpay-product-card" href="#" target="_blank" rel="noopener noreferrer">
+      <div class="product-card-icon pay">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="#000" stroke-width="2.5"/>
+          <path d="M9 12h6M12 9v6" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="product-card-body">
+        <div class="product-card-name">NOXPAY</div>
+        <div class="product-card-desc">Confidential payroll streaming on Sablier</div>
+      </div>
+      <div class="product-card-arrow">→</div>
+    </a>
+  </div>
+
+  <!-- Nox-Safe dashboard (Safe-specific data) -->
   <div class="content" id="main-content">
     <div class="spinner"></div>
     <p class="loading-text">Loading…</p>
