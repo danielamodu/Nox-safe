@@ -21,7 +21,11 @@ export function ConnectPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isConnected) navigate("/app", { replace: true });
+    if (isConnected) {
+      const params = new URLSearchParams(window.location.search);
+      const returnTo = params.get("returnTo") ?? "/products";
+      navigate(returnTo, { replace: true });
+    }
   }, [isConnected, navigate]);
 
   return (

@@ -198,7 +198,7 @@ export function Landing() {
           </div>
 
           <Link
-            to="/connect"
+            to="/products"
             className="font-heading font-bold text-sm px-5 py-2.5 bg-primary text-black rounded-full border-2 border-black transition-all duration-200 hover:bg-primary/90"
             style={{ boxShadow: "3px 3px 0px 0px #000" }}
             onMouseEnter={(e) => {
@@ -260,7 +260,7 @@ export function Landing() {
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-wrap gap-4 mt-10">
-                <Link to="/connect" className="btn-accent btn-brutal-lg text-lg !px-8 !py-4">
+                <Link to="/products" className="btn-accent btn-brutal-lg text-lg !px-8 !py-4">
                   Launch App
                 </Link>
                 <a href="#how-it-works" className="btn-brutal bg-charcoal text-white border-sage/30 text-lg !px-8 !py-4 hover:border-primary/50">
@@ -752,7 +752,7 @@ export function Landing() {
             Connect your wallet and start submitting confidential intents on Sepolia testnet.
           </motion.p>
           <motion.div variants={fadeUp}>
-            <Link to="/connect" className="btn-accent btn-brutal-lg text-xl !px-10 !py-5">
+            <Link to="/products" className="btn-accent btn-brutal-lg text-xl !px-10 !py-5">
               Launch Nox-Safe
             </Link>
           </motion.div>
@@ -807,13 +807,13 @@ export function Landing() {
             <div className="flex gap-12 md:gap-20 flex-wrap lg:flex-nowrap">
               {[
                 {
-                  title: "Product",
+                  title: "Products",
                   links: [
-                    { name: "Dashboard", href: "/app" },
-                    { name: "Submit Intent", href: "/app/submit" },
-                    { name: "Intent History", href: "/app/history" },
-                    { name: "Policy View", href: "/app/policy" },
-                    { name: "Sablier Shield", href: "/app/sablier" },
+                    { name: "Choose Product", href: "/products" },
+                    { name: "Nox-Safe Dashboard", href: "/app/safe" },
+                    { name: "Submit Intent", href: "/app/safe/submit" },
+                    { name: "NoxPay — Shield Stream", href: "/app/pay" },
+                    { name: "NoxPay — Withdraw", href: "/app/pay/withdraw" },
                   ],
                 },
                 {

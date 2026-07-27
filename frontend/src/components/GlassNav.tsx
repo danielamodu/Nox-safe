@@ -49,7 +49,7 @@ export function GlassNav({ alwaysGlass = false }: { alwaysGlass?: boolean }) {
             Docs
           </Link>
           <Link
-            to="/connect"
+            to="/products"
             className="font-heading font-bold text-sm px-5 py-2.5 bg-primary text-black rounded-full border-2 border-black transition-all duration-200 hover:bg-primary/90"
             style={{ boxShadow: "3px 3px 0px 0px #000" }}
             onMouseEnter={(e) => {

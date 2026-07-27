@@ -29,10 +29,10 @@ function WrongNetworkBanner() {
 }
 
 const MOBILE_NAV_ITEMS = [
-  { to: "/app", label: "Dashboard" },
-  { to: "/app/submit", label: "Submit Intent" },
-  { to: "/app/sablier", label: "Sablier Shield" },
-  { to: "/app/history", label: "History" },
+  { to: "/app/safe", label: "Dashboard" },
+  { to: "/app/safe/submit", label: "Submit" },
+  { to: "/app/safe/history", label: "History" },
+  { to: "/app/safe/policy", label: "Policy" },
 ];
 
 function MobileBottomNav() {
@@ -65,7 +65,7 @@ export function Layout() {
 
   useEffect(() => {
     if (!isConnected && !isConnecting && !isReconnecting) {
-      navigate("/connect", { replace: true });
+      navigate("/connect?returnTo=/app/safe", { replace: true });
     }
   }, [isConnected, isConnecting, isReconnecting, navigate]);
 
@@ -83,16 +83,24 @@ export function Layout() {
             Nox-Safe — Confidential Transaction Guard
           </span>
           <div className="flex items-center gap-4">
-            <a href="https://github.com/danielamodu/Nox-safe" target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-sage/70 hover:text-primary transition-colors">
+            <a
+              href="https://github.com/danielamodu/Nox-safe"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-xs text-sage/70 hover:text-primary transition-colors"
+            >
               GitHub
             </a>
-            <a href="https://x.com/szrxbt" target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-sage/70 hover:text-primary transition-colors">
+            <a
+              href="https://x.com/szrxbt"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-xs text-sage/70 hover:text-primary transition-colors"
+            >
               Twitter (@szrxbt)
             </a>
             <span className="font-mono text-xs text-sage/30">|</span>
-            <span className="font-mono text-xs text-sage/60">
-              Sepolia Testnet
-            </span>
+            <span className="font-mono text-xs text-sage/60">Sepolia Testnet</span>
           </div>
         </div>
       </footer>

@@ -68,7 +68,7 @@ function PendingCard({
 }) {
   const remaining = confirmationsRequired - confirmations;
   const thresholdMet = confirmations >= confirmationsRequired;
-  const appUrl = window.location.origin + "/app";
+  const appUrl = window.location.origin + "/app/safe";
 
   return (
     <div className="card-brutal bg-sage/10 space-y-4 mt-4">

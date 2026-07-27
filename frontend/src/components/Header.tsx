@@ -24,11 +24,11 @@ function OracleBadge() {
   );
 }
 
-const NAV_LINKS = [
-  { to: "/app", label: "Dashboard" },
-  { to: "/app/submit", label: "Submit Intent" },
-  { to: "/app/sablier", label: "Sablier Shield" },
-  { to: "/app/history", label: "History" },
+const SAFE_NAV = [
+  { to: "/app/safe", label: "Dashboard" },
+  { to: "/app/safe/submit", label: "Submit Intent" },
+  { to: "/app/safe/history", label: "History" },
+  { to: "/app/safe/policy", label: "Policy" },
 ];
 
 export function Header() {
@@ -44,13 +44,22 @@ export function Header() {
     } catch {
       // Ignore wallet_revokePermissions unsupported RPC error from wallet extension
     }
-    navigate("/connect", { replace: true });
+    navigate("/connect?returnTo=/app/safe", { replace: true });
   };
 
   return (
     <header className="sticky top-0 z-50 h-20 bg-primary border-b-2 border-black flex items-center px-4 sm:px-6 gap-3 sm:gap-6">
+      {/* Back to products */}
+      <Link
+        to="/products"
+        className="hidden sm:flex items-center font-mono text-xs text-black/50 hover:text-black/80 transition-colors shrink-0"
+      >
+        ← Products
+      </Link>
+      <div className="hidden sm:block w-px h-5 bg-black/20" />
+
       {/* Logo */}
-      <Link to="/" className="flex items-center gap-2 sm:gap-3 shrink-0">
+      <Link to="/app/safe" className="flex items-center gap-2 sm:gap-3 shrink-0">
         <div className="w-9 h-9 sm:w-10 sm:h-10 bg-black rounded-lg flex items-center justify-center">
           <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
             <path d="M16 2L4 8v8c0 7.4 5.12 14.32 12 16 6.88-1.68 12-8.6 12-16V8L16 2z" fill="#ffe17c" stroke="#ffe17c" strokeWidth="1"/>
@@ -64,7 +73,7 @@ export function Header() {
 
       {/* Nav */}
       <nav className="hidden md:flex items-center gap-1 flex-1">
-        {NAV_LINKS.map(({ to, label }) => {
+        {SAFE_NAV.map(({ to, label }) => {
           const active = location.pathname === to;
           return (
             <Link
@@ -104,7 +113,7 @@ export function Header() {
           </div>
         ) : (
           <button
-            onClick={() => navigate("/connect")}
+            onClick={() => navigate("/connect?returnTo=/app/safe")}
             className="btn-primary text-sm !py-2 !px-5"
           >
             Connect Wallet
