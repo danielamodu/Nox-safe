@@ -35,7 +35,6 @@ export function NoxPayCreate() {
   const { isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
 
-  const [sablierAddr, setSablierAddr] = useState<`0x${string}`>(ADDRESSES.SablierV2SepoliaLinear);
   const [streamId, setStreamId] = useState("");
   const [recipient, setRecipient] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
@@ -49,7 +48,6 @@ export function NoxPayCreate() {
     setError("");
     setStatusMsg("");
 
-    if (!isAddress(sablierAddr)) { setError("Invalid Sablier contract address"); return; }
     if (!streamId || isNaN(Number(streamId))) { setError("Enter a valid numeric stream ID"); return; }
     if (!isAddress(recipient)) { setError("Invalid recipient wallet address"); return; }
     if (!walletClient) { setError("Wallet not connected"); return; }
@@ -76,7 +74,7 @@ export function NoxPayCreate() {
         address: ADDRESSES.NoxRecipientProxy,
         abi: PROXY_ABI,
         functionName: "registerShieldedStream",
-        args: [sablierAddr, BigInt(streamId), handle as `0x${string}`, handleProof as `0x${string}`],
+        args: [ADDRESSES.SablierV2SepoliaLinear, BigInt(streamId), handle as `0x${string}`, handleProof as `0x${string}`],
       });
     } catch (err: unknown) {
       setError(`Failed: ${err instanceof Error ? err.message : String(err)}`);
@@ -98,7 +96,6 @@ export function NoxPayCreate() {
           <span className="badge-brutal bg-sage text-black border-black font-mono text-xs">
             NoxPay
           </span>
-          <span className="font-mono text-xs text-sage/60">Step 2 of 2</span>
         </div>
         <h1 className="font-heading font-bold text-2xl text-white">Shield a Payroll Stream</h1>
         <p className="font-body text-sm text-sage/70 mt-1">
@@ -107,9 +104,9 @@ export function NoxPayCreate() {
         </p>
       </div>
 
-      {/* Pre-step callout */}
+      {/* Setup callout */}
       <div className="card-brutal bg-white/5 border-2 border-sage/30 p-5 space-y-2">
-        <p className="font-heading font-bold text-sm text-sage">Before you start — Step 1</p>
+        <p className="font-heading font-bold text-sm text-sage">Before you register</p>
         <p className="font-body text-xs text-white/60 leading-relaxed">
           Create a Sablier V2 LockupLinear stream on{" "}
           <a
@@ -124,26 +121,13 @@ export function NoxPayCreate() {
           <span className="font-mono text-sage/80 break-all">
             {ADDRESSES.NoxRecipientProxy}
           </span>{" "}
-          (NoxRecipientProxy). Then come back here to register the encrypted real recipient.
+          (NoxRecipientProxy). Then enter your stream ID and real recipient below.
         </p>
       </div>
 
       {/* Form */}
       <div className="card-brutal bg-white border-2 border-black p-6 space-y-5">
         <h2 className="font-heading font-bold text-lg text-black">Register Encrypted Recipient</h2>
-
-        <div>
-          <label className="block font-body font-bold text-xs text-black mb-1">
-            Sablier V2 Contract Address
-          </label>
-          <input
-            type="text"
-            value={sablierAddr}
-            onChange={(e) => setSablierAddr(e.target.value as `0x${string}`)}
-            placeholder="0x…"
-            className="input-brutal font-mono text-sm"
-          />
-        </div>
 
         <div>
           <label className="block font-body font-bold text-xs text-black mb-1">

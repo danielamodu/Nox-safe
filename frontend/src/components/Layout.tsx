@@ -63,11 +63,23 @@ export function Layout() {
   const navigate = useNavigate();
   const { isConnected, isConnecting, isReconnecting } = useAccount();
 
+  const isAuthPending = isConnecting || isReconnecting;
+
   useEffect(() => {
-    if (!isConnected && !isConnecting && !isReconnecting) {
+    if (!isConnected && !isAuthPending) {
       navigate("/connect?returnTo=/app/safe", { replace: true });
     }
-  }, [isConnected, isConnecting, isReconnecting, navigate]);
+  }, [isConnected, isAuthPending, navigate]);
+
+  if (!isConnected && isAuthPending) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-charcoal">
+        <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isConnected) return null;
 
   return (
     <div className="min-h-screen flex flex-col bg-charcoal">
