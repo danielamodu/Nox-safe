@@ -58,13 +58,19 @@ function NoxPayHeader() {
 
   return (
     <header className="sticky top-0 z-50 h-20 bg-sage border-b-2 border-black flex items-center px-4 sm:px-6 gap-3 sm:gap-6">
-      <Link to="/products" className="flex items-center gap-2 shrink-0">
-        <span className="font-mono text-xs text-black/50 hover:text-black/80 transition-colors">
-          ← Products
-        </span>
+      {/* Product switcher */}
+      <Link
+        to="/app/safe"
+        className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-black bg-black/10 hover:bg-primary hover:text-black text-black font-body font-bold text-xs transition-all shrink-0"
+        style={{ boxShadow: "2px 2px 0px #000" }}
+      >
+        <svg width="13" height="13" viewBox="0 0 32 32" fill="none">
+          <path d="M16 2L4 8v8c0 7.4 5.12 14.32 12 16 6.88-1.68 12-8.6 12-16V8L16 2z" fill="currentColor" />
+        </svg>
+        Nox-Safe
       </Link>
 
-      <div className="w-px h-5 bg-black/20" />
+      <div className="w-px h-5 bg-black/20 hidden sm:block" />
 
       <Link to="/app/noxpay" className="flex items-center gap-2 sm:gap-3 shrink-0">
         <div className="w-9 h-9 sm:w-10 sm:h-10 bg-black rounded-lg flex items-center justify-center">

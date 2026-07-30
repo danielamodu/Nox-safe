@@ -49,12 +49,17 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 h-20 bg-primary border-b-2 border-black flex items-center px-4 sm:px-6 gap-3 sm:gap-6">
-      {/* Back to products */}
+      {/* Product switcher */}
       <Link
-        to="/products"
-        className="hidden sm:flex items-center font-mono text-xs text-black/50 hover:text-black/80 transition-colors shrink-0"
+        to="/app/noxpay"
+        className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-black bg-black/10 hover:bg-sage hover:text-black text-black font-body font-bold text-xs transition-all shrink-0"
+        style={{ boxShadow: "2px 2px 0px #000" }}
       >
-        ← Products
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.5" />
+          <path d="M9 12h6M12 9v6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+        </svg>
+        NoxPay
       </Link>
       <div className="hidden sm:block w-px h-5 bg-black/20" />
 
