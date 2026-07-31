@@ -129,7 +129,7 @@ export function NoxPayStreams() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="space-y-8 max-w-2xl"
+      className="space-y-8 max-w-4xl"
     >
       <div>
         <div className="flex items-center gap-2 mb-1">
