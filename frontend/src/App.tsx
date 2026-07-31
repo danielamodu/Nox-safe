@@ -9,9 +9,9 @@ import { Setup } from "./pages/Setup";
 import { SubmitIntent } from "./pages/SubmitIntent";
 import { IntentHistory } from "./pages/IntentHistory";
 import { PolicyView } from "./pages/PolicyView";
-import { NoxPayCreate } from "./pages/NoxPayCreate";
-import { NoxPayStreams } from "./pages/NoxPayStreams";
-import { NoxPayWithdraw } from "./pages/NoxPayWithdraw";
+import { NoxPayLanding } from "./pages/NoxPayLanding";
+import { NoxPayCompany } from "./pages/NoxPayCompany";
+import { NoxPayEmployee } from "./pages/NoxPayEmployee";
 import { Docs } from "./pages/Docs";
 import { Privacy } from "./pages/Privacy";
 import { Terms } from "./pages/Terms";
@@ -37,11 +37,17 @@ export function App() {
           <Route path="policy" element={<PolicyView />} />
         </Route>
 
-        {/* NoxPay (payroll streaming) */}
-        <Route path="/app/noxpay" element={<NoxPayLayout />}>
-          <Route index element={<NoxPayCreate />} />
-          <Route path="streams" element={<NoxPayStreams />} />
-          <Route path="withdraw" element={<NoxPayWithdraw />} />
+        {/* NoxPay — role chooser (no auth required) */}
+        <Route path="/app/noxpay" element={<NoxPayLanding />} />
+
+        {/* NoxPay — company flow (auth required) */}
+        <Route path="/app/noxpay/company" element={<NoxPayLayout />}>
+          <Route index element={<NoxPayCompany />} />
+        </Route>
+
+        {/* NoxPay — employee flow (auth required) */}
+        <Route path="/app/noxpay/employee" element={<NoxPayLayout />}>
+          <Route index element={<NoxPayEmployee />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -29,15 +29,13 @@ function WrongNetworkBanner() {
 }
 
 const NAV_LINKS = [
-  { to: "/app/noxpay", label: "Shield Stream" },
-  { to: "/app/noxpay/streams", label: "My Streams" },
-  { to: "/app/noxpay/withdraw", label: "Withdraw" },
+  { to: "/app/noxpay/company", label: "Company" },
+  { to: "/app/noxpay/employee", label: "Employee" },
 ];
 
 const MOBILE_NAV_ITEMS = [
-  { to: "/app/noxpay", label: "Shield" },
-  { to: "/app/noxpay/streams", label: "My Streams" },
-  { to: "/app/noxpay/withdraw", label: "Withdraw" },
+  { to: "/app/noxpay/company", label: "Company" },
+  { to: "/app/noxpay/employee", label: "Employee" },
 ];
 
 function NoxPayHeader() {
@@ -53,7 +51,7 @@ function NoxPayHeader() {
     } catch {
       // ignore wallet_revokePermissions RPC error
     }
-    navigate("/connect?returnTo=/app/noxpay", { replace: true });
+    navigate(`/connect?returnTo=${location.pathname}`, { replace: true });
   };
 
   return (
@@ -86,7 +84,7 @@ function NoxPayHeader() {
 
       <nav className="hidden md:flex items-center gap-1 flex-1">
         {NAV_LINKS.map(({ to, label }) => {
-          const active = location.pathname === to;
+          const active = location.pathname.startsWith(to);
           return (
             <Link
               key={to}
@@ -154,15 +152,16 @@ function MobileBottomNav() {
 
 export function NoxPayLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isConnected, isConnecting, isReconnecting } = useAccount();
 
   const isAuthPending = isConnecting || isReconnecting;
 
   useEffect(() => {
     if (!isConnected && !isAuthPending) {
-      navigate("/connect?returnTo=/app/noxpay", { replace: true });
+      navigate(`/connect?returnTo=${location.pathname}`, { replace: true });
     }
-  }, [isConnected, isAuthPending, navigate]);
+  }, [isConnected, isAuthPending, navigate, location.pathname]);
 
   if (!isConnected && isAuthPending) {
     return (

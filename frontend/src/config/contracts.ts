@@ -296,6 +296,33 @@ export const REGISTRY_ABI = [
 export const SABLIER_ABI = [
   {
     type: "function",
+    name: "getStream",
+    inputs: [{ name: "streamId", type: "uint256" }],
+    outputs: [{
+      name: "stream",
+      type: "tuple",
+      components: [
+        { name: "sender", type: "address" },
+        { name: "startTime", type: "uint40" },
+        { name: "cliffTime", type: "uint40" },
+        { name: "isCancelable", type: "bool" },
+        { name: "wasCanceled", type: "bool" },
+        { name: "asset", type: "address" },
+        { name: "endTime", type: "uint40" },
+        { name: "isDepleted", type: "bool" },
+        { name: "isStream", type: "bool" },
+        { name: "isTransferable", type: "bool" },
+        { name: "amounts", type: "tuple", components: [
+          { name: "deposited", type: "uint128" },
+          { name: "withdrawn", type: "uint128" },
+          { name: "refunded", type: "uint128" },
+        ]},
+      ],
+    }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "nextStreamId",
     inputs: [],
     outputs: [{ name: "", type: "uint256" }],
