@@ -38,8 +38,8 @@ Faucet: [faucet.circle.com](https://faucet.circle.com) — select "Ethereum Sepo
 4. Confirm on [NoxRecipientProxy events](https://sepolia.etherscan.io/address/0x1D9f855d88e526745fDb8b04Fe3180a274604172#events) — look for `ShieldedWithdrawExecuted`
 
 **Prior fulfillment proofs (on-chain):**
-- [FILL IN: Sepolia Etherscan tx for ShieldedWithdrawExecuted]
-- [FILL IN: Sepolia Etherscan tx for IntentExecuted]
+- [`ShieldedWithdrawExecuted` — 0x879a2a6…](https://sepolia.etherscan.io/tx/0x879a2a653abafb979402e657908ebd059c97c5f8c151b584e5e19daf545587da)
+- [`IntentExecuted` — 0x06345fa…](https://sepolia.etherscan.io/tx/0x06345fabe651700a57586ff6da6ea49b82130f8996bc1953ad20f4716744f9c7)
 
 ---
 
@@ -47,9 +47,9 @@ Faucet: [faucet.circle.com](https://faucet.circle.com) — select "Ethereum Sepo
 
 A Sepolia Safe with `NoxGuardModule` already enabled and a policy already set is available for judging:
 
-> Safe address: `[FILL IN: your pre-configured Sepolia Safe address]`
+> Safe address: `0xD465929D06d757fEA8fe2da0d93F99972A0E870A`
 >
-> Policy: whitelisted targets `[FILL IN]`, max `[FILL IN]` ETH per tx
+> Policy: whitelisted target `0x58F96F255286c165B03507C5f4Fa58c64c93fF9a`, max 0.1 ETH per tx, 0.1 ETH per day
 
 1. Go to [noxsafe.website/app/safe](https://noxsafe.website/app/safe), connect any Sepolia wallet
 2. Enter the Safe address above
