@@ -482,20 +482,13 @@ export function NoxPayCreate() {
             </p>
           </div>
 
-          {/* How it works */}
           <div className="card-brutal bg-white/5 border-2 border-white/10 p-5 space-y-2">
             <p className="font-heading font-bold text-sm text-sage">What this does</p>
             <ol className="space-y-1 font-body text-xs text-white/50 list-decimal list-inside leading-relaxed">
-              <li>Approves Sablier to spend your ERC-20 tokens</li>
-              <li>
-                Creates a LockupLinear stream with{" "}
-                <span className="font-mono text-white/60 break-all">
-                  {ADDRESSES.NoxRecipientProxy}
-                </span>{" "}
-                as the on-chain recipient
-              </li>
-              <li>Encrypts the real recipient address via the Nox TEE gateway</li>
-              <li>Registers the encrypted handle on NoxRecipientProxy</li>
+              <li>Approves Sablier to spend your tokens (one-time per token)</li>
+              <li>Creates a real Sablier payroll stream on-chain</li>
+              <li>Encrypts the recipient's wallet address inside the Nox TEE — never stored in plaintext</li>
+              <li>Registers the shielded recipient on-chain — only the oracle can reveal who gets paid</li>
             </ol>
           </div>
         </>
