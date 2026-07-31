@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { sepolia } from "wagmi/chains";
 import { useConnect, useDisconnect } from "wagmi";
+import { OracleStatus } from "./OracleStatus";
 
 function WrongNetworkBanner() {
   const chainId = useChainId();
@@ -98,6 +99,9 @@ function NoxPayHeader() {
           );
         })}
       </nav>
+
+      {/* Oracle status */}
+      <OracleStatus />
 
       <div className="ml-auto">
         {isConnected ? (

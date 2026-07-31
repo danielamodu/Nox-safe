@@ -10,6 +10,55 @@ We integrated iExec Nox TEE into two existing, widely-used protocols — Safe ($
 
 ---
 
+## Demo Guide for Judges
+
+> All contracts are live on Sepolia. Both products run end-to-end with no mock data.
+
+### NoxPay — 5-minute demo (no Safe setup required)
+
+You need a Sepolia wallet and ERC-20 test tokens.
+
+**Get test USDC**
+
+Use Sepolia USDC: `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238` (Circle's official Sepolia deployment).
+Faucet: [faucet.circle.com](https://faucet.circle.com) — select "Ethereum Sepolia", paste your wallet, receive 10 USDC. Takes ~30 seconds.
+
+**Create a shielded stream (Company role)**
+
+1. Go to [noxsafe.website/app/noxpay/company](https://noxsafe.website/app/noxpay/company) and connect a Sepolia wallet
+2. Fill in: recipient wallet (a second address you control), token `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238`, amount `10`, duration `1` minute
+3. Click **Create Shielded Stream** — one MetaMask session handles token approval, Sablier stream creation, Nox TEE encryption, and proxy registration
+4. Copy the stream ID shown on the success screen
+
+**Watch the oracle fulfill (Employee role)**
+
+1. Go to [noxsafe.website/app/noxpay/employee](https://noxsafe.website/app/noxpay/employee)
+2. Paste the stream ID — vested amount and withdrawable balance are shown live
+3. Click **Request Shielded Withdrawal** — oracle picks it up within ~30 seconds and calls `withdrawMax` directly to the decrypted recipient wallet
+4. Confirm on [NoxRecipientProxy events](https://sepolia.etherscan.io/address/0x1D9f855d88e526745fDb8b04Fe3180a274604172#events) — look for `ShieldedWithdrawExecuted`
+
+**Prior fulfillment proofs (on-chain):**
+- [FILL IN: Sepolia Etherscan tx for ShieldedWithdrawExecuted]
+- [FILL IN: Sepolia Etherscan tx for IntentExecuted]
+
+---
+
+### Nox-Safe — pre-configured Safe
+
+A Sepolia Safe with `NoxGuardModule` already enabled and a policy already set is available for judging:
+
+> Safe address: `[FILL IN: your pre-configured Sepolia Safe address]`
+>
+> Policy: whitelisted targets `[FILL IN]`, max `[FILL IN]` ETH per tx
+
+1. Go to [noxsafe.website/app/safe](https://noxsafe.website/app/safe), connect any Sepolia wallet
+2. Enter the Safe address above
+3. Go to **Submit Intent** — enter a whitelisted target address, ETH value within the policy cap, click **Encrypt & Submit**
+4. The oracle fulfills within ~30 seconds — the intent status flips Pending → Executed
+5. Confirm on [NoxGuardModule events](https://sepolia.etherscan.io/address/0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51#events)
+
+---
+
 ## Architecture
 
 ```
@@ -122,7 +171,7 @@ Nox-safe/
 │   └── deployments/sepolia.json   ← canonical deployed addresses
 ├── frontend/               React + Vite + wagmi web app
 │   └── src/
-│       ├── pages/          Dashboard, SubmitIntent, NoxPayCreate, NoxPayStreams, NoxPayWithdraw, …
+│       ├── pages/          Dashboard, SubmitIntent, NoxPayLanding, NoxPayCompany, NoxPayEmployee, …
 │       ├── hooks/          useSafeSetup.ts (Safe Protocol Kit + API Kit)
 │       └── config/         contracts.ts (ABIs + addresses)
 ├── nox-task/               Oracle daemon (Node.js + ethers v6)
@@ -277,25 +326,23 @@ With `nox-task` running, the daemon picks up `IntentSubmitted` within ~12 second
 
 ### NoxPay — Shielded Payroll Flow
 
-**Step 1 — Create a Sablier stream with the proxy as recipient**
+**Company: Create a shielded stream**
 
-Create a stream on the Sablier UI or directly on-chain, setting the recipient to `NoxRecipientProxy` (`0x1D9f855d88e526745fDb8b04Fe3180a274604172`).
+1. Go to `/app/noxpay` and click **I'm a Company**, or navigate directly to `/app/noxpay/company`
+2. Fill in: recipient wallet address, ERC-20 token address, total amount, stream duration
+3. Click **Create Shielded Stream** — the app runs four steps in sequence:
+   - Approves Sablier to spend the ERC-20 token (one-time per token)
+   - Creates a Sablier LockupLinear stream with `NoxRecipientProxy` as the on-chain recipient
+   - Encrypts the real recipient's wallet address inside the Nox TEE
+   - Calls `NoxRecipientProxy.registerShieldedStream` — binding the encrypted handle to the stream on-chain
+4. The stream ID is shown on the success screen — share it with the employee
 
-**Step 2 — Register the encrypted real recipient**
+**Employee: Request a withdrawal**
 
-In the web app, go to **NoxPay — Shield Stream** (`/app/noxpay`):
-
-1. Enter the Sablier lockup contract address and your stream ID
-2. Enter the real end-recipient address — it is encrypted via the Nox gateway before leaving the browser
-3. Click **Register Shielded Stream** — calls `NoxRecipientProxy.registerShieldedStream`
-
-**Step 3 — Request a withdrawal**
-
-When vested funds are withdrawable, click **Request Shielded Withdraw**. This calls `requestShieldedWithdraw` and emits `ShieldedWithdrawRequested`.
-
-**Step 4 — Oracle fulfills**
-
-The daemon picks up the event, decrypts the recipient inside the TEE, verifies the Nox proof on-chain, and calls `withdrawMax` on Sablier directly to the real recipient. The on-chain recipient field resolves only at fulfillment.
+1. Go to `/app/noxpay/employee` and enter the stream ID your employer shared
+2. The app reads on-chain data and shows: token, total deposited, vested so far, withdrawable now
+3. When withdrawable amount is > 0, click **Request Shielded Withdrawal** — calls `requestShieldedWithdraw` and emits `ShieldedWithdrawRequested`
+4. The oracle picks up the event within ~30 seconds, decrypts the recipient inside the TEE, verifies `Nox.publicDecrypt` on-chain, and calls `sablier.withdrawMax(streamId, realRecipient)` — tokens land at the decrypted wallet
 
 ---
 
@@ -313,16 +360,16 @@ NoxPay works with any ERC-20 token and any Sablier V2 LockupLinear stream on Sep
 
 **Request a withdrawal:**
 
-1. Go to [noxsafe.website/app/noxpay/withdraw](https://noxsafe.website/app/noxpay/withdraw)
-2. Enter the Sablier contract address and stream ID (or navigate from My Streams)
+1. Go to [noxsafe.website/app/noxpay/employee](https://noxsafe.website/app/noxpay/employee)
+2. Enter the stream ID your employer shared
 3. Click **Request Shielded Withdrawal** — emits `ShieldedWithdrawRequested` on-chain
 4. The oracle picks it up within ~30 seconds, decrypts the recipient inside the Nox TEE, verifies `Nox.publicDecrypt` on-chain, calls `sablier.withdrawMax(streamId, recipient)` — tokens land at the decrypted recipient wallet
 
 To verify the proof fired: [Etherscan → NoxRecipientProxy events](https://sepolia.etherscan.io/address/0x1D9f855d88e526745fDb8b04Fe3180a274604172#events) → look for `ShieldedWithdrawExecuted` after your request.
 
-**View your streams:**
+**View your streams (Company):**
 
-Go to [noxsafe.website/app/noxpay/streams](https://noxsafe.website/app/noxpay/streams) — streams you created are auto-discovered from on-chain `StreamShielded` events. No manual ID entry needed.
+Go to [noxsafe.website/app/noxpay/company](https://noxsafe.website/app/noxpay/company) → **My Streams** tab — streams you created are auto-discovered from on-chain `StreamShielded` events. No manual ID entry needed.
 
 ---
 

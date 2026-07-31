@@ -1,28 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAccount, useConnect, useDisconnect, useReadContract } from "wagmi";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { injected } from "wagmi/connectors";
-import { ADDRESSES, MODULE_ABI } from "../config/contracts";
-
-const ZERO_ADDR = "0x0000000000000000000000000000000000000000";
-
-function OracleBadge() {
-  const { data: oracleAddr, isError } = useReadContract({
-    address: ADDRESSES.NoxGuardModule,
-    abi: MODULE_ABI,
-    functionName: "noxOracle",
-    query: { staleTime: 60_000 },
-  });
-  const online = !isError && !!oracleAddr && oracleAddr !== ZERO_ADDR;
-
-  return (
-    <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/20 border border-black/30">
-      <span className={`w-2 h-2 rounded-full ${online ? "bg-green-400 animate-pulse" : "bg-red-400"}`} />
-      <span className="font-mono text-xs text-black font-semibold">
-        {online ? "Oracle Active" : "Oracle Offline"}
-      </span>
-    </div>
-  );
-}
+import { OracleStatus } from "./OracleStatus";
 
 const SAFE_NAV = [
   { to: "/app/safe", label: "Dashboard" },
@@ -96,8 +75,8 @@ export function Header() {
         })}
       </nav>
 
-      {/* Oracle badge */}
-      <OracleBadge />
+      {/* Oracle status */}
+      <OracleStatus />
 
       {/* Wallet */}
       <div className="ml-auto">
