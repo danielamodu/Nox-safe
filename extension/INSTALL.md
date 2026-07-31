@@ -43,7 +43,7 @@ The popup shows two product cards linking to [noxsafe.website](https://noxsafe.w
 ### NOXPAY — app.sablier.com
 
 - Browse any Sablier stream at [app.sablier.com](https://app.sablier.com). A floating **Pay with NoxPay** button appears in the corner.
-- On a stream detail page (e.g. `/stream/LL2-11155111-3487`), the stream ID is auto-detected and the button opens NoxPay's withdrawal page with the stream pre-filled — no copy-pasting needed.
+- On any stream detail page (e.g. `/stream/LL2-11155111-42`), the stream ID is auto-detected and the button opens NoxPay's withdrawal page with the stream pre-filled — no copy-pasting needed.
 
 ---
 

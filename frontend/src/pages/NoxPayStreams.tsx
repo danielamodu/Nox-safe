@@ -206,20 +206,6 @@ export function NoxPayStreams() {
         </p>
       </div>
 
-      {/* Demo stream */}
-      {ADDRESSES.DemoStreamId && (
-        <div>
-          <p className="font-body font-bold text-xs text-sage/60 uppercase tracking-wide mb-3">
-            Live Demo Stream
-          </p>
-          <StreamCard
-            sablier={ADDRESSES.SablierV2SepoliaLinear}
-            streamId={BigInt(ADDRESSES.DemoStreamId)}
-            label="Demo"
-          />
-        </div>
-      )}
-
       {/* Wallet streams */}
       {!address ? (
         <div className="card-brutal bg-white/5 border-2 border-white/10 p-6 text-center">
@@ -287,7 +273,7 @@ export function NoxPayStreams() {
             type="text"
             value={lookupId}
             onChange={(e) => { setLookupId(e.target.value); setSubmitted(false); }}
-            placeholder="e.g. 3487"
+            placeholder="e.g. 42"
             className="input-brutal font-mono text-sm"
           />
         </div>

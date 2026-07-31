@@ -6,8 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node --loader ts-node/esm src/index.ts",
-    "encrypt": "node --loader ts-node/esm src/encrypt.ts",
-    "setup-demo": "node --loader ts-node/esm src/setup-demo-stream.ts"
+    "encrypt": "node --loader ts-node/esm src/encrypt.ts"
   },
   "dependencies": {
     "@iexec-nox/handle": "^0.1.0-beta.13",

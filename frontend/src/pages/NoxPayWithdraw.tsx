@@ -109,14 +109,6 @@ export function NoxPayWithdraw() {
     }
   };
 
-  const fillDemo = () => {
-    setSablierAddr(ADDRESSES.SablierV2SepoliaLinear);
-    setStreamId(ADDRESSES.DemoStreamId);
-    setError("");
-    setRequestId(null);
-    setIsSettled(false);
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -136,21 +128,6 @@ export function NoxPayWithdraw() {
           calls <code className="font-mono text-xs">withdrawMax</code> on Sablier directly.
         </p>
       </div>
-
-      {/* Demo stream callout */}
-      {ADDRESSES.DemoStreamId && (
-        <div className="card-brutal bg-primary border-2 border-black p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <p className="font-heading font-bold text-sm text-black">Try the Live Demo Stream</p>
-            <p className="font-body text-xs text-black/70 mt-0.5">
-              Real Sablier V2 stream — Nox-encrypted recipient (Vitalik), oracle-fulfilled. Re-fills every second.
-            </p>
-          </div>
-          <button onClick={fillDemo} className="btn-primary whitespace-nowrap shrink-0">
-            Fill Demo →
-          </button>
-        </div>
-      )}
 
       {/* Form */}
       <div className="card-brutal bg-white border-2 border-black p-6 space-y-5">
@@ -179,7 +156,7 @@ export function NoxPayWithdraw() {
             type="text"
             value={streamId}
             onChange={(e) => setStreamId(e.target.value)}
-            placeholder="e.g. 3487"
+            placeholder="e.g. 42"
             className="input-brutal font-mono text-sm"
           />
         </div>

@@ -166,28 +166,6 @@ export function SablierShield() {
         </div>
       </div>
 
-      {/* Demo Stream Callout */}
-      {ADDRESSES.DemoStreamId && (
-        <div className="card-brutal bg-primary border-2 border-black p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <p className="font-heading font-bold text-sm text-black">Try the Live Demo Stream</p>
-            <p className="font-body text-xs text-black/70 mt-0.5">
-              Real Sablier V2 stream on Sepolia — Nox-encrypted recipient, oracle-fulfilled withdrawal.
-            </p>
-          </div>
-          <button
-            onClick={() => {
-              setSablierAddr(ADDRESSES.SablierV2SepoliaLinear);
-              setStreamId(ADDRESSES.DemoStreamId);
-              setTab("withdraw");
-            }}
-            className="btn-primary whitespace-nowrap shrink-0"
-          >
-            Try Demo Stream →
-          </button>
-        </div>
-      )}
-
       {/* Main Form Card */}
       <div className="card-brutal bg-white border-2 border-black p-6 space-y-6">
         {/* Tab Selection */}

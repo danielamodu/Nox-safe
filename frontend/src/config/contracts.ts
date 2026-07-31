@@ -10,7 +10,6 @@ export const ADDRESSES = {
   NoxRecipientProxy: "0x1D9f855d88e526745fDb8b04Fe3180a274604172" as `0x${string}`,
   MockSablierLockup: "0x518B1b36bcfA237c909380D56B6254052b350bb1" as `0x${string}`,
   SablierV2SepoliaLinear: "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301" as `0x${string}`,
-  DemoStreamId: "3487",
 } as const;
 
 export const MODULE_ABI = [

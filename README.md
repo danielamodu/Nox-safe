@@ -299,43 +299,30 @@ The daemon picks up the event, decrypts the recipient inside the TEE, verifies t
 
 ---
 
-## Try It Yourself — NoxPay Demo
+## Try It Yourself — NoxPay
 
-A live demo stream is deployed on Sepolia against the **real Sablier V2 LockupLinear** contract. The underlying token is `NoxDemoToken` (NDT) — a minimal ERC20 deployed solely for this demo. The entire oracle path is production: real `withdrawMax`, real Nox TEE proof, real ERC20 transfer to the decrypted recipient.
+NoxPay works with any ERC-20 token and any Sablier V2 LockupLinear stream on Sepolia. No pre-seeded data — the entire flow runs from your own wallet.
 
-| | |
-|---|---|
-| **Sablier contract** | `0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301` (SablierV2LockupLinear v1.1.2, Sepolia) |
-| **Stream ID** | see `ADDRESSES.DemoStreamId` in `frontend/src/config/contracts.ts` |
-| **Token** | NoxDemoToken (NDT) — 10 M tokens, 30-day linear vest, no cliff |
-| **Encrypted recipient** | Vitalik's address — `0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045` |
+**Create a shielded stream:**
 
-**Steps for judges:**
+1. Get a Sepolia ERC-20 token (e.g. any testnet token, or deploy your own minimal ERC-20)
+2. Go to [noxsafe.website/app/noxpay](https://noxsafe.website/app/noxpay) and connect a Sepolia wallet
+3. Fill in: recipient wallet address, token contract address, amount, duration
+4. Click **Create Shielded Stream** — the app handles ERC-20 approval, Sablier stream creation, Nox TEE encryption, and proxy registration in sequence
+5. The stream ID is shown on the success screen — share it with the recipient
+
+**Request a withdrawal:**
 
 1. Go to [noxsafe.website/app/noxpay/withdraw](https://noxsafe.website/app/noxpay/withdraw)
-2. Click **"Try Demo Stream →"** — pre-fills the real Sablier address and stream ID
-3. Connect any Sepolia wallet (no tokens needed; you are not the stream sender)
-4. Click **"Request Shielded Withdrawal"** — emits `ShieldedWithdrawRequested` on-chain
-5. The oracle picks it up within ~30 seconds, decrypts the recipient inside the Nox TEE, verifies `Nox.publicDecrypt` on-chain, calls `sablier.withdrawMax(streamId, recipient)` — real NDT tokens land at Vitalik's address
+2. Enter the Sablier contract address and stream ID (or navigate from My Streams)
+3. Click **Request Shielded Withdrawal** — emits `ShieldedWithdrawRequested` on-chain
+4. The oracle picks it up within ~30 seconds, decrypts the recipient inside the Nox TEE, verifies `Nox.publicDecrypt` on-chain, calls `sablier.withdrawMax(streamId, recipient)` — tokens land at the decrypted recipient wallet
 
-To verify the proof call fired: [Etherscan → NoxRecipientProxy events](https://sepolia.etherscan.io/address/0x1D9f855d88e526745fDb8b04Fe3180a274604172#events) → look for `ShieldedWithdrawExecuted` after your request.
+To verify the proof fired: [Etherscan → NoxRecipientProxy events](https://sepolia.etherscan.io/address/0x1D9f855d88e526745fDb8b04Fe3180a274604172#events) → look for `ShieldedWithdrawExecuted` after your request.
 
-**Multi-judge:** the stream is 30-day linear with no cliff, vesting ~0.38 NDT/second. After any drain, `withdrawableAmountOf` is non-zero again within ~3 seconds. No manual reset needed.
+**View your streams:**
 
-**Stream setup (one-time, already done — documented for reproducibility):**
-
-```bash
-# 1. Compile DemoToken
-cd contracts && npm run compile
-
-# 2. Deploy token, create real Sablier stream, register on NoxRecipientProxy
-cd ../nox-task
-cp .env.example .env   # fill in SEPOLIA_RPC_URL + ORACLE_PRIVATE_KEY
-npm run setup-demo
-
-# 3. Copy the printed stream ID into frontend/src/config/contracts.ts → DemoStreamId
-# 4. git add + commit + push → Vercel auto-deploys
-```
+Go to [noxsafe.website/app/noxpay/streams](https://noxsafe.website/app/noxpay/streams) — streams you created are auto-discovered from on-chain `StreamShielded` events. No manual ID entry needed.
 
 ---
 
