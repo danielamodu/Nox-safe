@@ -8,5 +8,17 @@ export function friendlyError(e: unknown): string {
     return "Insufficient funds in your wallet.";
   if (/nonce/i.test(msg))
     return "Transaction nonce error — try again.";
+  if (/ProxyNotRecipient/i.test(msg))
+    return "This stream's recipient is not NoxRecipientProxy. Create the stream with the proxy address as recipient first.";
+  if (/NotStreamSender/i.test(msg))
+    return "Only the original stream sender can register an encrypted recipient.";
+  if (/AlreadyRegistered/i.test(msg))
+    return "This stream is already registered with a shielded recipient.";
+  if (/StreamNotRegistered/i.test(msg))
+    return "This stream has no shielded recipient registered. Shield it first.";
+  if (/NoWithdrawableAmount/i.test(msg))
+    return "Nothing has vested yet — wait for the stream to accumulate balance.";
+  if (/RequestNotPending/i.test(msg))
+    return "This withdrawal request has already been processed.";
   return "Something went wrong. Please try again.";
 }

@@ -1,5 +1,9 @@
 export const CHAIN_ID = 11155111;
 
+// Used as fromBlock for StreamShielded getLogs queries — covers the hackathon window.
+// Update if the contract is redeployed much earlier than this block.
+export const PROXY_DEPLOYMENT_BLOCK = 7_700_000n;
+
 export const ADDRESSES = {
   NoxGuardModule: "0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51" as `0x${string}`,
   PolicyRegistry: "0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1" as `0x${string}`,
@@ -178,6 +182,37 @@ export const PROXY_ABI = [
     ],
     stateMutability: "view",
   },
+  {
+    type: "event",
+    name: "StreamShielded",
+    inputs: [
+      { name: "sablier", type: "address", indexed: true },
+      { name: "streamId", type: "uint256", indexed: true },
+      { name: "recipientHandle", type: "bytes32", indexed: true },
+      { name: "sender", type: "address", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "ShieldedWithdrawRequested",
+    inputs: [
+      { name: "requestId", type: "bytes32", indexed: true },
+      { name: "sablier", type: "address", indexed: true },
+      { name: "streamId", type: "uint256", indexed: true },
+      { name: "recipientHandle", type: "bytes32", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "ShieldedWithdrawExecuted",
+    inputs: [
+      { name: "requestId", type: "bytes32", indexed: true },
+      { name: "sablier", type: "address", indexed: true },
+      { name: "streamId", type: "uint256", indexed: false },
+      { name: "recipient", type: "address", indexed: true },
+      { name: "amount", type: "uint128", indexed: false },
+    ],
+  },
 ] as const;
 
 export const SAFE_ABI = [
@@ -255,5 +290,96 @@ export const REGISTRY_ABI = [
     type: "event",
     name: "PolicyUpdated",
     inputs: [{ name: "safe", type: "address", indexed: true }],
+  },
+] as const;
+
+// Sablier V2.2 LockupLinear — 0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301 on Sepolia
+export const SABLIER_ABI = [
+  {
+    type: "function",
+    name: "nextStreamId",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "withdrawableAmountOf",
+    inputs: [{ name: "streamId", type: "uint256" }],
+    outputs: [{ name: "", type: "uint128" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "createWithDurations",
+    inputs: [
+      {
+        name: "params",
+        type: "tuple",
+        components: [
+          { name: "sender", type: "address" },
+          { name: "recipient", type: "address" },
+          { name: "totalAmount", type: "uint128" },
+          { name: "asset", type: "address" },
+          { name: "cancelable", type: "bool" },
+          { name: "transferable", type: "bool" },
+          {
+            name: "durations",
+            type: "tuple",
+            components: [
+              { name: "cliff", type: "uint40" },
+              { name: "total", type: "uint40" },
+            ],
+          },
+          {
+            name: "broker",
+            type: "tuple",
+            components: [
+              { name: "account", type: "address" },
+              { name: "fee", type: "uint256" },
+            ],
+          },
+        ],
+      },
+    ],
+    outputs: [{ name: "streamId", type: "uint256" }],
+    stateMutability: "nonpayable",
+  },
+] as const;
+
+export const ERC20_ABI = [
+  {
+    type: "function",
+    name: "allowance",
+    inputs: [
+      { name: "owner", type: "address" },
+      { name: "spender", type: "address" },
+    ],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "approve",
+    inputs: [
+      { name: "spender", type: "address" },
+      { name: "amount", type: "uint256" },
+    ],
+    outputs: [{ name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "decimals",
+    inputs: [],
+    outputs: [{ name: "", type: "uint8" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "symbol",
+    inputs: [],
+    outputs: [{ name: "", type: "string" }],
+    stateMutability: "view",
   },
 ] as const;
