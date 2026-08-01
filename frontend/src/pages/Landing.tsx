@@ -268,6 +268,23 @@ export function Landing() {
                 </a>
               </motion.div>
 
+              <motion.div variants={fadeUp} className="mt-4">
+                <a
+                  href="https://app.safe.global/share/safe-app?appUrl=https://noxsafe.website&chain=sep"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 font-body text-sm text-sage/70 hover:text-sage border border-sage/20 hover:border-sage/40 rounded-full px-4 py-2 transition-colors"
+                >
+                  <svg width="14" height="14" fill="none" viewBox="0 0 32 32">
+                    <path d="M16 2L4 8v8c0 7.4 5.12 14.32 12 16 6.88-1.68 12-8.6 12-16V8L16 2z" fill="#b7c6c2" strokeWidth="1"/>
+                  </svg>
+                  Open in Safe App
+                  <svg width="10" height="10" fill="none" viewBox="0 0 24 24">
+                    <path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </a>
+              </motion.div>
+
               <motion.div variants={fadeUp} className="flex flex-wrap gap-8 mt-8 pt-6 border-t border-sage/10">
                 {STATS.map((s) => (
                   <div key={s.label}>

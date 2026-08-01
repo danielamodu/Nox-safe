@@ -63,6 +63,31 @@ You can also set up your own Safe — the full module enable and policy setup fl
 
 ---
 
+## Safe App
+
+Nox-Safe is registered as a Safe App and can be loaded directly inside the Safe{Wallet} interface at [app.safe.global](https://app.safe.global).
+
+**To open Nox-Safe inside Safe:**
+
+1. In Safe{Wallet}, go to **Apps → Custom Apps**
+2. Paste `https://noxsafe.website` and click **Add**
+3. Nox-Safe loads in the embedded dApp browser — the connected Safe address is detected automatically via `@safe-global/safe-apps-sdk`, so no manual address entry is required
+4. The wallet is the Safe itself, so all signing flows work natively
+
+Alternatively, use the direct share link:
+
+```
+https://app.safe.global/share/safe-app?appUrl=https://noxsafe.website&chain=sep
+```
+
+**Technical notes:**
+- `public/manifest.json` declares the app name, description, and supported networks (Sepolia, chainId 11155111)
+- `vercel.json` includes a `Content-Security-Policy: frame-ancestors` header permitting embedding from `app.safe.global`
+- `safe()` is registered as the first wagmi connector, so Safe's injected provider is preferred when available
+- When the SDK detects a Safe App context (1.5 s handshake timeout), `safeAddress` is auto-populated and the "Connect your Safe" entry screen is skipped entirely
+
+---
+
 ## Architecture
 
 ```

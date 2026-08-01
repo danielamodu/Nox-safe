@@ -140,7 +140,7 @@ function PendingCard({
 export function Dashboard() {
   const navigate = useNavigate();
   const { address } = useAccount();
-  const { safeAddress, setSafeAddress } = useSafe();
+  const { safeAddress, setSafeAddress, isInSafeApp, detectingSafeApp } = useSafe();
   const hasSafe = typeof safeAddress === "string" && safeAddress.length === 42;
 
   // Safe address input state
@@ -314,6 +314,16 @@ export function Dashboard() {
   // ── Render: Step 0 — no safe ──────────────────────────────────────────────
 
   if (!hasSafe) {
+    // Brief loading state while we check for Safe App context
+    if (detectingSafeApp) {
+      return (
+        <div className="flex flex-col items-center justify-center py-24 gap-4">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="font-body text-sm text-sage">Connecting to Safe…</p>
+        </div>
+      );
+    }
+
     return (
       <motion.div
         className="max-w-md mx-auto pt-8 space-y-6"
@@ -591,6 +601,11 @@ export function Dashboard() {
         <div className="card-brutal py-2 px-4 flex items-center gap-2">
           <StatusDot ok={true} />
           <span className="font-mono text-xs">Safe: {safeAddress.slice(0, 6)}…{safeAddress.slice(-4)}</span>
+          {isInSafeApp && (
+            <span className="font-mono text-[10px] bg-primary text-black px-1.5 py-0.5 rounded border border-black">
+              Safe App
+            </span>
+          )}
         </div>
         <div className="card-brutal py-2 px-4 flex items-center gap-2">
           <StatusDot ok={!!isModuleEnabled} />
