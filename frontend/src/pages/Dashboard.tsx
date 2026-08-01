@@ -84,6 +84,7 @@ function PendingCard({
   onSign,
   onExecute,
   isLoading,
+  walletReady,
 }: {
   safeTxHash: string;
   safeAddress: string;
@@ -93,6 +94,7 @@ function PendingCard({
   onSign: () => void;
   onExecute: () => void;
   isLoading: boolean;
+  walletReady: boolean;
 }) {
   const remaining = confirmationsRequired - confirmations;
   const thresholdMet = confirmations >= confirmationsRequired;
@@ -117,14 +119,14 @@ function PendingCard({
       {thresholdMet ? (
         <div className="space-y-3">
           <p className="font-body text-sm font-bold text-green-600">Threshold met — ready to execute</p>
-          <button onClick={onExecute} disabled={isLoading} className="btn-primary btn-brutal-lg disabled:opacity-50">
-            {isLoading ? "Executing…" : "Execute Transaction"}
+          <button onClick={onExecute} disabled={isLoading || !walletReady} className="btn-primary btn-brutal-lg disabled:opacity-50">
+            {isLoading ? "Executing…" : !walletReady ? "Reconnect wallet to execute" : "Execute Transaction"}
           </button>
           {isLoading && (
             <div className="flex items-start gap-2 bg-primary/20 border border-primary/40 rounded px-3 py-2">
               <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin shrink-0 mt-0.5" />
               <p className="font-body text-xs text-black/80">
-                <strong>Check MetaMask</strong> — approve the transaction to complete execution on-chain.
+                <strong>Check your wallet</strong> — approve the transaction to complete execution on-chain.
               </p>
             </div>
           )}
@@ -154,8 +156,8 @@ function PendingCard({
       ) : (
         <div className="space-y-3">
           <p className="font-body text-sm font-bold">This wallet hasn't signed yet</p>
-          <button onClick={onSign} disabled={isLoading} className="btn-primary btn-brutal-lg disabled:opacity-50">
-            {isLoading ? "Signing…" : "Sign Transaction"}
+          <button onClick={onSign} disabled={isLoading || !walletReady} className="btn-primary btn-brutal-lg disabled:opacity-50">
+            {isLoading ? "Signing…" : !walletReady ? "Reconnect wallet to sign" : "Sign Transaction"}
           </button>
         </div>
       )}
@@ -510,6 +512,7 @@ export function Dashboard() {
               onSign={handleSign}
               onExecute={handleExecute}
               isLoading={isLoading}
+              walletReady={!!address}
             />
           )}
 
@@ -527,8 +530,6 @@ export function Dashboard() {
               </button>
             </div>
           )}
-
-          {hookError && <p className="font-body text-sm text-red-500 break-words">{hookError}</p>}
         </div>
 
         <button
@@ -646,6 +647,7 @@ export function Dashboard() {
               onSign={handleSign}
               onExecute={handleExecute}
               isLoading={isLoading}
+              walletReady={!!address}
             />
           )}
 
@@ -663,8 +665,6 @@ export function Dashboard() {
               </button>
             </div>
           )}
-
-          {hookError && <p className="font-body text-sm text-red-500 break-words">{hookError}</p>}
         </div>
       </motion.div>
     );

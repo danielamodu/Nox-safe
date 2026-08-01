@@ -61,16 +61,27 @@ function MobileBottomNav() {
 
 function ReconnectBanner() {
   const { connect, connectors } = useConnect();
+
+  // Auto-attempt reconnect as soon as a new provider is available
+  useEffect(() => {
+    const injected = connectors.find((c) => c.id === "injected") ?? connectors[0];
+    if (injected) connect({ connector: injected });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="bg-charcoal border-b-2 border-primary/40 px-6 py-3 flex items-center justify-between gap-4">
       <div className="flex items-center gap-2">
         <div className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse border border-black" />
         <span className="font-body font-bold text-sm text-sage">
-          Wallet switching… connect with your second wallet to sign.
+          Switching wallet…
         </span>
       </div>
       <button
-        onClick={() => connect({ connector: connectors[1] ?? connectors[0] })}
+        onClick={() => {
+          const injected = connectors.find((c) => c.id === "injected") ?? connectors[0];
+          if (injected) connect({ connector: injected });
+        }}
         className="shrink-0 bg-primary text-black font-body font-bold text-xs px-3 py-1.5 rounded border-2 border-black"
         style={{ boxShadow: "2px 2px 0px #000" }}
       >
