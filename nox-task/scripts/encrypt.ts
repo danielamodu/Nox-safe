@@ -1,8 +1,9 @@
+// Dev tool for local testing only — not part of the production oracle daemon.
 /**
  * Client-side encryption helper — encrypts target and value as separate Nox handles.
  *
  * Usage:
- *   SEPOLIA_RPC_URL=... PRIVATE_KEY=... npx ts-node src/encrypt.ts \
+ *   SEPOLIA_RPC_URL=... PRIVATE_KEY=... npx ts-node scripts/encrypt.ts \
  *     --target 0x1111...1111 \
  *     --value 500000000000000000 \
  *     --module 0xModuleAddress

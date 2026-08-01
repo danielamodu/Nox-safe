@@ -21,7 +21,7 @@ import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
  * - buildTargetProof(address): encodes address as uint256(uint160(addr))
  * - buildValueProof(bigint):   encodes wei amount as uint256
  */
-describe("Integration: NoxVerifier end-to-end", function () {
+describe("Integration: NoxGuardModule end-to-end", function () {
   let module: NoxGuardModule;
   let registry: PolicyRegistry;
   let mockSafe: MockSafe;

@@ -297,7 +297,7 @@ async function processShieldedWithdraw(
   const recipientProof = await fetchDecryptionProof(recipientHandle);
   const recipientUint = extractPlaintext(recipientProof);
   const recipient = ethers.getAddress(ethers.toBeHex(recipientUint, 20));
-  console.log(`[nox-task] Decoded shielded recipient: ${recipient}`);
+  console.log(`[nox-task] Recipient decrypted — requestId: ${requestId}`);
 
   console.log(`[nox-task] Fulfilling shielded withdrawal...`);
   try {

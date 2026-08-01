@@ -399,6 +399,8 @@ In production the oracle is packaged as a Docker image and deployed as an iExec 
 
 **Oracle owner key and deployer are the same address.** In this build the deployer EOA is also the oracle wallet and the `NoxGuardModule` contract owner (who can call `setNoxOracle`). A compromised deployer key could redirect all intent fulfillment through a malicious oracle address without any time delay. In production, the deployer key, oracle key, and contract owner role should be separated, with a timelock or multisig required to change the oracle address.
 
+**Oracle daily cap check asymmetry.** The oracle pre-validates the per-transaction cap off-chain and calls `rejectIntent` directly if exceeded. The daily cap check is handled by the contract's soft-reject path inside `fulfillIntent` — this means a daily cap violation costs the oracle one transaction's gas before being rejected on-chain. Intentional trade-off for v1.
+
 **WalletConnect is optional.** A placeholder WalletConnect project ID was replaced with a proper opt-in env var (`VITE_WC_PROJECT_ID`) during development. WalletConnect is skipped entirely if the env var is absent — MetaMask and Coinbase Wallet work out of the box.
 
 ---
