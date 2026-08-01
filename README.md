@@ -74,12 +74,6 @@ Nox-Safe is registered as a Safe App and can be loaded directly inside the Safe{
 3. Nox-Safe loads in the embedded dApp browser — the connected Safe address is detected automatically via `@safe-global/safe-apps-sdk`, so no manual address entry is required
 4. The wallet is the Safe itself, so all signing flows work natively
 
-Alternatively, use the direct share link:
-
-```
-https://app.safe.global/share/safe-app?appUrl=https://noxsafe.website&chain=sep
-```
-
 **Technical notes:**
 - `public/manifest.json` declares the app name, description, and supported networks (Sepolia, chainId 11155111)
 - `vercel.json` includes a `Content-Security-Policy: frame-ancestors` header permitting embedding from `app.safe.global`
