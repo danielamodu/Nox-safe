@@ -19,7 +19,7 @@ import { createHandleClient } from "@iexec-nox/handle";
 const ALCHEMY = process.env.SEPOLIA_RPC_URL!;
 const ORACLE_KEY = process.env.ORACLE_PRIVATE_KEY!;
 
-const NOX_RECIPIENT_PROXY = "0x1D9f855d88e526745fDb8b04Fe3180a274604172";
+const NOX_RECIPIENT_PROXY = "0xd707bE1206c174d4F15f133d1cB27Df3583d6A0b";
 const MOCK_SABLIER = "0x518B1b36bcfA237c909380D56B6254052b350bb1";
 const NOX_GATEWAY = "https://gateway-testnets.noxprotocol.dev";
 const NOX_COMPUTE = "0x24Ef36Ec5b626D7DCD09a98F3083c2758F0F77bF";

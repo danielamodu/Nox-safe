@@ -7,7 +7,7 @@ export const PROXY_DEPLOYMENT_BLOCK = 7_700_000n;
 export const ADDRESSES = {
   NoxGuardModule: "0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51" as `0x${string}`,
   PolicyRegistry: "0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1" as `0x${string}`,
-  NoxRecipientProxy: "0x1D9f855d88e526745fDb8b04Fe3180a274604172" as `0x${string}`,
+  NoxRecipientProxy: "0xd707bE1206c174d4F15f133d1cB27Df3583d6A0b" as `0x${string}`,
   SablierV2SepoliaLinear: "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301" as `0x${string}`,
 } as const;
 
@@ -156,6 +156,7 @@ export const PROXY_ABI = [
           { name: "recipientHandle", type: "bytes32" },
           { name: "sender", type: "address" },
           { name: "active", type: "bool" },
+          { name: "pendingRequest", type: "bool" },
         ],
       },
     ],

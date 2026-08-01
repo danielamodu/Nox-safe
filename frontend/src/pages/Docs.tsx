@@ -57,7 +57,7 @@ NoxGuardModule (on-chain)
                 {[
                   ["PolicyRegistry", "0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1"],
                   ["NoxGuardModule", "0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51"],
-                  ["NoxRecipientProxy", "0x1D9f855d88e526745fDb8b04Fe3180a274604172"],
+                  ["NoxRecipientProxy", "0xd707bE1206c174d4F15f133d1cB27Df3583d6A0b"],
                   ["SablierV2LockupLinear v1.1.2", "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301"],
                   ["NoxCompute (iExec)", "0x24Ef36Ec5b626D7DCD09a98F3083c2758F0F77bF"],
                 ].map(([name, addr], i) => (
@@ -143,7 +143,7 @@ SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
 ORACLE_PRIVATE_KEY=<oracle wallet private key, no 0x prefix>
 NOX_GUARD_MODULE=0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51
 POLICY_REGISTRY=0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1
-NOX_RECIPIENT_PROXY=0x1D9f855d88e526745fDb8b04Fe3180a274604172`}</CodeBlock>
+NOX_RECIPIENT_PROXY=0xd707bE1206c174d4F15f133d1cB27Df3583d6A0b`}</CodeBlock>
             <p className="mt-4">
               The oracle wallet must match the <code>noxOracle</code> address stored in <code>NoxGuardModule</code>. To change it, call <code>NoxGuardModule.setNoxOracle(newAddress)</code> from the deployer/owner wallet.
             </p>
