@@ -9,7 +9,7 @@ import {
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 
 /**
- * Integration test: end-to-end intent lifecycle through real NoxVerifier.
+ * Integration test: end-to-end intent lifecycle through NoxGuardModule.
  *
  * Uses MockNoxCompute which strips the 65-byte signature prefix from the proof
  * and returns the remainder as plaintext — same interface as the real NoxCompute
@@ -102,7 +102,7 @@ describe("Integration: NoxGuardModule end-to-end", function () {
     return event!.args.intentId;
   }
 
-  it("fulfills a native-ETH intent end-to-end through real NoxVerifier", async function () {
+  it("fulfills a native-ETH intent end-to-end through NoxGuardModule", async function () {
     const safeAddr = await mockSafe.getAddress();
     const callValue = ethers.parseEther("0.5");
     const callData = "0x"; // native ETH — full privacy case

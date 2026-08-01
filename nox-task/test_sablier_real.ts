@@ -20,7 +20,7 @@ const ALCHEMY = process.env.SEPOLIA_RPC_URL!;
 const ORACLE_KEY = process.env.ORACLE_PRIVATE_KEY!;
 
 const NOX_RECIPIENT_PROXY = "0xd707bE1206c174d4F15f133d1cB27Df3583d6A0b";
-const MOCK_SABLIER = "0x518B1b36bcfA237c909380D56B6254052b350bb1";
+const MOCK_SABLIER = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301";
 const NOX_GATEWAY = "https://gateway-testnets.noxprotocol.dev";
 const NOX_COMPUTE = "0x24Ef36Ec5b626D7DCD09a98F3083c2758F0F77bF";
 const CHAIN_ID = 11155111;
@@ -80,7 +80,7 @@ async function main() {
   const handleClient = await createHandleClient(signer);
   const streamId = BigInt(Math.floor(Date.now() / 1000));
   const withdrawableAmount = ethers.parseEther("100");
-  const realEndRecipient = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"; // Test recipient wallet
+  const realEndRecipient = "0x58F96F255286c165B03507C5f4Fa58c64c93fF9a"; // Oracle wallet — used as test recipient on Sepolia
 
   // 1. Create stream on Sablier with recipient = NoxRecipientProxy
   console.log(`[1] Creating Sablier stream ${streamId} with recipient = NoxRecipientProxy...`);
