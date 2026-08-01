@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { useAccount, useChainId, useSwitchChain, useConnect } from "wagmi";
 import { sepolia } from "wagmi/chains";
 import { Header } from "./Header";
 
@@ -59,40 +59,54 @@ function MobileBottomNav() {
   );
 }
 
+function ReconnectBanner() {
+  const { connect, connectors } = useConnect();
+  return (
+    <div className="bg-charcoal border-b-2 border-primary/40 px-6 py-3 flex items-center justify-between gap-4">
+      <div className="flex items-center gap-2">
+        <div className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse border border-black" />
+        <span className="font-body font-bold text-sm text-sage">
+          Wallet switching… connect with your second wallet to sign.
+        </span>
+      </div>
+      <button
+        onClick={() => connect({ connector: connectors[1] ?? connectors[0] })}
+        className="shrink-0 bg-primary text-black font-body font-bold text-xs px-3 py-1.5 rounded border-2 border-black"
+        style={{ boxShadow: "2px 2px 0px #000" }}
+      >
+        Reconnect
+      </button>
+    </div>
+  );
+}
+
 export function Layout() {
   const navigate = useNavigate();
   const { isConnected, isConnecting, isReconnecting } = useAccount();
 
   const isAuthPending = isConnecting || isReconnecting;
-  const redirectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const wasConnected = useRef(false);
+
+  // Persist across wallet-switch re-renders using sessionStorage
+  const wasConnected = useRef(
+    typeof sessionStorage !== "undefined" && sessionStorage.getItem("nox-was-connected") === "1"
+  );
 
   useEffect(() => {
     if (isConnected) {
       wasConnected.current = true;
-      if (redirectTimer.current) {
-        clearTimeout(redirectTimer.current);
-        redirectTimer.current = null;
-      }
-      return;
+      sessionStorage.setItem("nox-was-connected", "1");
     }
-    if (isAuthPending) return;
+  }, [isConnected]);
 
-    // When switching between wallet extensions (e.g. MetaMask → Zerion),
-    // window.ethereum re-registers and wagmi can take 2-3 s to pick up the
-    // new provider. Give it 3 s if the user was already connected this
-    // session; only redirect quickly on a fresh first load (500 ms).
-    const delay = wasConnected.current ? 3000 : 500;
-    redirectTimer.current = setTimeout(() => {
+  // Fresh visitor who has never connected → redirect to /connect
+  useEffect(() => {
+    if (!isConnected && !isAuthPending && !wasConnected.current) {
       navigate("/connect?returnTo=/app/safe", { replace: true });
-    }, delay);
-
-    return () => {
-      if (redirectTimer.current) clearTimeout(redirectTimer.current);
-    };
+    }
   }, [isConnected, isAuthPending, navigate]);
 
-  if (!isConnected && isAuthPending) {
+  // Initial reconnect spinner (page load, never been connected yet)
+  if (!isConnected && isAuthPending && !wasConnected.current) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-charcoal">
         <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -100,12 +114,13 @@ export function Layout() {
     );
   }
 
-  if (!isConnected) return null;
+  // Mid-session disconnect (wallet switch) → keep the app mounted, show banner
+  const showReconnectBanner = !isConnected && wasConnected.current;
 
   return (
     <div className="min-h-screen flex flex-col bg-charcoal">
       <Header />
-      <WrongNetworkBanner />
+      {showReconnectBanner ? <ReconnectBanner /> : <WrongNetworkBanner />}
       <main className="flex-1 px-4 sm:px-6 py-6 sm:py-8 max-w-6xl mx-auto w-full mb-16 md:mb-0">
         <Outlet />
       </main>
