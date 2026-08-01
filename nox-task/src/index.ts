@@ -159,7 +159,9 @@ async function main(): Promise<void> {
           console.log(`[nox-task] Already processed (status=${intent.status}), skipping.`);
           continue;
         }
-        await processIntent(module, registry, intentId, safe, targetHandle, valueHandle, data);
+        // Use the INTERNAL handles from the struct (allowPublicDecryption was called on these),
+        // not the external handles from the event (which are pre-fromExternal and not publicly decryptable).
+        await processIntent(module, registry, intentId, safe, intent.targetHandle, intent.valueHandle, data);
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         console.error(`[nox-task] Error processing intent ${intentId}:`, msg);

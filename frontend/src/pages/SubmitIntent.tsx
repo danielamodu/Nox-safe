@@ -17,7 +17,7 @@ import { useSafe } from "../hooks/useSafe";
 import { friendlyError } from "../utils/errors";
 import { StatusBadge } from "../components/StatusBadge";
 
-const DRPC_URL = "https://sepolia.drpc.org";
+const DRPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
 
 // Methods that MUST go through the connected wallet (signing, account access).
 // Everything else — reads, gas estimates, chain queries — goes through DRPC so
@@ -98,9 +98,21 @@ export function SubmitIntent() {
     args: liveIntentId ? [liveIntentId as `0x${string}`] : undefined,
     query: {
       enabled: !!liveIntentId && step === "done",
-      refetchInterval: 3000,
+      refetchInterval: 1500,
     },
   });
+
+  // Elapsed timer while oracle is pending
+  const [elapsed, setElapsed] = useState(0);
+  const elapsedRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => {
+    if (step === "done" && (liveStatus === undefined || Number(liveStatus) === 0)) {
+      elapsedRef.current = setInterval(() => setElapsed((s) => s + 1), 1000);
+    } else {
+      if (elapsedRef.current) clearInterval(elapsedRef.current);
+    }
+    return () => { if (elapsedRef.current) clearInterval(elapsedRef.current); };
+  }, [step, liveStatus]);
 
   // Request notification permission when user submits
   useEffect(() => {
@@ -383,20 +395,37 @@ export function SubmitIntent() {
           </p>
 
           {/* Live oracle status */}
-          <div className="flex items-center justify-center gap-3 mb-4 py-3 bg-white/60 border-2 border-black/10 rounded-lg">
-            <span className="font-body text-sm text-gray-600">Oracle status:</span>
-            {!liveIntentId ? (
-              <span className="font-mono text-xs text-gray-400 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-gray-300 animate-pulse inline-block" />
-                Waiting for receipt…
-              </span>
-            ) : (
-              <div className="flex items-center gap-2">
-                <StatusBadge status={liveStatus !== undefined ? Number(liveStatus) : 0} />
-                {(liveStatus === undefined || Number(liveStatus) === 0) && (
-                  <span className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin inline-block" />
+          <div className="flex flex-col items-center gap-2 mb-4 py-3 px-4 bg-white/60 border-2 border-black/10 rounded-lg">
+            <div className="flex items-center justify-center gap-3">
+              <span className="font-body text-sm text-gray-600">Oracle status:</span>
+              {!liveIntentId ? (
+                <span className="font-mono text-xs text-gray-400 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-gray-300 animate-pulse inline-block" />
+                  Waiting for receipt…
+                </span>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <StatusBadge status={liveStatus !== undefined ? Number(liveStatus) : 0} />
+                  {(liveStatus === undefined || Number(liveStatus) === 0) && (
+                    <span className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin inline-block" />
+                  )}
+                </div>
+              )}
+            </div>
+            {liveIntentId && (liveStatus === undefined || Number(liveStatus) === 0) && (
+              <p className="font-body text-xs text-gray-400">
+                TEE decryption in progress
+                {elapsed > 0 && (
+                  <span className="ml-1 font-mono">
+                    — {elapsed < 60 ? `${elapsed}s` : `${Math.floor(elapsed / 60)}m ${elapsed % 60}s`}
+                  </span>
                 )}
-              </div>
+                {elapsed >= 90 && (
+                  <span className="block mt-1 text-gray-400">
+                    Taking longer than usual — TEE nodes can be slow on testnet.
+                  </span>
+                )}
+              </p>
             )}
           </div>
 

@@ -14,9 +14,9 @@ export const config = createConfig({
   ],
   transports: {
     [sepolia.id]: fallback([
-      http("https://sepolia.drpc.org"),
       http("https://ethereum-sepolia-rpc.publicnode.com"),
       http("https://rpc.ankr.com/eth_sepolia"),
+      http("https://sepolia.drpc.org"),
     ]),
   },
 });
