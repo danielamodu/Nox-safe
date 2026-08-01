@@ -7,9 +7,10 @@ import {
   useWriteContract,
   useWaitForTransactionReceipt,
   useReadContract,
+  usePublicClient,
 } from "wagmi";
 import { motion } from "motion/react";
-import { createWalletClient, custom, isAddress, parseEther } from "viem";
+import { createWalletClient, custom, isAddress, parseEther, parseAbiItem } from "viem";
 import { sepolia } from "viem/chains";
 import { createViemHandleClient } from "@iexec-nox/handle";
 import { ADDRESSES, MODULE_ABI } from "../config/contracts";
@@ -113,6 +114,22 @@ export function SubmitIntent() {
     }
     return () => { if (elapsedRef.current) clearInterval(elapsedRef.current); };
   }, [step, liveStatus]);
+
+  // Fetch rejection reason from IntentRejected event when oracle rejects
+  const publicClient = usePublicClient();
+  const [rejectionReason, setRejectionReason] = useState("");
+  useEffect(() => {
+    if (Number(liveStatus) !== 2 || !liveIntentId || !publicClient) return;
+    publicClient.getLogs({
+      address: ADDRESSES.NoxGuardModule,
+      event: parseAbiItem("event IntentRejected(bytes32 indexed intentId, string reason)"),
+      args: { intentId: liveIntentId as `0x${string}` },
+      fromBlock: "earliest",
+      toBlock: "latest",
+    }).then((logs) => {
+      if (logs[0]?.args?.reason) setRejectionReason(logs[0].args.reason);
+    }).catch(() => {});
+  }, [liveStatus, liveIntentId, publicClient]);
 
   // Request notification permission when user submits
   useEffect(() => {
@@ -425,6 +442,11 @@ export function SubmitIntent() {
                     Taking longer than usual — TEE nodes can be slow on testnet.
                   </span>
                 )}
+              </p>
+            )}
+            {Number(liveStatus) === 2 && rejectionReason && (
+              <p className="font-mono text-xs text-red-600 bg-red-50 border border-red-200 rounded px-3 py-1.5">
+                Reason: {rejectionReason}
               </p>
             )}
           </div>
