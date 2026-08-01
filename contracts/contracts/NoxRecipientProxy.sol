@@ -28,6 +28,7 @@ contract NoxRecipientProxy is ReentrancyGuard {
         bytes32 recipientHandle; // Nox handle for encrypted recipient (address packed as uint256)
         address sender;          // Real stream creator
         bool active;
+        bool pendingRequest;     // True while a withdrawal request is in flight
     }
 
     struct WithdrawRequest {
@@ -89,6 +90,7 @@ contract NoxRecipientProxy is ReentrancyGuard {
     error AlreadyRegistered();
     error StreamNotRegistered();
     error NoWithdrawableAmount();
+    error PendingRequestExists(address sablier, uint256 streamId);
     error RequestNotPending(bytes32 requestId);
     error UnknownRequest(bytes32 requestId);
     error InvalidProof(bytes32 requestId);
@@ -158,7 +160,8 @@ contract NoxRecipientProxy is ReentrancyGuard {
             streamId: streamId,
             recipientHandle: rawHandle,
             sender: msg.sender,
-            active: true
+            active: true,
+            pendingRequest: false
         });
 
         emit StreamShielded(sablier, streamId, rawHandle, msg.sender);
@@ -174,6 +177,7 @@ contract NoxRecipientProxy is ReentrancyGuard {
     ) external returns (bytes32 requestId) {
         ShieldedStream storage stream = _streams[sablier][streamId];
         if (!stream.active) revert StreamNotRegistered();
+        if (stream.pendingRequest) revert PendingRequestExists(sablier, streamId);
 
         ISablierV2LockupMinimal lockup = ISablierV2LockupMinimal(sablier);
         uint128 withdrawable = lockup.withdrawableAmountOf(streamId);
@@ -182,6 +186,8 @@ contract NoxRecipientProxy is ReentrancyGuard {
         requestId = keccak256(
             abi.encodePacked(block.chainid, address(this), _requestNonce++, sablier, streamId, msg.sender)
         );
+
+        stream.pendingRequest = true;
 
         _requests[requestId] = WithdrawRequest({
             sablier: sablier,
@@ -215,6 +221,7 @@ contract NoxRecipientProxy is ReentrancyGuard {
         if (address(uint160(decRecipientUint)) != recipient) revert InvalidProof(requestId);
 
         req.status = Status.Executed;
+        _streams[req.sablier][req.streamId].pendingRequest = false;
 
         // Execute withdrawal from Sablier directly to real recipient
         uint128 withdrawn = ISablierV2LockupMinimal(req.sablier).withdrawMax(req.streamId, recipient);
@@ -231,6 +238,7 @@ contract NoxRecipientProxy is ReentrancyGuard {
         if (req.status != Status.Pending) revert RequestNotPending(requestId);
 
         req.status = Status.Rejected;
+        _streams[req.sablier][req.streamId].pendingRequest = false;
         emit ShieldedWithdrawRejected(requestId, reason);
     }
 

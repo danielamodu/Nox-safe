@@ -51,6 +51,8 @@ A Sepolia Safe with `NoxGuardModule` already enabled and a policy already set is
 >
 > Policy: whitelisted target `0x58F96F255286c165B03507C5f4Fa58c64c93fF9a`, max 0.1 ETH per tx, 0.1 ETH per day
 
+You can also set up your own Safe — the full module enable and policy setup flow works with any Sepolia Safe at [noxsafe.website/app/safe](https://noxsafe.website/app/safe).
+
 1. Go to [noxsafe.website/app/safe](https://noxsafe.website/app/safe), connect any Sepolia wallet
 2. Enter the Safe address above
 3. Go to **Submit Intent** — enter a whitelisted target address, ETH value within the policy cap, click **Encrypt & Submit**
@@ -102,7 +104,7 @@ A Safe Module. When enabled on a Safe, it accepts encrypted intents and executes
 
 ### PolicyRegistry
 
-Stores per-Safe spend policies: an array of whitelisted target addresses, a max ETH value per transaction, and a max ETH value per UTC day. **Only the Safe itself can call `setPolicy`** — this requires a multisig transaction signed by the Safe owners. Policies cannot be changed by any single signer.
+Stores per-Safe spend policies: an array of whitelisted target addresses, a max ETH value per transaction, and a max ETH value per UTC day. Any address can call `setPolicy`, but the policy is stored against `msg.sender` — so an EOA writing a policy can only affect their own address slot, not any Safe's. In the `NoxGuardModule` flow, `setPolicy` is always called via a Safe multisig transaction, making the Safe itself the `msg.sender`. Policies for a given Safe cannot be changed by any single signer — only by a transaction that meets the multisig threshold.
 
 ### NoxRecipientProxy — Sablier integration
 
@@ -385,7 +387,7 @@ In production the oracle is packaged as a Docker image and deployed as an iExec 
 
 **Calldata privacy gap (v1).** Transaction calldata (`data`) is cleartext. Its `keccak256` hash is committed at intent submission so the oracle cannot swap it out, but the calldata itself is visible in the `IntentSubmitted` event. For native ETH transfers (`data = 0x`) there is nothing to leak. For ERC-20 transfers or DeFi calls where the recipient address is encoded in the calldata, that recipient is readable. Encrypting arbitrary-length calldata requires a `euint8[]` or `eBytes` Nox type — a v2 item.
 
-**Oracle liveness dependency.** Submitted intents remain in `Pending` state indefinitely if the oracle is offline. There is no on-chain timeout, no fallback executor, and no permissionless cancellation path for the submitter. In production this needs a heartbeat timeout and fallback mechanism.
+**Oracle liveness dependency.** Submitted intents remain in `Pending` state indefinitely if the oracle is offline. There is no on-chain timeout, no fallback executor, and no permissionless cancellation path for the submitter. The daemon scans the last 100 blocks (~20 minutes) on startup — intents submitted during an oracle downtime longer than 20 minutes will be missed and require manual resubmission. In production this needs a heartbeat timeout, a longer startup lookback (or a subgraph), and a fallback mechanism.
 
 **Block timestamp for daily cap reset.** The daily spend cap resets per `block.timestamp / 86400`. Validators can shift `block.timestamp` by a small amount, making the midnight reset boundary approximate. Not a material issue at the value ranges used in v1.
 
@@ -394,6 +396,10 @@ In production the oracle is packaged as a Docker image and deployed as an iExec 
 **Event-log based history (no subgraph).** The transaction history page fetches `IntentSubmitted` events via `getLogs` filtered by the Safe address, using 6 parallel 9,000-block chunks via DRPC (~54,000 blocks, roughly 7.5 days). This covers the typical use window but does not provide a full audit trail back to genesis. A subgraph or off-chain indexer would be needed for exhaustive historical lookups across arbitrary time ranges.
 
 **Oracle is a trusted party for decrypted content.** The oracle must decrypt the target address and value to validate and submit `fulfillIntent`. It observes all transaction details during processing. `Nox.publicDecrypt` verifies proofs on-chain, preventing the oracle from executing unauthorized transactions, but does not prevent the oracle operator from observing transaction contents. In production, the oracle should be run inside a TEE enclave with remote attestation, removing operator visibility.
+
+**Oracle owner key and deployer are the same address.** In this build the deployer EOA is also the oracle wallet and the `NoxGuardModule` contract owner (who can call `setNoxOracle`). A compromised deployer key could redirect all intent fulfillment through a malicious oracle address without any time delay. In production, the deployer key, oracle key, and contract owner role should be separated, with a timelock or multisig required to change the oracle address.
+
+**WalletConnect is optional.** A placeholder WalletConnect project ID was replaced with a proper opt-in env var (`VITE_WC_PROJECT_ID`) during development. WalletConnect is skipped entirely if the env var is absent — MetaMask and Coinbase Wallet work out of the box.
 
 ---
 

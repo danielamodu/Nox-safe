@@ -2,7 +2,6 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import {
   NoxGuardModule,
-  NoxVerifier,
   PolicyRegistry,
   MockSafe,
   MockNoxCompute,
@@ -24,7 +23,6 @@ import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
  */
 describe("Integration: NoxVerifier end-to-end", function () {
   let module: NoxGuardModule;
-  let verifier: NoxVerifier;
   let registry: PolicyRegistry;
   let mockSafe: MockSafe;
   let mockNoxCompute: MockNoxCompute;
@@ -50,10 +48,6 @@ describe("Integration: NoxVerifier end-to-end", function () {
       "0x75C6AF4430cc474b1bb9b8540b7E46D6f8e1C685",
       bytecode,
     ]);
-
-    verifier = await (
-      await ethers.getContractFactory("NoxVerifier")
-    ).deploy(await mockNoxCompute.getAddress());
 
     registry = await (await ethers.getContractFactory("PolicyRegistry")).deploy();
     mockSafe = await (await ethers.getContractFactory("MockSafe")).deploy();

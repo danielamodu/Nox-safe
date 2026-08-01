@@ -12,6 +12,13 @@ import "./interfaces/IPolicyRegistry.sol";
 /// Safe is the tx origin). This means:
 ///   - No attacker can write to a Safe's slot (they'd write their own slot).
 ///   - No extra access-control logic is required.
+///
+/// Note: There is no on-chain restriction preventing an EOA from calling
+/// setPolicy to write a policy for their own address. This is intentional —
+/// an EOA writing their own slot cannot affect any other address's policy,
+/// and in the NoxGuardModule flow only the Safe's own policy slot is ever
+/// consulted. In production, consider adding an allowlist of registrants if
+/// this registry is reused outside the Safe module context.
 contract PolicyRegistry is IPolicyRegistry {
     mapping(address => Policy) private _policies;
 

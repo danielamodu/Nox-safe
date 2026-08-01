@@ -174,6 +174,18 @@ describe("NoxRecipientProxy", function () {
         proxy.connect(realRecipient).requestShieldedWithdraw(sablierAddr, STREAM_ID)
       ).to.be.revertedWithCustomError(proxy, "NoWithdrawableAmount");
     });
+
+    it("reverts if a pending request already exists for this stream", async function () {
+      const sablierAddr = await mockSablier.getAddress();
+
+      // First request succeeds
+      await proxy.connect(realRecipient).requestShieldedWithdraw(sablierAddr, STREAM_ID);
+
+      // Second request on the same stream while the first is still pending must revert
+      await expect(
+        proxy.connect(realRecipient).requestShieldedWithdraw(sablierAddr, STREAM_ID)
+      ).to.be.revertedWithCustomError(proxy, "PendingRequestExists");
+    });
   });
 
   describe("fulfillShieldedWithdraw", function () {
