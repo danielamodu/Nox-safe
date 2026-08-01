@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.27;
+pragma solidity ^0.8.35;
 
 /// @notice Minimal interface to the iExec NoxCompute gateway (ACL layer).
 interface INoxCompute {
