@@ -1,8 +1,8 @@
 export const CHAIN_ID = 11155111;
 
-// Used as fromBlock for StreamShielded getLogs queries — covers the hackathon window.
-// Update if the contract is redeployed much earlier than this block.
-export const PROXY_DEPLOYMENT_BLOCK = 7_700_000n;
+// Used as fromBlock for StreamShielded getLogs queries.
+// Updated when NoxRecipientProxy was redeployed on 2026-08-01 (Sepolia block ~11,390,000).
+export const PROXY_DEPLOYMENT_BLOCK = 11_390_000n;
 
 export const ADDRESSES = {
   NoxGuardModule: "0xa517298b74c058c7AC8c7614C3c84CC5f1b2a311" as `0x${string}`,
