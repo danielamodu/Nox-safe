@@ -10,7 +10,7 @@ import {
 import { motion } from "motion/react";
 import { ADDRESSES, PROXY_ABI, SABLIER_ABI, ERC20_ABI } from "../config/contracts";
 import { friendlyError } from "../utils/errors";
-import { formatUnits } from "viem";
+import { formatUnits, parseAbiItem } from "viem";
 
 type EmployeeStep = "enter" | "details" | "submitted";
 
@@ -131,6 +131,27 @@ export function NoxPayEmployee() {
   useEffect(() => {
     if (reqStatus !== null && reqStatus !== 0) setIsSettled(true);
   }, [reqStatus]);
+
+  // When oracle fulfills, fetch the ShieldedWithdrawExecuted log to get tx hash + amount
+  const [fulfillment, setFulfillment] = useState<{ txHash: string; amount: bigint } | null>(null);
+  useEffect(() => {
+    if (reqStatus !== 1 || !requestId || !publicClient) return;
+    publicClient.getLogs({
+      address: ADDRESSES.NoxRecipientProxy,
+      event: parseAbiItem(
+        "event ShieldedWithdrawExecuted(bytes32 indexed requestId, address indexed sablier, uint256 streamId, address indexed recipient, uint128 amount)"
+      ),
+      args: { requestId },
+      fromBlock: "earliest",
+      toBlock: "latest",
+    }).then((logs) => {
+      if (!logs[0]) return;
+      setFulfillment({
+        txHash: logs[0].transactionHash ?? "",
+        amount: (logs[0].args.amount as bigint) ?? 0n,
+      });
+    }).catch(() => {});
+  }, [reqStatus, requestId, publicClient]);
 
   const handleLookup = async () => {
     setError("");
@@ -416,23 +437,31 @@ export function NoxPayEmployee() {
                     )}
                     {reqStatus === 1 && <div className="w-3 h-3 bg-green-500 rounded-full shrink-0 mt-0.5" />}
                     {reqStatus === 2 && <div className="w-3 h-3 bg-red-500 rounded-full shrink-0 mt-0.5" />}
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       <p className="font-body text-xs font-bold text-black">
                         {STATUS_LABELS[reqStatus] ?? "Unknown status"}
                       </p>
-                      {reqStatus === 1 && (
-                        <a
-                          href={`https://sepolia.etherscan.io/address/${ADDRESSES.NoxRecipientProxy}#events`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="font-mono text-xs text-black/50 hover:text-black underline"
-                        >
-                          View ShieldedWithdrawExecuted event ↗
-                        </a>
+                      {reqStatus === 1 && fulfillment && (
+                        <>
+                          <p className="font-mono text-sm font-bold text-green-700">
+                            {fmtAmount(fulfillment.amount)} received
+                          </p>
+                          <a
+                            href={`https://sepolia.etherscan.io/tx/${fulfillment.txHash}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-mono text-xs text-black/50 hover:text-black underline block"
+                          >
+                            {fulfillment.txHash.slice(0, 18)}…{fulfillment.txHash.slice(-8)} ↗
+                          </a>
+                        </>
+                      )}
+                      {reqStatus === 1 && !fulfillment && (
+                        <p className="font-mono text-xs text-black/40">Fetching receipt…</p>
                       )}
                       {requestId && (
                         <p className="font-mono text-xs text-black/30 break-all">
-                          Request ID: {requestId.slice(0, 18)}…
+                          Request: {requestId.slice(0, 18)}…
                         </p>
                       )}
                     </div>
