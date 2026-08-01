@@ -1,7 +1,7 @@
 {
   "name": "Nox-Safe",
   "description": "Confidential treasury execution for Safe multisig, powered by iExec Nox TEE",
-  "iconPath": "logo.png",
+  "iconPath": "favicon.svg",
   "tags": ["privacy", "DeFi", "treasury"],
   "developer": "Nox-Safe",
   "networks": [
