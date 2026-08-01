@@ -90,7 +90,7 @@ export function useSafeSetup(safeAddress: string, address: `0x${string}` | undef
   }
 
   const refreshPendingTxs = useCallback(async (): Promise<PendingTx[]> => {
-    if (!safeAddress || !address) return [];
+    if (!safeAddress) return [];
     try {
       const apiKit = makeApiKit();
       const result = await apiKit.getPendingTransactions(safeAddress);
@@ -103,9 +103,13 @@ export function useSafeSetup(safeAddress: string, address: `0x${string}` | undef
         nonce: tx.nonce,
         confirmations: tx.confirmations?.length ?? 0,
         confirmationsRequired: tx.confirmationsRequired,
-        alreadySigned: (tx.confirmations ?? []).some(
-          (c) => c.owner.toLowerCase() === address.toLowerCase()
-        ),
+        // address may be undefined during a wallet switch — treat as not signed
+        alreadySigned: address
+          ? (tx.confirmations ?? []).some(
+              (c) => c.owner.toLowerCase() === address.toLowerCase()
+            )
+          : false,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         description: describeData(tx.to, (tx as any).data ?? "0x", safeAddress),
       }));
       setPendingTxs(txs);

@@ -209,9 +209,11 @@ export function Dashboard() {
   const policyActive = policy?.active === true;
   const isReady = isModuleEnabled && policyActive;
 
-  // Auto-fetch pending txs whenever the safe or wallet changes
+  // Auto-fetch pending txs whenever the safe or wallet changes.
+  // safeAddress alone is enough for the API call; address is only used
+  // for alreadySigned and may be undefined during a wallet switch.
   useEffect(() => {
-    if (hasSafe && address) refreshPendingTxs();
+    if (hasSafe) refreshPendingTxs();
   }, [hasSafe, address, refreshPendingTxs]);
 
   // Auto-advance wizard state if another owner already proposed a tx

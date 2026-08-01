@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { sepolia } from "wagmi/chains";
@@ -64,11 +64,25 @@ export function Layout() {
   const { isConnected, isConnecting, isReconnecting } = useAccount();
 
   const isAuthPending = isConnecting || isReconnecting;
+  const redirectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!isConnected && !isAuthPending) {
-      navigate("/connect?returnTo=/app/safe", { replace: true });
+      // Debounce: wallet switches briefly drop isConnected before the new
+      // account reconnects. Wait 1 s before redirecting so we don't boot
+      // the user mid-switch and lose their pending-tx wizard state.
+      redirectTimer.current = setTimeout(() => {
+        navigate("/connect?returnTo=/app/safe", { replace: true });
+      }, 1000);
+    } else {
+      if (redirectTimer.current) {
+        clearTimeout(redirectTimer.current);
+        redirectTimer.current = null;
+      }
     }
+    return () => {
+      if (redirectTimer.current) clearTimeout(redirectTimer.current);
+    };
   }, [isConnected, isAuthPending, navigate]);
 
   if (!isConnected && isAuthPending) {
