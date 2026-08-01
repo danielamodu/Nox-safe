@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAccount, useReadContract } from "wagmi";
 import { motion } from "motion/react";
@@ -7,6 +7,34 @@ import { ADDRESSES, MODULE_ABI, REGISTRY_ABI, SAFE_ABI } from "../config/contrac
 import { useSafe } from "../hooks/useSafe";
 import { useSafeSetup } from "../hooks/useSafeSetup";
 import { friendlyError } from "../utils/errors";
+
+const SAFE_API = "https://safe-transaction-sepolia.safe.global/api/v1";
+
+type OwnedSafe = {
+  address: string;
+  threshold: number;
+  owners: number;
+};
+
+async function fetchOwnedSafes(ownerAddress: string): Promise<OwnedSafe[]> {
+  const listRes = await fetch(`${SAFE_API}/owners/${ownerAddress}/safes/`);
+  if (!listRes.ok) return [];
+  const { safes }: { safes: string[] } = await listRes.json();
+  if (!safes.length) return [];
+  const details = await Promise.all(
+    safes.map(async (addr) => {
+      try {
+        const r = await fetch(`${SAFE_API}/safes/${addr}/`);
+        if (!r.ok) return { address: addr, threshold: 1, owners: 1 };
+        const d = await r.json();
+        return { address: addr, threshold: d.threshold ?? 1, owners: d.owners?.length ?? 1 };
+      } catch {
+        return { address: addr, threshold: 1, owners: 1 };
+      }
+    })
+  );
+  return details;
+}
 
 // ─── Tiny helpers ─────────────────────────────────────────────────────────────
 
@@ -153,6 +181,21 @@ export function Dashboard() {
   const [policyState, setPolicyState] = useState<SubState>("idle");
   const [pendingTxHash, setPendingTxHash] = useState("");
   const [hookError, setHookError] = useState("");
+
+  // Safe discovery
+  const [ownedSafes, setOwnedSafes] = useState<OwnedSafe[]>([]);
+  const [safesLoading, setSafesLoading] = useState(false);
+  const lastFetchedAddress = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!address || address === lastFetchedAddress.current) return;
+    lastFetchedAddress.current = address;
+    setSafesLoading(true);
+    fetchOwnedSafes(address)
+      .then(setOwnedSafes)
+      .catch(() => setOwnedSafes([]))
+      .finally(() => setSafesLoading(false));
+  }, [address]);
 
   // Policy form
   const [targetsList, setTargetsList] = useState<string[]>([]);
@@ -334,16 +377,54 @@ export function Dashboard() {
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       >
         <div>
-          <h1 className="font-heading font-extrabold text-3xl text-primary">Connect your Safe</h1>
+          <h1 className="font-heading font-extrabold text-3xl text-primary">Choose your Safe</h1>
           <p className="font-body text-sage mt-1 text-sm">
-            A Safe is a shared crypto wallet that requires multiple approvals before sending funds.
-            Paste your Safe's address below to get started.
+            Select the Safe multisig you want to protect with Nox-Safe.
           </p>
         </div>
 
+        {/* ── Owned Safes ── */}
+        {safesLoading && (
+          <div className="flex items-center gap-3 py-2">
+            <div className="w-5 h-5 border-4 border-primary border-t-transparent rounded-full animate-spin shrink-0" />
+            <p className="font-body text-sm text-sage">Looking up your Safes…</p>
+          </div>
+        )}
+
+        {!safesLoading && ownedSafes.length > 0 && (
+          <div className="space-y-2">
+            <p className="font-body font-bold text-sm text-white">Safes you own</p>
+            {ownedSafes.map((safe) => (
+              <button
+                key={safe.address}
+                onClick={() => { setSafeAddress(safe.address); setSafeInput(safe.address); }}
+                className="w-full card-brutal bg-charcoal/40 hover:bg-charcoal/70 border-sage/30 hover:border-primary/50 text-left transition-all flex items-center justify-between gap-4 group"
+              >
+                <div className="min-w-0">
+                  <p className="font-mono text-sm text-white truncate">
+                    {safe.address.slice(0, 10)}…{safe.address.slice(-8)}
+                  </p>
+                  <p className="font-body text-xs text-sage/70 mt-0.5">
+                    {safe.threshold}/{safe.owners} · {safe.owners === 1 ? "1 owner" : `${safe.owners} owners`}
+                  </p>
+                </div>
+                <svg
+                  className="w-5 h-5 text-primary shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                  fill="none" viewBox="0 0 24 24"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* ── Manual entry ── */}
         <div className="card-brutal card-brutal-lg space-y-4">
+          <p className="font-body font-bold text-sm">
+            {ownedSafes.length > 0 ? "Or enter an address manually" : "Enter your Safe address"}
+          </p>
           <div>
-            <label className="font-body font-bold text-sm block mb-1">Safe Wallet Address</label>
             <input
               type="text"
               value={safeInput}
