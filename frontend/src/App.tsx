@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { NoxPayLayout } from "./components/NoxPayLayout";
 import { Landing } from "./pages/Landing";
@@ -21,8 +21,7 @@ export function App() {
     <BrowserRouter>
       <Routes>
         {/* Public */}
-        <Route path="/" element={<Navigate to="/app/safe" replace />} />
-        <Route path="/about" element={<Landing />} />
+        <Route path="/" element={<Landing />} />
         <Route path="/products" element={<ProductSelect />} />
         <Route path="/connect" element={<ConnectPage />} />
         <Route path="/docs" element={<Docs />} />
