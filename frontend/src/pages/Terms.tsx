@@ -119,7 +119,7 @@ export function Terms() {
 
         {/* Footer nav */}
         <div className="mt-20 pt-8 border-t-2 border-black flex flex-wrap gap-6">
-          <Link to="/" className="font-body text-sm text-black/60 hover:text-black transition-colors">← Back to home</Link>
+          <Link to="/about" className="font-body text-sm text-black/60 hover:text-black transition-colors">← Back to home</Link>
           <Link to="/docs" className="font-body text-sm text-black/60 hover:text-black transition-colors">Docs</Link>
           <Link to="/privacy" className="font-body text-sm text-black/60 hover:text-black transition-colors">Privacy Policy</Link>
         </div>

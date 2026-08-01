@@ -193,7 +193,7 @@ NOX_RECIPIENT_PROXY=0xc8E18A3F8386D00A7095A49eABa0F1265f7dc3F0`}</CodeBlock>
 
         {/* Footer nav */}
         <div className="mt-20 pt-8 border-t-2 border-black flex flex-wrap gap-6">
-          <Link to="/" className="font-body text-sm text-black/60 hover:text-black transition-colors">← Back to home</Link>
+          <Link to="/about" className="font-body text-sm text-black/60 hover:text-black transition-colors">← Back to home</Link>
           <Link to="/privacy" className="font-body text-sm text-black/60 hover:text-black transition-colors">Privacy Policy</Link>
           <Link to="/terms" className="font-body text-sm text-black/60 hover:text-black transition-colors">Terms of Service</Link>
           <Link to="/app" className="font-body text-sm text-black/60 hover:text-black transition-colors">Launch App</Link>

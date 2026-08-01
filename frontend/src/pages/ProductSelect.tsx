@@ -25,7 +25,7 @@ export function ProductSelect() {
           className="mb-2"
         >
           <Link
-            to="/"
+            to="/about"
             className="font-mono text-sm text-white/30 hover:text-white/60 transition-colors"
           >
             ← Back to home

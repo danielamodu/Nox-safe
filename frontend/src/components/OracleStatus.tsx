@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { usePublicClient } from "wagmi";
 import { parseAbiItem } from "viem";
-import { ADDRESSES } from "../config/contracts";
+import { ADDRESSES, MODULE_ABI } from "../config/contracts";
 
 type State =
   | { status: "loading" }
   | { status: "live"; minutesAgo: number }
-  | { status: "starting" }
+  | { status: "active" }
   | { status: "error" };
 
 function useOracleActivity(): State {
@@ -23,7 +23,7 @@ function useOracleActivity(): State {
         const currentBlock = await client.getBlockNumber();
         const fromBlock = currentBlock > 1000n ? currentBlock - 1000n : 0n;
 
-        const [executedLogs, withdrawLogs] = await Promise.all([
+        const [executedLogs, withdrawLogs, oracleAddr] = await Promise.all([
           client.getLogs({
             address: ADDRESSES.NoxGuardModule,
             event: parseAbiItem(
@@ -40,23 +40,32 @@ function useOracleActivity(): State {
             fromBlock,
             toBlock: currentBlock,
           }),
+          client.readContract({
+            address: ADDRESSES.NoxGuardModule,
+            abi: MODULE_ABI,
+            functionName: "noxOracle",
+          }),
         ]);
 
         if (cancelled) return;
 
         const allLogs = [...executedLogs, ...withdrawLogs];
-        if (allLogs.length === 0) {
-          setState({ status: "starting" });
+        if (allLogs.length > 0) {
+          const latestBlock = allLogs.reduce(
+            (max, log) => (log.blockNumber! > max ? log.blockNumber! : max),
+            0n
+          );
+          const blocksAgo = currentBlock - latestBlock;
+          const minutesAgo = Math.round((Number(blocksAgo) * 12) / 60);
+          setState({ status: "live", minutesAgo });
           return;
         }
 
-        const latestBlock = allLogs.reduce(
-          (max, log) => (log.blockNumber! > max ? log.blockNumber! : max),
-          0n
-        );
-        const blocksAgo = currentBlock - latestBlock;
-        const minutesAgo = Math.round((Number(blocksAgo) * 12) / 60);
-        setState({ status: "live", minutesAgo });
+        // No recent fulfillments, but oracle address is configured on-chain → active
+        const isConfigured =
+          typeof oracleAddr === "string" &&
+          oracleAddr !== "0x0000000000000000000000000000000000000000";
+        setState(isConfigured ? { status: "active" } : { status: "error" });
       } catch {
         if (!cancelled) setState({ status: "error" });
       }
@@ -91,8 +100,8 @@ export function OracleStatus() {
 
   return (
     <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/20 border border-black/30">
-      <span className="w-2 h-2 rounded-full bg-yellow-400" />
-      <span className="font-mono text-xs text-black font-semibold">Oracle starting…</span>
+      <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+      <span className="font-mono text-xs text-black font-semibold">Oracle active</span>
     </div>
   );
 }
