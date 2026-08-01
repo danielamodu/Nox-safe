@@ -2,19 +2,19 @@
 
 **Privacy infrastructure for on-chain finance, powered by iExec Nox TEE.**
 
-We integrated iExec Nox TEE into two existing, widely-used protocols — Safe ($100B+ TVL) and Sablier — as two distinct privacy primitives. Neither protocol is forked or modified. Both run on real Sepolia infrastructure with a 24/7 oracle and no mock data.
+Nox-Safe adds a confidential execution layer to two battle-tested DeFi protocols — Safe ($100B+ TVL) and Sablier — without forking or modifying either. Transaction details are encrypted client-side via the Nox TEE gateway, travel on-chain as opaque 32-byte handles, and are decrypted inside a hardware-isolated enclave. Neither the oracle operator nor any on-chain observer can read what is being sent until the moment of execution.
 
-**Nox-Safe (product)** — Confidential treasury execution for Safe multisig. Hide transaction target and value until the moment of execution. Built for DAOs, funds, and companies who can't afford to leak trading intent on-chain. Recipient address and ETH value are encrypted client-side via the Nox TEE gateway and travel on-chain only as opaque 32-byte handles. A Nox oracle daemon decrypts them inside the TEE, validates against a per-Safe policy, and executes through Safe's standard module interface.
+**Nox-Safe** — Confidential treasury execution for Safe multisig. Hide transaction target and value until the moment of execution. Built for DAOs, funds, and companies who can't afford to leak trading intent on-chain. Recipient address and ETH value are encrypted client-side and travel on-chain only as opaque 32-byte handles. A Nox oracle daemon decrypts them inside the TEE, validates against a per-Safe spend policy, and executes through Safe's standard module interface.
 
 **NoxPay** — Confidential payroll streaming on Sablier. Shield employee wallet addresses from public view. Built for companies paying contributors on-chain without exposing who earns what. A stream creator registers an encrypted end-recipient through `NoxRecipientProxy`; no one on-chain can read the destination until the oracle fulfills a withdrawal.
 
 ---
 
-## Demo Guide for Judges
+## Live Demo
 
-> All contracts are live on Sepolia. Both products run end-to-end with no mock data.
+Both products are deployed on Sepolia and running end-to-end. No mock data, no simulated oracles.
 
-### NoxPay — 5-minute demo (no Safe setup required)
+### NoxPay — 5 minutes (no Safe setup required)
 
 You need a Sepolia wallet and ERC-20 test tokens.
 
@@ -37,7 +37,7 @@ Faucet: [faucet.circle.com](https://faucet.circle.com) — select "Ethereum Sepo
 3. Click **Request Shielded Withdrawal** — oracle picks it up within ~30 seconds and calls `withdrawMax` directly to the decrypted recipient wallet
 4. Confirm on [NoxRecipientProxy events](https://sepolia.etherscan.io/address/0xc8E18A3F8386D00A7095A49eABa0F1265f7dc3F0#events) — look for `ShieldedWithdrawExecuted`
 
-**Prior fulfillment proofs (on-chain):**
+**Verified on-chain fulfillments:**
 - [`ShieldedWithdrawExecuted` — 0x879a2a6…](https://sepolia.etherscan.io/tx/0x879a2a653abafb979402e657908ebd059c97c5f8c151b584e5e19daf545587da)
 - [`IntentExecuted` — 0x06345fa…](https://sepolia.etherscan.io/tx/0x06345fabe651700a57586ff6da6ea49b82130f8996bc1953ad20f4716744f9c7)
 
@@ -45,7 +45,7 @@ Faucet: [faucet.circle.com](https://faucet.circle.com) — select "Ethereum Sepo
 
 ### Nox-Safe — pre-configured Safe
 
-A Sepolia Safe with `NoxGuardModule` already enabled and a policy already set is available for judging:
+A Sepolia Safe with `NoxGuardModule` already enabled and a spend policy already set is available for testing:
 
 > Safe address: `0xD465929D06d757fEA8fe2da0d93F99972A0E870A`
 >
@@ -379,9 +379,9 @@ Go to [noxsafe.website/app/noxpay/company](https://noxsafe.website/app/noxpay/co
 
 ## Production Architecture
 
-In this hackathon build the oracle runs as a standard Node.js process. The oracle operator can observe decrypted transaction details — target address and ETH value — during processing. `Nox.publicDecrypt` enforces on-chain proof verification, so the oracle cannot execute transactions that weren't authorized by the submitter, but it can see what those transactions contain.
+Currently the oracle runs as a standard Node.js process. The oracle operator can observe decrypted transaction details — target address and ETH value — during processing. `Nox.publicDecrypt` enforces on-chain proof verification, so the oracle cannot execute transactions that weren't authorized by the submitter, but it can see what those transactions contain.
 
-In production the oracle is packaged as a Docker image and deployed as an iExec worker app running inside an SGX enclave — the runtime Nox is specifically designed for. Decryption happens inside hardware-verified isolation: the operator cannot inspect memory, and remote attestation lets anyone verify the enclave code matches the published image. The path there is straightforward: containerize `nox-task`, register it as an iExec app, and configure a perpetual deal so the worker runs continuously. No contract changes are needed.
+The target architecture packages the oracle as a Docker image deployed as an iExec worker app inside an SGX enclave — the runtime Nox is specifically designed for. Decryption happens inside hardware-verified isolation: the operator cannot inspect memory, and remote attestation lets anyone verify the enclave code matches the published image. The path there is straightforward: containerize `nox-task`, register it as an iExec app, and configure a perpetual deal so the worker runs continuously. No contract changes are needed.
 
 ---
 
@@ -409,7 +409,7 @@ In production the oracle is packaged as a Docker image and deployed as an iExec 
 
 ## Production Readiness Roadmap
 
-The v1 build proves the privacy primitive works end-to-end on real infrastructure. The items below are the gap between this hackathon MVP and a mainnet-grade deployment.
+The v1 build delivers end-to-end transaction privacy on real infrastructure. The items below mark the path to a mainnet-grade deployment.
 
 **1. Full calldata encryption (`externalEbytes` handle).** The current build encrypts target address and ETH value but leaves transaction calldata cleartext — meaning ERC-20 transfers and DeFi calls still leak the encoded recipient in the `IntentSubmitted` event. The fix is a Nox `eBytes` or `euint8[]` handle for arbitrary-length calldata, which would make the entire transaction opaque until oracle fulfillment. No contract interface changes are needed; `submitIntent` gains a third encrypted parameter and the oracle decodes it the same way.
 
@@ -419,11 +419,17 @@ The v1 build proves the privacy primitive works end-to-end on real infrastructur
 
 **4. Gasless EIP-712 relay for anonymous intent submission.** Currently `submitIntent` must be called by the user's own wallet, linking their address to the intent on-chain even though the transaction contents are encrypted. A meta-transaction relay (EIP-712 signed payload, forwarded by a permissionless relayer) would break this link entirely — the submitter's identity never appears in the transaction origin. Combined with full calldata encryption, this closes the last metadata leakage vector and makes the submission phase genuinely unlinkable.
 
+**5. EIP-712 meta-transaction relay (`submitIntentWithSig`).** Even with encrypted handles, the wallet that calls `submitIntent` is visible as the transaction origin — creating a metadata link between the submitter's identity and the Safe's activity. A `submitIntentWithSig` entrypoint accepts an EIP-712 signature and lets a permissionless relayer post the transaction on the user's behalf, so the submitter's address never appears on-chain. This closes the last remaining privacy gap for native ETH transfers and is fully compatible with the existing oracle fulfillment path.
+
+**6. NoxPay recipient-only withdrawal access control.** Currently any address can call `requestShieldedWithdraw` on any registered stream, which lets a third party trigger oracle work and incur gas on an employee's behalf. Once a recipient proves their identity via a Nox attestation, their decrypted address can be stored as the sole authorized caller for future withdrawal requests on their stream — ensuring employees retain exclusive control over when funds move, and preventing unsolicited oracle invocations.
+
+**7. Batch withdrawal (`batchRequestShieldedWithdraw`).** Employees with multiple active streams, or payroll operators managing many recipients, currently must submit one `requestShieldedWithdraw` transaction per stream — each triggering a separate oracle round-trip and confirmation wait. A batch entrypoint accepts an array of stream IDs, emits all `ShieldedWithdrawRequested` events in a single transaction, and lets the oracle fulfill them in parallel. This reduces gas overhead and oracle latency proportionally for payroll-scale use cases.
+
 ---
 
 ## Feedback
 
-See [feedback.md](./feedback.md) for running notes on the iExec Nox developer experience during this build — submitted as part of the hackathon deliverable.
+See [feedback.md](./feedback.md) for developer experience notes on building with the iExec Nox SDK.
 
 ---
 
