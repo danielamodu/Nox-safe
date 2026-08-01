@@ -26,7 +26,7 @@ Faucet: [faucet.circle.com](https://faucet.circle.com) — select "Ethereum Sepo
 **Create a shielded stream (Company role)**
 
 1. Go to [noxsafe.website/app/noxpay/company](https://noxsafe.website/app/noxpay/company) and connect a Sepolia wallet
-2. Fill in: recipient wallet (a second address you control), token `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238`, amount `10`, duration `1` minute
+2. Fill in: recipient wallet (a second address you control), token `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238`, amount `10`, duration `1` day
 3. Click **Create Shielded Stream** — one MetaMask session handles token approval, Sablier stream creation, Nox TEE encryption, and proxy registration
 4. Copy the stream ID shown on the success screen
 
@@ -53,9 +53,11 @@ A Sepolia Safe with `NoxGuardModule` already enabled and a policy already set is
 
 You can also set up your own Safe — the full module enable and policy setup flow works with any Sepolia Safe at [noxsafe.website/app/safe](https://noxsafe.website/app/safe).
 
+> **Before submitting:** check the Safe's ETH balance on [Sepolia Etherscan](https://sepolia.etherscan.io/address/0xD465929D06d757fEA8fe2da0d93F99972A0E870A) first. The Safe holds ~0.07 ETH; if prior judges have depleted it, use **0 ETH** as the value — the oracle still fully exercises the Nox encryption and proof-verification path, it just sends an empty transfer. Any non-zero value that exceeds the Safe's balance will cause the oracle to silently fail and the intent to stay Pending indefinitely.
+
 1. Go to [noxsafe.website/app/safe](https://noxsafe.website/app/safe), connect any Sepolia wallet
 2. Enter the Safe address above
-3. Go to **Submit Intent** — enter a whitelisted target address, ETH value within the policy cap, click **Encrypt & Submit**
+3. Go to **Submit Intent** — enter the whitelisted target `0x58F96F255286c165B03507C5f4Fa58c64c93fF9a`, ETH value ≤ Safe balance (or 0 ETH), click **Encrypt & Submit**
 4. The oracle fulfills within ~30 seconds — the intent status flips Pending → Executed
 5. Confirm on [NoxGuardModule events](https://sepolia.etherscan.io/address/0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51#events)
 
@@ -140,7 +142,7 @@ The popup displays both product cards (Nox-Safe and NoxPay) linking to [noxsafe.
 | `SablierV2LockupLinear` v1.1.2 (Sepolia, Sablier-deployed) | `0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301` | [view](https://sepolia.etherscan.io/address/0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301) |
 | `NoxCompute` (iExec, used by Nox SDK) | `0x24Ef36Ec5b626D7DCD09a98F3083c2758F0F77bF` | [view](https://sepolia.etherscan.io/address/0x24Ef36Ec5b626D7DCD09a98F3083c2758F0F77bF) |
 
-> `MockSafe` and `MockSablierLockup` are test helpers; their addresses are in `contracts/deployments/sepolia.json`. On-chain proof verification is handled by `Nox.publicDecrypt()` in the iExec Nox SDK, which calls `NoxCompute` — there is no separately deployed NoxVerifier contract.
+> On-chain proof verification is handled by `Nox.publicDecrypt()` in the iExec Nox SDK, which calls `NoxCompute` — there is no separately deployed NoxVerifier contract. `MockSafe` and `MockSablierLockup` are Hardhat test helpers deployed to Sepolia for the test suite only; they are not part of the production system.
 
 ---
 
