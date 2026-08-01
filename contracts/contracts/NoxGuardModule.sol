@@ -53,8 +53,10 @@ contract NoxGuardModule is INoxGuardModule, ReentrancyGuard {
 
     error NotOracle();
     error NotOwner();
+    error NotSubmitter(bytes32 intentId);
     error IntentNotPending(bytes32 intentId);
     error UnknownIntent(bytes32 intentId);
+    error TooEarlyToCancel(bytes32 intentId);
     error InvalidProof(bytes32 intentId);
     error DataHashMismatch(bytes32 intentId);
     error SafeExecutionFailed(bytes32 intentId);
@@ -125,7 +127,8 @@ contract NoxGuardModule is INoxGuardModule, ReentrancyGuard {
             submittedAt:  block.timestamp,
             targetHandle: rawTarget,
             valueHandle:  rawValue,
-            dataHash:     keccak256(data)
+            dataHash:     keccak256(data),
+            submitter:    msg.sender
         });
 
         // Emit the EXTERNAL handles (pre-fromExternal) so the oracle can query
@@ -205,6 +208,18 @@ contract NoxGuardModule is INoxGuardModule, ReentrancyGuard {
         if (!success) revert SafeExecutionFailed(intentId);
 
         emit IntentExecuted(intentId, safe, target, value, data);
+    }
+
+    /// @inheritdoc INoxGuardModule
+    function cancelIntent(bytes32 intentId) external {
+        Intent storage intent = _intents[intentId];
+        if (intent.safe == address(0)) revert UnknownIntent(intentId);
+        if (intent.status != IntentStatus.Pending) revert IntentNotPending(intentId);
+        if (msg.sender != intent.submitter) revert NotSubmitter(intentId);
+        if (block.timestamp <= intent.submittedAt + 1 hours) revert TooEarlyToCancel(intentId);
+
+        intent.status = IntentStatus.Cancelled;
+        emit IntentCancelled(intentId);
     }
 
     /// @inheritdoc INoxGuardModule

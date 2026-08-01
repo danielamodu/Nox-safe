@@ -31,7 +31,7 @@ interface INoxGuardModule {
     // Types
     // -------------------------------------------------------------------------
 
-    enum IntentStatus { Pending, Executed, Rejected }
+    enum IntentStatus { Pending, Executed, Rejected, Cancelled }
 
     struct Intent {
         address safe;
@@ -40,6 +40,7 @@ interface INoxGuardModule {
         bytes32 targetHandle;
         bytes32 valueHandle;
         bytes32 dataHash;
+        address submitter;
     }
 
     // -------------------------------------------------------------------------
@@ -63,6 +64,7 @@ interface INoxGuardModule {
     );
 
     event IntentRejected(bytes32 indexed intentId, string reason);
+    event IntentCancelled(bytes32 indexed intentId);
 
     // -------------------------------------------------------------------------
     // Mutations
@@ -105,6 +107,9 @@ interface INoxGuardModule {
 
     /// @notice Called by the oracle to decline an intent.
     function rejectIntent(bytes32 intentId, string calldata reason) external;
+
+    /// @notice Called by the original submitter to cancel a pending intent after a 1-hour timeout.
+    function cancelIntent(bytes32 intentId) external;
 
     // -------------------------------------------------------------------------
     // Views

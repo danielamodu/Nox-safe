@@ -70,7 +70,7 @@ export function NoxPayEmployee() {
     args: streamIdBigInt !== undefined ? [streamIdBigInt] : undefined,
     query: {
       enabled: step === "details" && streamIdBigInt !== undefined,
-      refetchInterval: 15_000,
+      refetchInterval: 5_000,
     },
   });
 
@@ -284,6 +284,16 @@ export function NoxPayEmployee() {
 
             {shielded && (
               <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {sStream && withdrawable !== undefined && (
+                  <div className="sm:col-span-2 flex items-center gap-2 py-1">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+                    </span>
+                    <span className="font-mono text-xs text-green-700 font-bold">Vesting live</span>
+                    <span className="font-body text-xs text-black/40">— updates every 5 seconds</span>
+                  </div>
+                )}
                 {sStream && (
                   <>
                     <div>

@@ -35,7 +35,7 @@ Faucet: [faucet.circle.com](https://faucet.circle.com) — select "Ethereum Sepo
 1. Go to [noxsafe.website/app/noxpay/employee](https://noxsafe.website/app/noxpay/employee)
 2. Paste the stream ID — vested amount and withdrawable balance are shown live
 3. Click **Request Shielded Withdrawal** — oracle picks it up within ~30 seconds and calls `withdrawMax` directly to the decrypted recipient wallet
-4. Confirm on [NoxRecipientProxy events](https://sepolia.etherscan.io/address/0xd707bE1206c174d4F15f133d1cB27Df3583d6A0b#events) — look for `ShieldedWithdrawExecuted`
+4. Confirm on [NoxRecipientProxy events](https://sepolia.etherscan.io/address/0xc8E18A3F8386D00A7095A49eABa0F1265f7dc3F0#events) — look for `ShieldedWithdrawExecuted`
 
 **Prior fulfillment proofs (on-chain):**
 - [`ShieldedWithdrawExecuted` — 0x879a2a6…](https://sepolia.etherscan.io/tx/0x879a2a653abafb979402e657908ebd059c97c5f8c151b584e5e19daf545587da)
@@ -59,7 +59,7 @@ You can also set up your own Safe — the full module enable and policy setup fl
 2. Enter the Safe address above
 3. Go to **Submit Intent** — enter the whitelisted target `0x58F96F255286c165B03507C5f4Fa58c64c93fF9a`, ETH value ≤ Safe balance (or 0 ETH), click **Encrypt & Submit**
 4. The oracle fulfills within ~30 seconds — the intent status flips Pending → Executed
-5. Confirm on [NoxGuardModule events](https://sepolia.etherscan.io/address/0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51#events)
+5. Confirm on [NoxGuardModule events](https://sepolia.etherscan.io/address/0xa517298b74c058c7AC8c7614C3c84CC5f1b2a311#events)
 
 ---
 
@@ -136,9 +136,9 @@ The popup displays both product cards (Nox-Safe and NoxPay) linking to [noxsafe.
 
 | Contract | Address | Etherscan |
 |---|---|---|
-| `PolicyRegistry` | `0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1` | [view](https://sepolia.etherscan.io/address/0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1) |
-| `NoxGuardModule` | `0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51` | [view](https://sepolia.etherscan.io/address/0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51) |
-| `NoxRecipientProxy` | `0xd707bE1206c174d4F15f133d1cB27Df3583d6A0b` | [view](https://sepolia.etherscan.io/address/0xd707bE1206c174d4F15f133d1cB27Df3583d6A0b) |
+| `PolicyRegistry` | `0xf3812133f47cDEa7cfc11E75e0DeAdE149fD7650` | [view](https://sepolia.etherscan.io/address/0xf3812133f47cDEa7cfc11E75e0DeAdE149fD7650) |
+| `NoxGuardModule` | `0xa517298b74c058c7AC8c7614C3c84CC5f1b2a311` | [view](https://sepolia.etherscan.io/address/0xa517298b74c058c7AC8c7614C3c84CC5f1b2a311) |
+| `NoxRecipientProxy` | `0xc8E18A3F8386D00A7095A49eABa0F1265f7dc3F0` | [view](https://sepolia.etherscan.io/address/0xc8E18A3F8386D00A7095A49eABa0F1265f7dc3F0) |
 | `SablierV2LockupLinear` v1.1.2 (Sepolia, Sablier-deployed) | `0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301` | [view](https://sepolia.etherscan.io/address/0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301) |
 | `NoxCompute` (iExec, used by Nox SDK) | `0x24Ef36Ec5b626D7DCD09a98F3083c2758F0F77bF` | [view](https://sepolia.etherscan.io/address/0x24Ef36Ec5b626D7DCD09a98F3083c2758F0F77bF) |
 
@@ -258,9 +258,9 @@ Fill in `.env`:
 ```
 SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
 ORACLE_PRIVATE_KEY=<oracle wallet private key, no 0x prefix>
-NOX_GUARD_MODULE=0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51
-POLICY_REGISTRY=0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1
-NOX_RECIPIENT_PROXY=0xd707bE1206c174d4F15f133d1cB27Df3583d6A0b
+NOX_GUARD_MODULE=0xa517298b74c058c7AC8c7614C3c84CC5f1b2a311
+POLICY_REGISTRY=0xf3812133f47cDEa7cfc11E75e0DeAdE149fD7650
+NOX_RECIPIENT_PROXY=0xc8E18A3F8386D00A7095A49eABa0F1265f7dc3F0
 ```
 
 The oracle wallet address must match the `noxOracle` value stored in `NoxGuardModule`. The initial oracle is set to the deployer address at deploy time. To change it: call `NoxGuardModule.setNoxOracle(newOracleAddress)` from the owner wallet.
@@ -369,7 +369,7 @@ NoxPay works with any ERC-20 token and any Sablier V2 LockupLinear stream on Sep
 3. Click **Request Shielded Withdrawal** — emits `ShieldedWithdrawRequested` on-chain
 4. The oracle picks it up within ~30 seconds, decrypts the recipient inside the Nox TEE, verifies `Nox.publicDecrypt` on-chain, calls `sablier.withdrawMax(streamId, recipient)` — tokens land at the decrypted recipient wallet
 
-To verify the proof fired: [Etherscan → NoxRecipientProxy events](https://sepolia.etherscan.io/address/0xd707bE1206c174d4F15f133d1cB27Df3583d6A0b#events) → look for `ShieldedWithdrawExecuted` after your request.
+To verify the proof fired: [Etherscan → NoxRecipientProxy events](https://sepolia.etherscan.io/address/0xc8E18A3F8386D00A7095A49eABa0F1265f7dc3F0#events) → look for `ShieldedWithdrawExecuted` after your request.
 
 **View your streams (Company):**
 

@@ -1,18 +1,18 @@
 {
   "network": "sepolia",
   "chainId": 11155111,
-  "timestamp": "2026-08-01T07:31:28.314Z",
+  "timestamp": "2026-08-01T14:30:15.117Z",
   "deployer": "0x58F96F255286c165B03507C5f4Fa58c64c93fF9a",
   "contracts": {
-    "PolicyRegistry": "0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1",
-    "NoxGuardModule": "0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51",
-    "NoxRecipientProxy": "0xd707bE1206c174d4F15f133d1cB27Df3583d6A0b",
+    "PolicyRegistry": "0xf3812133f47cDEa7cfc11E75e0DeAdE149fD7650",
+    "NoxGuardModule": "0xa517298b74c058c7AC8c7614C3c84CC5f1b2a311",
+    "NoxRecipientProxy": "0xc8E18A3F8386D00A7095A49eABa0F1265f7dc3F0",
     "SablierV2SepoliaLinear": "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301"
   },
   "noxCompute": "0x24Ef36Ec5b626D7DCD09a98F3083c2758F0F77bF",
   "safeSetup": {
     "step1_enableModule": {
-      "data": "0x610b59250000000000000000000000001ba951e0883e5f4afedcdf88b76b8eef34165a51"
+      "data": "0x610b5925000000000000000000000000a517298b74c058c7ac8c7614c3c84cc5f1b2a311"
     }
   }
 }

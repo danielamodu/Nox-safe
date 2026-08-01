@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useAccount, useReadContract } from "wagmi";
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { createPublicClient, http, fallback, isHex } from "viem";
 import { sepolia } from "viem/chains";
 import { motion, AnimatePresence } from "motion/react";
@@ -23,7 +23,7 @@ const drpcClient = createPublicClient({
 const CHUNK = 9_000n;
 const LOOK_BACK = 54_000n; // 6 chunks
 
-const STATUS_LABEL: Record<number, string> = { 0: "Pending", 1: "Executed", 2: "Rejected" };
+const STATUS_LABEL: Record<number, string> = { 0: "Pending", 1: "Executed", 2: "Rejected", 3: "Cancelled" };
 
 function exportCsv(rows: IntentRow[]) {
   const header = "Intent ID,Status,Timestamp,Block,Tx Hash,Etherscan\n";
@@ -68,6 +68,9 @@ function shortId(id: string) {
 export function IntentHistory() {
   const { isConnected } = useAccount();
   const { safeAddress } = useSafe();
+  const { writeContract: cancelWrite, data: cancelTxHash } = useWriteContract();
+  const { isLoading: isCancelling, isSuccess: cancelSuccess } =
+    useWaitForTransactionReceipt({ hash: cancelTxHash });
   const hasSafe = safeAddress.length === 42;
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -178,6 +181,11 @@ export function IntentHistory() {
     return () => clearInterval(id);
   }, [fetchIntents, hasSafe]);
 
+  // Refresh list after a successful cancel
+  useEffect(() => {
+    if (cancelSuccess) fetchIntents();
+  }, [cancelSuccess, fetchIntents]);
+
   const handleLookup = () => {
     if (!isHex(intentId) || intentId.length !== 66) return;
     setLookupId(intentId as `0x${string}`);
@@ -286,6 +294,23 @@ export function IntentHistory() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0 ml-4">
                   <StatusBadge status={row.status} />
+                  {row.status === 0 && row.timestamp > 0 && row.timestamp + 3600 < Math.floor(Date.now() / 1000) && (
+                    <button
+                      onClick={() =>
+                        cancelWrite({
+                          address: ADDRESSES.NoxGuardModule,
+                          abi: MODULE_ABI,
+                          functionName: "cancelIntent",
+                          args: [row.intentId],
+                        })
+                      }
+                      disabled={isCancelling}
+                      title="Cancel this timed-out intent"
+                      className="font-mono text-xs border-2 border-red-500 text-red-600 px-2 py-1 hover:bg-red-50 transition-colors disabled:opacity-40"
+                    >
+                      {isCancelling ? "…" : "Cancel"}
+                    </button>
+                  )}
                   <button
                     onClick={() => {
                       setIntentId(row.intentId);

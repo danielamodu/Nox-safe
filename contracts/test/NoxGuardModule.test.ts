@@ -171,6 +171,49 @@ describe("NoxGuardModule", function () {
     });
   });
 
+  describe("cancelIntent", function () {
+    it("submitter can cancel after 1 hour timeout", async function () {
+      const intentId = await submitAndGetId({ caller: alice });
+
+      // Should revert before 1 hour has passed
+      await expect(
+        module.connect(alice).cancelIntent(intentId)
+      ).to.be.revertedWithCustomError(module, "TooEarlyToCancel");
+
+      // Advance time past the 1-hour lock
+      await time.increase(3601);
+
+      // Non-submitter cannot cancel
+      await expect(
+        module.connect(bob).cancelIntent(intentId)
+      ).to.be.revertedWithCustomError(module, "NotSubmitter");
+
+      // Submitter can cancel
+      await expect(module.connect(alice).cancelIntent(intentId))
+        .to.emit(module, "IntentCancelled")
+        .withArgs(intentId);
+
+      const intent = await module.getIntent(intentId);
+      expect(intent.status).to.equal(3); // Cancelled
+    });
+
+    it("cannot cancel an already-executed intent", async function () {
+      await setActivePolicy();
+      const safeAddr = await mockSafe.getAddress();
+      const intentId = await submitAndGetId({ safe: safeAddr, caller: alice });
+
+      const callValue = ethers.parseEther("0.1");
+      const targetProof = buildTargetProof(TARGET);
+      const valueProof = buildValueProof(callValue);
+      await module.connect(oracle).fulfillIntent(intentId, TARGET, callValue, "0x", targetProof, valueProof);
+
+      await time.increase(3601);
+      await expect(
+        module.connect(alice).cancelIntent(intentId)
+      ).to.be.revertedWithCustomError(module, "IntentNotPending");
+    });
+  });
+
   describe("governance", function () {
     it("owner can update noxOracle", async function () {
       await expect(

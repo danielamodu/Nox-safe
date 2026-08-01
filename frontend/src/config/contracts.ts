@@ -5,9 +5,9 @@ export const CHAIN_ID = 11155111;
 export const PROXY_DEPLOYMENT_BLOCK = 7_700_000n;
 
 export const ADDRESSES = {
-  NoxGuardModule: "0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51" as `0x${string}`,
-  PolicyRegistry: "0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1" as `0x${string}`,
-  NoxRecipientProxy: "0xd707bE1206c174d4F15f133d1cB27Df3583d6A0b" as `0x${string}`,
+  NoxGuardModule: "0xa517298b74c058c7AC8c7614C3c84CC5f1b2a311" as `0x${string}`,
+  PolicyRegistry: "0xf3812133f47cDEa7cfc11E75e0DeAdE149fD7650" as `0x${string}`,
+  NoxRecipientProxy: "0xc8E18A3F8386D00A7095A49eABa0F1265f7dc3F0" as `0x${string}`,
   SablierV2SepoliaLinear: "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301" as `0x${string}`,
 } as const;
 
@@ -55,10 +55,18 @@ export const MODULE_ABI = [
           { name: "targetHandle", type: "bytes32" },
           { name: "valueHandle", type: "bytes32" },
           { name: "dataHash", type: "bytes32" },
+          { name: "submitter", type: "address" },
         ],
       },
     ],
     stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "cancelIntent",
+    inputs: [{ name: "intentId", type: "bytes32" }],
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -112,6 +120,13 @@ export const MODULE_ABI = [
     inputs: [
       { name: "intentId", type: "bytes32", indexed: true },
       { name: "reason", type: "string", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "IntentCancelled",
+    inputs: [
+      { name: "intentId", type: "bytes32", indexed: true },
     ],
   },
 ] as const;
