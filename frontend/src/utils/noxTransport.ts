@@ -1,6 +1,6 @@
 import { custom } from "viem";
 
-const DRPC_URL = "https://sepolia.drpc.org";
+const DRPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
 
 // Sign/account methods go to the wallet; everything else (reads, gas) goes to DRPC.
 const WALLET_METHODS = new Set([

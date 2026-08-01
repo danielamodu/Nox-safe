@@ -20,5 +20,7 @@ export function friendlyError(e: unknown): string {
     return "Nothing has vested yet — wait for the stream to accumulate balance.";
   if (/RequestNotPending/i.test(msg))
     return "This withdrawal request has already been processed.";
-  return "Something went wrong. Please try again.";
+  // Fall back to the raw message so the user sees what actually failed
+  const short = msg.length > 200 ? msg.slice(0, 200) + "…" : msg;
+  return short || "Something went wrong. Please try again.";
 }
