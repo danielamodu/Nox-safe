@@ -407,6 +407,20 @@ In production the oracle is packaged as a Docker image and deployed as an iExec 
 
 ---
 
+## Production Readiness Roadmap
+
+The v1 build proves the privacy primitive works end-to-end on real infrastructure. The items below are the gap between this hackathon MVP and a mainnet-grade deployment.
+
+**1. Full calldata encryption (`externalEbytes` handle).** The current build encrypts target address and ETH value but leaves transaction calldata cleartext — meaning ERC-20 transfers and DeFi calls still leak the encoded recipient in the `IntentSubmitted` event. The fix is a Nox `eBytes` or `euint8[]` handle for arbitrary-length calldata, which would make the entire transaction opaque until oracle fulfillment. No contract interface changes are needed; `submitIntent` gains a third encrypted parameter and the oracle decodes it the same way.
+
+**2. Decentralized K-of-N oracle committee with intent expiry.** A single oracle is a liveness dependency and a trust assumption — if it goes offline, intents pend forever; if its key is compromised, all fulfillment is at risk. The path forward is a threshold oracle committee (e.g. 3-of-5) where each member runs the oracle daemon inside an SGX enclave with remote attestation, and a submitter-triggered expiry window (e.g. 24 hours) that cancels and refunds gas if no quorum is reached. iExec's existing worker pool is the natural substrate for this.
+
+**3. O(1) policy whitelist lookups and multi-asset spend caps.** `PolicyRegistry` currently stores whitelisted targets as a dynamic array, making `isTargetWhitelisted` an O(n) linear scan — acceptable for small whitelists but a gas DoS vector if a Safe whitelists hundreds of addresses. A `mapping(address => mapping(address => bool))` lookup table brings this to O(1). A parallel upgrade would extend spend caps from ETH-only to per-ERC-20-token caps, so a DAO treasury policy can limit USDC outflows independently of ETH outflows.
+
+**4. Gasless EIP-712 relay for anonymous intent submission.** Currently `submitIntent` must be called by the user's own wallet, linking their address to the intent on-chain even though the transaction contents are encrypted. A meta-transaction relay (EIP-712 signed payload, forwarded by a permissionless relayer) would break this link entirely — the submitter's identity never appears in the transaction origin. Combined with full calldata encryption, this closes the last metadata leakage vector and makes the submission phase genuinely unlinkable.
+
+---
+
 ## Feedback
 
 See [feedback.md](./feedback.md) for running notes on the iExec Nox developer experience during this build — submitted as part of the hackathon deliverable.
