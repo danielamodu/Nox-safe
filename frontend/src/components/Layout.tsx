@@ -65,21 +65,28 @@ export function Layout() {
 
   const isAuthPending = isConnecting || isReconnecting;
   const redirectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wasConnected = useRef(false);
 
   useEffect(() => {
-    if (!isConnected && !isAuthPending) {
-      // Debounce: wallet switches briefly drop isConnected before the new
-      // account reconnects. Wait 1 s before redirecting so we don't boot
-      // the user mid-switch and lose their pending-tx wizard state.
-      redirectTimer.current = setTimeout(() => {
-        navigate("/connect?returnTo=/app/safe", { replace: true });
-      }, 1000);
-    } else {
+    if (isConnected) {
+      wasConnected.current = true;
       if (redirectTimer.current) {
         clearTimeout(redirectTimer.current);
         redirectTimer.current = null;
       }
+      return;
     }
+    if (isAuthPending) return;
+
+    // When switching between wallet extensions (e.g. MetaMask → Zerion),
+    // window.ethereum re-registers and wagmi can take 2-3 s to pick up the
+    // new provider. Give it 3 s if the user was already connected this
+    // session; only redirect quickly on a fresh first load (500 ms).
+    const delay = wasConnected.current ? 3000 : 500;
+    redirectTimer.current = setTimeout(() => {
+      navigate("/connect?returnTo=/app/safe", { replace: true });
+    }, delay);
+
     return () => {
       if (redirectTimer.current) clearTimeout(redirectTimer.current);
     };
