@@ -4,6 +4,11 @@
   "iconPath": "favicon.svg",
   "tags": ["privacy", "DeFi", "treasury"],
   "developer": "Nox-Safe",
+  "developerWebsite": "https://noxsafe.website",
+  "socialProfiles": {
+    "github": "https://github.com/danielamodu/Nox-safe",
+    "twitter": "https://x.com/fortyxbt"
+  },
   "networks": [
     { "chainId": 11155111, "entryPoint": "https://noxsafe.website" }
   ]
