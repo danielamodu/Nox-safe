@@ -611,7 +611,7 @@ export function Dashboard() {
       {/* Primary action */}
       <motion.div
         className="card-brutal card-brutal-lg bg-primary dot-pattern cursor-pointer hover:translate-x-0.5 hover:translate-y-0.5 transition-transform"
-        onClick={() => navigate("/app/submit")}
+        onClick={() => navigate("/app/safe/submit")}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.08 }}
@@ -713,11 +713,11 @@ export function Dashboard() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.28 }}
       >
-        <button onClick={() => navigate("/app/history")} className="card-brutal py-4 text-left hover:bg-sage/10 transition-colors">
+        <button onClick={() => navigate("/app/safe/history")} className="card-brutal py-4 text-left hover:bg-sage/10 transition-colors">
           <p className="font-heading font-bold text-sm">Transaction History</p>
           <p className="font-body text-xs text-gray-500 mt-0.5">View your past encrypted transactions</p>
         </button>
-        <button onClick={() => navigate("/app/setup")} className="card-brutal py-4 text-left hover:bg-sage/10 transition-colors">
+        <button onClick={() => navigate("/app/safe/setup")} className="card-brutal py-4 text-left hover:bg-sage/10 transition-colors">
           <p className="font-heading font-bold text-sm">Update Spending Rules</p>
           <p className="font-body text-xs text-gray-500 mt-0.5">Change limits or approved recipients</p>
         </button>

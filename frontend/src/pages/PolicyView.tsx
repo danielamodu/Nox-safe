@@ -171,7 +171,7 @@ export function PolicyView() {
               Use the Setup wizard to propose a new policy — all required owners will be prompted to sign.
             </p>
             <Link
-              to="/app/setup"
+              to="/app/safe/setup"
               className="btn-primary btn-brutal-lg block text-center"
             >
               Update Spending Rules →
