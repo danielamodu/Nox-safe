@@ -59,7 +59,7 @@ export function useSafeSetup(safeAddress: string, address: `0x${string}` | undef
 
     // Proxy: reads go through Alchemy (Zerion's RPC returns 404 for eth_getCode),
     // signing methods go through the connected wallet.
-    const ALCHEMY = import.meta.env.VITE_ALCHEMY_URL;
+    const ALCHEMY = import.meta.env.VITE_ALCHEMY_URL ?? "https://ethereum-sepolia-rpc.publicnode.com";
     const SIGN_METHODS = new Set([
       "eth_accounts", "eth_requestAccounts",
       "eth_sign", "eth_signTransaction", "eth_signTypedData",

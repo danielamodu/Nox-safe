@@ -8,7 +8,6 @@ export const ADDRESSES = {
   NoxGuardModule: "0x1Ba951E0883e5F4AFEdCdF88B76B8EeF34165a51" as `0x${string}`,
   PolicyRegistry: "0x1A86ed6a9739Ae24D089FaC892DeC2f09280Cce1" as `0x${string}`,
   NoxRecipientProxy: "0x1D9f855d88e526745fDb8b04Fe3180a274604172" as `0x${string}`,
-  MockSablierLockup: "0x518B1b36bcfA237c909380D56B6254052b350bb1" as `0x${string}`,
   SablierV2SepoliaLinear: "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301" as `0x${string}`,
 } as const;
 

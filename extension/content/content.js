@@ -5,8 +5,8 @@
   const SEPOLIA_CHAIN_ID = "0xaa36a7"; // 11155111
   const NOX_GATEWAY = "https://gateway-testnets.noxprotocol.dev";
 
-  // keccak256("submitIntent(address,bytes32,bytes32,bytes)").slice(0, 4)
-  const SUBMIT_INTENT_SELECTOR = "0x7b5d186e";
+  // keccak256("submitIntent(address,bytes32,bytes,bytes32,bytes,bytes)").slice(0, 4)
+  const SUBMIT_INTENT_SELECTOR = "0x03009285";
 
   const SHIELD_SVG = `<svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" stroke="currentColor" stroke-width="2.5"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   const STAR_SVG = `<svg width="20" height="20" viewBox="0 0 32 32" fill="none"><path d="M16 2L4 8v8c0 7.4 5.12 14.32 12 16 6.88-1.68 12-8.6 12-16V8L16 2z" fill="#ffe17c" stroke="#ffe17c" stroke-width="1"/><path d="M16 9l1.8 3.6H22l-3.4 2.5 1.3 4L16 16.6 12.1 19.1l1.3-4L10 12.6h4.2L16 9z" fill="#000"/></svg>`;
@@ -62,60 +62,79 @@
     return "0x" + Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
   }
 
-  // ── Nox gateway encryption (one call per field) ──
-  // Calls the Nox TEE gateway directly with solidityType: "uint256".
+  // ── Nox gateway encryption ──
+  // Calls POST /v0/secrets and returns { handle, proof } for a uint256 value.
   // target is passed as BigInt(address) (uint160 packed into uint256).
   // value is passed as wei (uint256).
-  async function encryptUint256(owner, value) {
+  async function encryptForNox(owner, value) {
     const salt = randomHex32();
     const url = `${NOX_GATEWAY}/v0/secrets?chain_id=11155111&salt=${salt}`;
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        value: value.toString(), // decimal string representation of the uint256
+        value: value.toString(),
         solidityType: "uint256",
         applicationContract: NOX_MODULE,
         owner,
       }),
     });
     const json = await res.json();
-    const payload = json?.payload ?? json;
-    const handle = payload?.handle;
+    // Gateway response shape: { data: { handle, proof } } or { payload: { handle, proof } } or flat
+    const data = json?.data ?? json?.payload ?? json;
+    const handle = data?.handle;
+    const proof  = data?.proof;
     if (!handle || !/^0x[0-9a-fA-F]{64}$/.test(handle)) {
-      throw new Error(
-        `Nox gateway error (${res.status}): ${JSON.stringify(json)}`
-      );
+      throw new Error(`Nox gateway error (${res.status}): ${JSON.stringify(json)}`);
     }
-    return handle;
+    if (!proof || !/^0x[0-9a-fA-F]+$/.test(proof)) {
+      throw new Error(`Nox gateway did not return proof: ${JSON.stringify(json)}`);
+    }
+    return { handle, proof };
   }
 
-  // ── Manual ABI encoder for submitIntent(address,bytes32,bytes32,bytes) ──
-  // Layout: selector (4) | safe (32) | targetHandle (32) | valueHandle (32)
-  //         | bytes_offset (32=0xa0) | bytes_length (32) | bytes_data (padded)
-  function buildSubmitIntentCalldata(safe, targetHandle, valueHandle, data) {
-    const safePadded = safe.toLowerCase().replace("0x", "").padStart(64, "0");
-    const targetClean = targetHandle.replace("0x", "");
-    const valueClean = valueHandle.replace("0x", "");
+  // ── ABI helpers ──
 
-    // bytes type: dynamic, offset points past the 4 static slots (4*32=128=0x80)
-    const bytesOffset = (4 * 32).toString(16).padStart(64, "0");
+  // Encode a bytes value: [uint256 length][data padded to 32-byte boundary]
+  function encodeBytes(hex) {
+    const len = hex.length / 2;
+    const lenWord = len.toString(16).padStart(64, "0");
+    const padLen = hex.length === 0 ? 0 : Math.ceil(hex.length / 64) * 64;
+    return lenWord + hex.padEnd(padLen, "0");
+  }
 
-    const dataBytes = data === "0x" ? "" : data.replace("0x", "");
-    const dataLen = (dataBytes.length / 2).toString(16).padStart(64, "0");
-    // Pad data to 32-byte boundary
-    const dataPadded = dataBytes.length === 0
-      ? ""
-      : dataBytes.padEnd(Math.ceil(dataBytes.length / 64) * 64, "0");
+  // ── Manual ABI encoder for submitIntent(address,bytes32,bytes,bytes32,bytes,bytes) ──
+  // Params: safe (address), targetHandle (bytes32), targetProof (bytes),
+  //         valueHandle (bytes32), valueProof (bytes), data (bytes)
+  // Head: 6 × 32 = 192 bytes. Dynamic params (bytes) carry offset pointers.
+  function buildSubmitIntentCalldata(safe, targetHandle, targetProof, valueHandle, valueProof, data) {
+    const safePadded        = safe.toLowerCase().replace("0x", "").padStart(64, "0");
+    const targetHandleClean = targetHandle.replace("0x", "");
+    const valueHandleClean  = valueHandle.replace("0x", "");
+    const targetProofClean  = targetProof.replace("0x", "");
+    const valueProofClean   = valueProof.replace("0x", "");
+    const dataClean         = data === "0x" ? "" : data.replace("0x", "");
+
+    const targetProofEnc = encodeBytes(targetProofClean);
+    const valueProofEnc  = encodeBytes(valueProofClean);
+    const dataEnc        = encodeBytes(dataClean);
+
+    const HEAD = 6 * 32; // 192 = 0xC0
+    const targetProofOffset = HEAD;
+    const valueProofOffset  = HEAD + targetProofEnc.length / 2;
+    const dataOffset        = HEAD + targetProofEnc.length / 2 + valueProofEnc.length / 2;
 
     return (
       SUBMIT_INTENT_SELECTOR +
       safePadded +
-      targetClean +
-      valueClean +
-      bytesOffset +
-      dataLen +
-      dataPadded
+      targetHandleClean +
+      targetProofOffset.toString(16).padStart(64, "0") +
+      valueHandleClean +
+      valueProofOffset.toString(16).padStart(64, "0") +
+      dataOffset.toString(16).padStart(64, "0") +
+      targetProofEnc +
+      valueProofEnc +
+      dataEnc
     );
   }
 
@@ -298,14 +317,16 @@
         })
         .catch(() => {});
 
-      // Encrypt target address as uint256(uint160(address)).
-      const targetUint256 = BigInt(target);
-      const targetHandle = await encryptUint256(owner, targetUint256);
+      // Encrypt target address as uint256(uint160(address)) and ETH value in wei.
+      const [
+        { handle: targetHandle, proof: targetProof },
+        { handle: valueHandle,  proof: valueProof  },
+      ] = await Promise.all([
+        encryptForNox(owner, BigInt(target)),
+        encryptForNox(owner, valueWei),
+      ]);
 
-      // Encrypt ETH value in wei as uint256.
-      const valueHandle = await encryptUint256(owner, valueWei);
-
-      await runSubmit(safe, targetHandle, valueHandle, data, accounts[0]);
+      await runSubmit(safe, targetHandle, targetProof, valueHandle, valueProof, data, accounts[0]);
     } catch (err) {
       showError(err.message || "Encryption failed");
     }
@@ -313,7 +334,7 @@
 
   // ── Step 3: Submit on-chain ──
 
-  async function runSubmit(safe, targetHandle, valueHandle, data, from) {
+  async function runSubmit(safe, targetHandle, targetProof, valueHandle, valueProof, data, from) {
     setContent(`
       ${renderSteps(2)}
       <div style="text-align:center;padding:32px 0;">
@@ -328,8 +349,7 @@
     `);
 
     try {
-      // Build calldata: submitIntent(address safe, bytes32 targetHandle, bytes32 valueHandle, bytes data)
-      const txData = buildSubmitIntentCalldata(safe, targetHandle, valueHandle, data);
+      const txData = buildSubmitIntentCalldata(safe, targetHandle, targetProof, valueHandle, valueProof, data);
 
       const txHash = await window.ethereum.request({
         method: "eth_sendTransaction",
@@ -341,7 +361,11 @@
       if (statusText) statusText.textContent = "Transaction submitted!";
       if (statusSub) statusSub.textContent = "Waiting for confirmation...";
 
-      await waitForReceipt(txHash);
+      const receipt = await waitForReceipt(txHash);
+      if (!receipt) {
+        showError("Timed out waiting for confirmation — check Etherscan for the transaction status.");
+        return;
+      }
       showSuccess(txHash);
     } catch (err) {
       showError(err.message || "Transaction failed");
@@ -555,7 +579,7 @@
     if (existing) {
       // Keep FAB; update href in case user navigated to a different stream
       const link = existing.querySelector("a");
-      if (link) link.href = buildNoxPayUrl("/app/noxpay/withdraw");
+      if (link) link.href = buildNoxPayUrl("/app/noxpay/employee");
       return;
     }
 
@@ -563,7 +587,7 @@
     fab.id = "noxpay-fab";
     fab.className = "noxpay-fab";
     fab.innerHTML = `
-      <a href="${buildNoxPayUrl("/app/noxpay/withdraw")}" target="_blank" rel="noopener noreferrer"
+      <a href="${buildNoxPayUrl("/app/noxpay/employee")}" target="_blank" rel="noopener noreferrer"
          style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;text-decoration:none;color:inherit;">
         <div style="width:28px;height:28px;background:#000;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#8fb88b;">
           ${PAY_SVG}
@@ -597,7 +621,7 @@
     const btn = document.createElement("a");
     btn.id = "noxpay-inject-btn";
     btn.className = "noxpay-inject-btn";
-    btn.href = buildNoxPayUrl("/app/noxpay/withdraw");
+    btn.href = buildNoxPayUrl("/app/noxpay/employee");
     btn.target = "_blank";
     btn.rel = "noopener noreferrer";
     btn.innerHTML = `${PAY_SVG} Pay with NoxPay`;
